@@ -60,7 +60,7 @@ issue = str(payload["number"])
 
 if is_new_contributor(author, stats):
         #collaborators = json.load(urllib2.urlopen(collaborators_url))
-	collaborators = ['jdm', 'lbergstrom', 'metajack', 'SimonSapin', 'kmc']
+	collaborators = ['jdm', 'lbergstrom', 'metajack', 'SimonSapin', 'kmcallister']
         random.seed()
         to_notify = random.choice(collaborators)
         data = {'body': welcome_msg % to_notify}

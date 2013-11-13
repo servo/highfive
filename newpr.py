@@ -23,8 +23,9 @@ collaborators_url = "https://api.github.com/repos/mozilla/servo/collaborators"
 post_comment_url = "https://api.github.com/repos/mozilla/servo/issues/%s/comments"
 
 welcome_msg = "Thanks for the pull request, and welcome! The Servo team is excited to review your changes, and you should hear from @%s (or someone else) soon."
+unsafe_warning_msg = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> These changes modify **unsafe code**. Please review them carefully! <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>'
 
-def api_req(method, url, data, username, token):
+def api_req(method, url, data=None, username=None, token=None):
 	data = json.dumps(data)
 	req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
 	req.get_method = lambda: method
@@ -64,5 +65,11 @@ if is_new_contributor(author, stats):
         random.seed()
         to_notify = random.choice(collaborators)
         data = {'body': welcome_msg % to_notify}
-	result = api_req("POST", post_comment_url % issue, data, user, token)
+        result = api_req("POST", post_comment_url % issue, data, user, token)
 
+diff = api_req("GET", payload["pull_request"]["diff_url"])
+for line in diff.split('\n'):
+    if line.startswith('+') and not line.startswith('+++') and line.find('unsafe') > -1:
+        data = {'body': unsafe_warning_msg}
+        result = api_req("POST", post_comment_url % issue, data, user, token)
+        break

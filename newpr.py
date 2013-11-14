@@ -18,12 +18,14 @@ def is_new_contributor(username, stats):
             return False
     return True
 
-contributors_url = "https://api.github.com/repos/mozilla/servo/stats/contributors"
-collaborators_url = "https://api.github.com/repos/mozilla/servo/collaborators"
-post_comment_url = "https://api.github.com/repos/mozilla/servo/issues/%s/comments"
+contributors_url = "https://api.github.com/repos/%s/%s/stats/contributors"
+collaborators_url = "https://api.github.com/repos/%s/%s/collaborators"
+post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
 
 welcome_msg = "Thanks for the pull request, and welcome! The Servo team is excited to review your changes, and you should hear from @%s (or someone else) soon."
-unsafe_warning_msg = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> These changes modify **unsafe code**. Please review them carefully! <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>'
+warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
+unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
+reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
 
 def api_req(method, url, data=None, username=None, token=None):
 	data = json.dumps(data)
@@ -53,7 +55,9 @@ payload = json.loads(payload_raw)
 if payload["action"] != "opened":
 	sys.exit(0)
 
-stats_raw = api_req("GET", contributors_url, None, user, token)
+owner = payload['pull_request']['repo']['owner']['login']
+repo = payload['pull_request']['repo']['name']
+stats_raw = api_req("GET", contributors_url % (owner, repo), None, user, token)
 stats = json.loads(stats_raw)
 
 author = payload["pull_request"]['user']['login']
@@ -65,11 +69,27 @@ if is_new_contributor(author, stats):
         random.seed()
         to_notify = random.choice(collaborators)
         data = {'body': welcome_msg % to_notify}
-        result = api_req("POST", post_comment_url % issue, data, user, token)
+        result = api_req("POST", post_comment_url % (owner, repo, issue), data, user, token)
 
+warn_unsafe = False
+layout_changed = False
+saw_reftest = False
 diff = api_req("GET", payload["pull_request"]["diff_url"])
 for line in diff.split('\n'):
     if line.startswith('+') and not line.startswith('+++') and line.find('unsafe') > -1:
-        data = {'body': unsafe_warning_msg}
-        result = api_req("POST", post_comment_url % issue, data, user, token)
-        break
+        warn_unsafe = True
+    if line.startswith('diff --git') and line.find('components/main/layout/') > -1:
+        layout_changed = True
+    if line.startswith('diff --git') and line.find('src/test/ref') > -1:
+        saw_reftest = True
+
+warnings = []
+if warn_unsafe:
+    warnings.push(unsafe_warning_msg)
+
+if layout_changed and not saw_reftest:
+    warnings.push(reftest_required_msg)
+
+if warnings:
+    data = {'body': warning_summary % map(lambda x: '* ' + x, warnings).join('\n')}
+    result = api_req("POST", post_comment_url % (owner, repo, issue), data, user, token)

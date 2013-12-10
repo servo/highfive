@@ -26,6 +26,7 @@ welcome_msg = "Thanks for the pull request, and welcome! The Servo team is excit
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
 reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
+smoketest_required_msg = '%s, please confirm that src/test/html/acid1.html and your favourite wikipedia page still render correctly!'
 
 def api_req(method, url, data=None, username=None, token=None, media_type=None):
 	data = None if not data else json.dumps(data)
@@ -99,8 +100,10 @@ warnings = []
 if warn_unsafe:
     warnings += [unsafe_warning_msg]
 
-if layout_changed and not saw_reftest:
-    warnings += [reftest_required_msg]
+if layout_changed:
+    if not saw_reftest:
+        warnings += [reftest_required_msg]
+    warnings += [smoketest_required_msg % author]
 
 if warnings:
     post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)

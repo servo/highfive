@@ -18,7 +18,7 @@ def is_new_contributor(username, stats):
             return False
     return True
 
-contributors_url = "https://api.github.com/repos/%s/%s/contributors"
+contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=400"
 collaborators_url = "https://api.github.com/repos/%s/%s/collaborators"
 post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
 

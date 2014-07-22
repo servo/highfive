@@ -79,7 +79,7 @@ def post_comment(body, owner, repo, issue, user, token):
 
 if is_new_contributor(author, stats):
         #collaborators = json.load(urllib2.urlopen(collaborators_url))
-	collaborators = ['jdm', 'larsbergstrom', 'metajack', 'kmcallister'] if repo == 'servo' and owner == 'mozilla' else ['test_user_selection_ignore_this']
+	collaborators = ['jdm', 'larsbergstrom', 'metajack', 'kmcallister'] if repo == 'servo' and owner == 'servo' else ['test_user_selection_ignore_this']
         random.seed()
         to_notify = random.choice(collaborators)
 	post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)

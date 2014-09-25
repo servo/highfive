@@ -16,6 +16,7 @@ cgitb.enable()
 # contributor will happen early,
 contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=100"
 post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
+issue_url = "https://api.github.com/repos/%s/%s/issues/%s"
 
 welcome_msg = "Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from @%s (or someone else) soon."
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
@@ -47,7 +48,17 @@ def post_comment(body, owner, repo, issue, user, token):
         result = api_req("POST", post_comment_url % (owner, repo, issue), {"body": body}, user, token)['body']
     except urllib2.HTTPError, e:
         if e.code == 201:
-                pass
+            pass
+        else:
+            raise e
+
+def set_assignee(assignee, owner, repo, issue, user, token):
+    global issue_url
+    try:
+        result = api_req("PATCH", issue_url % (owner, repo, issue), {"assignee": assignee}, user, token)['body']
+    except urllib2.HTTPError, e:
+        if e.code == 201:
+            pass
         else:
             raise e
 
@@ -122,6 +133,7 @@ if is_new_contributor(author, owner, repo, user, token):
     random.seed()
     to_notify = random.choice(collaborators)
     post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)
+    set_assignee(to_notify, owner, repo, issue, user, token)
 
 warn_unsafe = False
 diff = api_req("GET", payload["pull_request"]["diff_url"])['body']

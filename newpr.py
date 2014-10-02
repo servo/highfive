@@ -150,15 +150,16 @@ else:
     if reviewer:
         set_assignee(reviewer, owner, repo, issue, user, token)
 
-warn_unsafe = False
-diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
-for line in diff.split('\n'):
-    if line.startswith('+') and not line.startswith('+++') and line.find('unsafe') > -1:
-        warn_unsafe = True
+# This seems to be buggy, disabling for now
+#warn_unsafe = False
+#diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
+#for line in diff.split('\n'):
+#    if line.startswith('+') and not line.startswith('+++') and line.find('unsafe') > -1:
+#        warn_unsafe = True
 
 warnings = []
-if warn_unsafe:
-    warnings += [unsafe_warning_msg]
+#if warn_unsafe:
+#    warnings += [unsafe_warning_msg]
 
 if warnings:
     post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)

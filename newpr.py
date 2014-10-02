@@ -10,6 +10,8 @@ import sys
 import ConfigParser
 from StringIO import StringIO
 import gzip
+import re
+
 cgitb.enable()
 
 # Maximum per page is 100. Sorted by number of commits, so most of the time the
@@ -21,6 +23,8 @@ issue_url = "https://api.github.com/repos/%s/%s/issues/%s"
 welcome_msg = "Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from @%s (or someone else) soon."
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
+
+reviewer_re = re.compile("[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 
 
 def api_req(method, url, data=None, username=None, token=None, media_type=None):
@@ -106,6 +110,12 @@ def is_new_contributor(username, owner, repo, user, token):
             return True
         url = links['next']
 
+# If the user specified a reviewer, return the username, otherwise returns None.
+def find_reviewer(commit_msg):
+    match = reviewer_re.search(commit_msg)
+    if not match:
+        return None
+    return match.group(1)
 
 
 print "Content-Type: text/html;charset=utf-8"
@@ -134,6 +144,11 @@ if is_new_contributor(author, owner, repo, user, token):
     to_notify = random.choice(collaborators)
     post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)
     set_assignee(to_notify, owner, repo, issue, user, token)
+else:
+    msg = payload["pull_request"]['body']
+    reviewer = find_reviewer(msg)
+    if reviewer:
+        set_assignee(reviewer, owner, repo, issue, user, token)
 
 warn_unsafe = False
 diff = api_req("GET", payload["pull_request"]["diff_url"])['body']

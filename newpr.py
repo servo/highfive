@@ -25,6 +25,7 @@ warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warni
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
 
 reviewer_re = re.compile("[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
+unsafe_re = re.compile("\\bunsafe\\b|#!?\\[unsafe_")
 
 
 def api_req(method, url, data=None, username=None, token=None, media_type=None):
@@ -117,6 +118,19 @@ def find_reviewer(commit_msg):
         return None
     return match.group(1)
 
+def modifies_unsafe(diff):
+    in_rust_code = False
+    for line in diff.split('\n'):
+        if line.startswith("diff --git "):
+            in_rust_code = line[-3:] == ".rs"
+            continue
+        if not in_rust_code:
+            continue
+        if (not line.startswith('+') or line.startswith('+++')) and not line.startswith("@@ "):
+            continue
+        if unsafe_re.search(line):
+            return True
+    return False
 
 print "Content-Type: text/html;charset=utf-8"
 print
@@ -150,16 +164,11 @@ else:
     if reviewer:
         set_assignee(reviewer, owner, repo, issue, user, token)
 
-# This seems to be buggy, disabling for now
-#warn_unsafe = False
-#diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
-#for line in diff.split('\n'):
-#    if line.startswith('+') and not line.startswith('+++') and line.find('unsafe') > -1:
-#        warn_unsafe = True
+diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
 
 warnings = []
-#if warn_unsafe:
-#    warnings += [unsafe_warning_msg]
+if modifies_unsafe(diff):
+    warnings += [unsafe_warning_msg]
 
 if warnings:
     post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)

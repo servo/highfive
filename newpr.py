@@ -122,7 +122,7 @@ def modifies_unsafe(diff):
     in_rust_code = False
     for line in diff.split('\n'):
         if line.startswith("diff --git "):
-            in_rust_code = line[-3:] == ".rs"
+            in_rust_code = line[-3:] == ".rs" and line.find(" b/src/test/") == -1
             continue
         if not in_rust_code:
             continue

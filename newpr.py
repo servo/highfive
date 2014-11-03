@@ -11,6 +11,8 @@ import ConfigParser
 from StringIO import StringIO
 import gzip
 import re
+import time
+import socket
 
 cgitb.enable()
 
@@ -27,6 +29,50 @@ unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it car
 reviewer_re = re.compile("[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 unsafe_re = re.compile("\\bunsafe\\b|#!?\\[unsafe_")
 
+rustaceans_api_url = "http://www.ncameron.org/rustaceans/user?username={username}"
+
+
+class IrcClient(object):
+    """ A simple IRC client to send a message and then leave.
+    the calls to `time.sleep` are so the socket has time to recognize
+    responses from the IRC protocol
+    """
+    def __init__(self, target, nick="rust-highfive", should_join=False):
+        self.target = target
+        self.nick = nick
+        self.should_join = should_join
+        self.ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.ircsock.connect(("irc.mozilla.org", 6667))
+        self.ircsock.send("USER {0} {0} {0} :alert bot!\r\n".format(self.nick))
+        self.ircsock.send("NICK {}\r\n".format(self.nick))
+        time.sleep(2)
+
+    def join(self):
+        self.ircsock.send("JOIN {}\r\n".format(self.target))
+
+    def send(self, msg):
+        start = time.time()
+        while True:
+            if time.time() - start > 5:
+                print("Timeout! EXITING")
+                return
+            ircmsg = self.ircsock.recv(2048).strip()
+            #if ircmsg: print(ircmsg)
+
+            if ircmsg.find(self.nick + " +x") != -1:
+                self.ircsock.send("PRIVMSG {} :{}\r\n".format(self.target, msg))
+                return
+
+    def quit(self):
+        self.ircsock.send("QUIT :bot out\r\n")
+
+    def send_then_quit(self, msg):
+        if should_join:
+            self.join()
+        time.sleep(2)
+        self.send(msg)
+        time.sleep(3)
+        self.quit()
 
 def api_req(method, url, data=None, username=None, token=None, media_type=None):
     data = None if not data else json.dumps(data)
@@ -132,6 +178,19 @@ def modifies_unsafe(diff):
             return True
     return False
 
+def get_irc_nick(gh_name):
+    """ returns None if the request status code is not 200,
+     if the user does not exist on the rustacean database,
+     or if the user has no `irc` field associated with their username
+    """
+    data = urllib2.urlopen(rustaceans_api_url.format(username=gh_name))
+    if data.getcode() == 200:
+        rustacean_data = json.loads(data.read())
+        if rustacean_data:
+            return rustacean_data[0].get("irc")
+    return None
+
+
 print "Content-Type: text/html;charset=utf-8"
 print
 
@@ -173,3 +232,9 @@ if modifies_unsafe(diff):
 if warnings:
     post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)
 
+if reviewer:
+    irc_name_of_reviewer = get_irc_nick(reviewer)
+    if irc_name_of_reviewer:
+        client = IrcClient(target="#rust-bots")
+        client.send_then_quit("{}: ping to review issue https://www.github.com/rust-lang/rust/pull/{} by {}. Have a nice day!"
+            .format(get_irc_nick(reviewer), issue, author))

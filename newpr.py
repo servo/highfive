@@ -164,19 +164,19 @@ def find_reviewer(commit_msg):
         return None
     return match.group(1)
 
-def modifies_unsafe(diff):
-    in_rust_code = False
-    for line in diff.split('\n'):
-        if line.startswith("diff --git "):
-            in_rust_code = line[-3:] == ".rs" and line.find(" b/src/test/") == -1
-            continue
-        if not in_rust_code:
-            continue
-        if (not line.startswith('+') or line.startswith('+++')) and not line.startswith("@@ "):
-            continue
-        if unsafe_re.search(line):
-            return True
-    return False
+#def modifies_unsafe(diff):
+#    in_rust_code = False
+#    for line in diff.split('\n'):
+#        if line.startswith("diff --git "):
+#            in_rust_code = line[-3:] == ".rs" and line.find(" b/src/test/") == -1
+#            continue
+#        if not in_rust_code:
+#            continue
+#        if (not line.startswith('+') or line.startswith('+++')) and not line.startswith("@@ "):
+#            continue
+#        if unsafe_re.search(line):
+#            return True
+#    return False
 
 def get_irc_nick(gh_name):
     """ returns None if the request status code is not 200,
@@ -226,8 +226,9 @@ else:
 diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
 
 warnings = []
-if modifies_unsafe(diff):
-    warnings += [unsafe_warning_msg]
+# Lets not check unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.
+#if modifies_unsafe(diff):
+#    warnings += [unsafe_warning_msg]
 
 if warnings:
     post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)

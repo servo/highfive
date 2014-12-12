@@ -79,6 +79,7 @@ class IrcClient(object):
         time.sleep(3)
         self.quit()
 
+
 def api_req(method, url, data=None, username=None, token=None, media_type=None):
     data = None if not data else json.dumps(data)
     headers = {} if not data else {'Content-Type': 'application/json'}
@@ -149,7 +150,6 @@ def is_new_contributor(username, owner, repo, user, token):
     # iterate through the pages to try and find the contributor
     url = contributors_url % (owner, repo)
     while True:
-        print 'looking for contribs on ' + url
         stats_raw = api_req("GET", url, None, user, token)
         stats = json.loads(stats_raw['body'])
         links = parse_header_links(stats_raw['header'].get('Link'))
@@ -196,6 +196,62 @@ def get_irc_nick(gh_name):
     return None
 
 
+def new_pr(payload, user, token):
+    owner = payload['pull_request']['base']['repo']['owner']['login']
+    repo = payload['pull_request']['base']['repo']['name']
+
+    author = payload["pull_request"]['user']['login']
+    issue = str(payload["number"])
+
+    if is_new_contributor(author, owner, repo, user, token):
+        collaborators = ['brson', 'nikomatsakis', 'pcwalton', 'alexcrichton', 'aturon', 'huonw'] if repo == 'rust' and owner == 'rust-lang' else ['test_user_selection_ignore_this']
+        random.seed()
+        to_notify = random.choice(collaborators)
+        post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)
+        set_assignee(to_notify, owner, repo, issue, user, token)
+    else:
+        msg = payload["pull_request"]['body']
+        reviewer = find_reviewer(msg)
+        if reviewer:
+            set_assignee(reviewer, owner, repo, issue, user, token)
+
+    diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
+
+    warnings = []
+    # Lets not check unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.
+    #if modifies_unsafe(diff):
+    #    warnings += [unsafe_warning_msg]
+
+    if warnings:
+        post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)
+
+    if reviewer:
+        irc_name_of_reviewer = get_irc_nick(reviewer)
+        if irc_name_of_reviewer:
+            client = IrcClient(target="#rust-bots")
+            client.send_then_quit("{}: ping to review issue https://www.github.com/rust-lang/rust/pull/{} by {}."
+                .format(get_irc_nick(reviewer), issue, author))
+
+
+def new_comment(payload, user, token):
+    # Check the issue is a PR and is open.
+    if payload['issue']['state'] != 'open' or 'pull_request' not in payload['issue']:
+        return
+
+    # Check the commenter is the submitter of the PR.
+    if payload['issue']['user']['login'] != payload['comment']['user']['login']:
+        return
+
+    # Check for r? and set the assignee.
+    msg = payload["comment"]['body']
+    reviewer = find_reviewer(msg)
+    if reviewer:
+        owner = payload['repository']['owner']['login']
+        repo = payload['repository']['name']
+        issue = str(payload['issue']['number'])
+        set_assignee(reviewer, owner, repo, issue, user, token)
+
+
 print "Content-Type: text/html;charset=utf-8"
 print
 
@@ -207,40 +263,10 @@ token = config.get('github', 'token')
 post = cgi.FieldStorage()
 payload_raw = post.getfirst("payload",'')
 payload = json.loads(payload_raw)
-if payload["action"] != "opened":
-    sys.exit(0)
-
-owner = payload['pull_request']['base']['repo']['owner']['login']
-repo = payload['pull_request']['base']['repo']['name']
-
-author = payload["pull_request"]['user']['login']
-issue = str(payload["number"])
-
-if is_new_contributor(author, owner, repo, user, token):
-    collaborators = ['brson', 'nikomatsakis', 'pcwalton', 'alexcrichton', 'aturon', 'huonw'] if repo == 'rust' and owner == 'rust-lang' else ['test_user_selection_ignore_this']
-    random.seed()
-    to_notify = random.choice(collaborators)
-    post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)
-    set_assignee(to_notify, owner, repo, issue, user, token)
+if payload["action"] == "opened":
+    new_pr(payload, user, token)
+elif payload["action"] == "created":
+    new_comment(payload, user, token)
 else:
-    msg = payload["pull_request"]['body']
-    reviewer = find_reviewer(msg)
-    if reviewer:
-        set_assignee(reviewer, owner, repo, issue, user, token)
-
-diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
-
-warnings = []
-# Lets not check unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.
-#if modifies_unsafe(diff):
-#    warnings += [unsafe_warning_msg]
-
-if warnings:
-    post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)
-
-if reviewer:
-    irc_name_of_reviewer = get_irc_nick(reviewer)
-    if irc_name_of_reviewer:
-        client = IrcClient(target="#rust-bots")
-        client.send_then_quit("{}: ping to review issue https://www.github.com/rust-lang/rust/pull/{} by {}. Have a nice day!"
-            .format(get_irc_nick(reviewer), issue, author))
+    print payload["action"]
+    sys.exit(0)

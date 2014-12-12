@@ -22,8 +22,7 @@ contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=100
 post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
 issue_url = "https://api.github.com/repos/%s/%s/issues/%s"
 
-welcome_msg = "Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from @%s (or someone else) soon."
- = """Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from @%s (or someone else) soon.
+welcome_msg = """Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from @%s (or someone else) soon.
 
 If any changes to this PR are deemed necessary, please add them as extra commits. This ensures that the reviewer can see what has changed since they last reviewed the code. The way Github handles out-of-date commits, this should also make it reasonably obvious what issues have or haven't been addressed. Large or tricky changes may require several passes of review and changes.
 

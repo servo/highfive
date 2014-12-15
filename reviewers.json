@@ -1,6 +1,6 @@
 {
     "groups": {
-        "all": ["@brson", "@pcwalton", "@nikomatsakis", "@alexcrichton", "@huon"],
+        "all": ["@brson", "@pcwalton", "@nikomatsakis", "@alexcrichton", "@huonw"],
         "compiler": ["@pnkfelix", "@nick29581", "@luqmana", "@eddyb"],
         "syntax": ["@pnkfelix", "@nick29581", "@sfackler", "@kmc"],
         "libs": ["@aturon"]

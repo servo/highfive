@@ -275,6 +275,7 @@ def new_pr(payload, user, token):
 
     author = payload["pull_request"]['user']['login']
     issue = str(payload["number"])
+    diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
 
     msg = payload["pull_request"]['body']
     reviewer = find_reviewer(msg)

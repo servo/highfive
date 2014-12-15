@@ -30,6 +30,7 @@ Please see [CONTRIBUTING.md](https://github.com/rust-lang/rust/blob/master/CONTR
 """
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
+review_msg = 'r? @%s\n\n(rust_highfive has picked a reviewer for you, use r? to override)'
 
 reviewer_re = re.compile("[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 unsafe_re = re.compile("\\bunsafe\\b|#!?\\[unsafe_")
@@ -274,20 +275,22 @@ def new_pr(payload, user, token):
 
     author = payload["pull_request"]['user']['login']
     issue = str(payload["number"])
-    diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
+
+    msg = payload["pull_request"]['body']
+    reviewer = find_reviewer(msg)
+    if not reviewer:
+        diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
+        reviewer = choose_reviewer(repo, owner, diff, author)
+
+    set_assignee(reviewer, owner, repo, issue, user, token)
 
     if is_new_contributor(author, owner, repo, user, token):
-        to_notify = choose_reviewer(repo, owner, diff, author)
-        post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)
-        set_assignee(to_notify, owner, repo, issue, user, token)
+        post_comment(welcome_msg % reviewer, owner, repo, issue, user, token)
     else:
-        msg = payload["pull_request"]['body']
-        reviewer = find_reviewer(msg)
-        if reviewer:
-            set_assignee(reviewer, owner, repo, issue, user, token)
+        post_comment(review_msg % reviewer, owner, repo, issue, user, token)
 
     warnings = []
-    # Lets not check unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.
+    # Lets not check for unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.
     #if modifies_unsafe(diff):
     #    warnings += [unsafe_warning_msg]
 

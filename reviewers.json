@@ -1,0 +1,42 @@
+{
+    "groups": {
+        "all": ["@brson", "@pcwalton", "@nikomatsakis", "@alexcrichton", "@huon"],
+        "compiler": ["@pnkfelix", "@nick29581", "@luqmana", "@eddyb"],
+        "syntax": ["@pnkfelix", "@nick29581", "@sfackler", "@kmc"],
+        "libs": ["@aturon"]
+    },
+    "dirs": {
+        "doc":              ["@steveklabnik"],
+        "jemalloc":         ["@thestinger"],
+        "liballoc":         ["libs"],
+        "libarena":         ["libs"],
+        "libbacktrace":     [],
+        "libcollections":   ["libs"],
+        "libcore":          ["libs"],
+        "libcoretest":      ["libs"],
+        "libflate":         ["libs"],
+        "libfmt_macros":    ["libs"],
+        "libfourcc":        ["libs"],
+        "libgetopts":       ["libs"],
+        "libgraphviz":      ["@pnkfelix"],
+        "liblibc":          ["libs"],
+        "liblint":          ["syntax"],
+        "liblog":           ["libs", "@nrc"],
+        "libnative":        ["libs"],
+        "librand":          ["libs"],
+        "librbml":          ["libs", "@erikt"],
+        "libregex":         ["libs", "@burntsushi"],
+        "libregex_macros":  ["libs", "@burntsushi"],
+        "librustc":         ["compiler"],
+        "librustdoc":       [],
+        "librustrt":        ["libs"],
+        "libserialize":     ["libs", "@erikt"],
+        "libstd":           ["libs"],
+        "libsyntax":        ["syntax"],
+        "libterm":          ["libs"],
+        "libtest":          ["libs"],
+        "libtime":          ["libs"],
+        "libunicode":       ["libs"],
+        "libuv":            ["libs"]
+    }
+}

@@ -169,6 +169,78 @@ def find_reviewer(commit_msg):
         return None
     return match.group(1)
 
+# Choose a reviewer for the PR
+def choose_reviewer(repo, owner, diff, exclude):
+    if repo != 'rust' or owner != 'rust-lang':
+        return 'test_user_selection_ignore_this'
+
+    # Inspect the diff to find the directory (under src) with the most additions.
+    counts = {}
+    cur_dir = None
+    for line in diff.split('\n'):
+        if line.startswith("diff --git "):
+            # update cur_dir
+            cur_dir = None
+            start = line.find(" b/src/") + len(" b/src/")
+            if start == -1:
+                continue
+            end = line.find("/", start)
+            if end == -1:
+                continue
+
+            cur_dir = line[start:end]
+
+            # A few heuristics to get better reviewers
+            if cur_dir.startswith('librustc'):
+                cur_dir = 'librustc'
+            if cur_dir == 'test':
+                cur_dir = None
+            if cur_dir and cur_dir not in counts:
+                counts[cur_dir] = 0
+            continue
+
+        if cur_dir and (not line.startswith('+++')) and line.startswith('+'):
+            counts[cur_dir] += 1
+
+    # Find the largest count.
+    most_changed = None
+    most_changes = 0
+    for dir, changes in counts.iteritems():
+        if changes > most_changes:
+            most_changes = changes
+            most_changed = dir
+
+    # Get JSON data on reviewers.
+    rf = open('reviewers.json')
+    reviewers = json.load(rf)
+    rf.close()
+    dirs = reviewers['dirs']
+    groups = reviewers['groups']
+
+    # lookup that directory in the json file to find the potential reviewers
+    potential = []
+    if most_changed and most_changed in dirs:
+        potential = dirs[most_changed]
+
+    # expand the reviewers list by group
+    reviewers = []
+    for p in potential:
+        if p.startswith('@'):
+            reviewers.append(p)
+        elif p in groups:
+            reviewers.extend(groups[p])
+    reviewers.extend(groups['all'])
+
+    # remove the '@' prefix from each username
+    reviewers = map(lambda r: r[1:], reviewers)
+
+    if exclude in reviewers:
+        reviewers.remove(exclude)
+
+    random.seed()
+    return random.choice(reviewers)
+
+
 #def modifies_unsafe(diff):
 #    in_rust_code = False
 #    for line in diff.split('\n'):
@@ -202,20 +274,16 @@ def new_pr(payload, user, token):
 
     author = payload["pull_request"]['user']['login']
     issue = str(payload["number"])
+    diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
 
     if is_new_contributor(author, owner, repo, user, token):
-        collaborators = ['brson', 'nikomatsakis', 'pcwalton', 'alexcrichton', 'aturon', 'huonw'] if repo == 'rust' and owner == 'rust-lang' else ['test_user_selection_ignore_this']
-        random.seed()
-        to_notify = random.choice(collaborators)
         post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)
-        set_assignee(to_notify, owner, repo, issue, user, token)
+        set_assignee(choose_reviewer(repo, owner, diff, author), owner, repo, issue, user, token)
     else:
         msg = payload["pull_request"]['body']
         reviewer = find_reviewer(msg)
         if reviewer:
             set_assignee(reviewer, owner, repo, issue, user, token)
-
-    diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
 
     warnings = []
     # Lets not check unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.

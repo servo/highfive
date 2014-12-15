@@ -279,7 +279,9 @@ def new_pr(payload, user, token):
 
     msg = payload["pull_request"]['body']
     reviewer = find_reviewer(msg)
+    post_msg = false
     if not reviewer:
+        post_msg = true
         diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
         reviewer = choose_reviewer(repo, owner, diff, author)
 
@@ -287,7 +289,7 @@ def new_pr(payload, user, token):
 
     if is_new_contributor(author, owner, repo, user, token):
         post_comment(welcome_msg % reviewer, owner, repo, issue, user, token)
-    else:
+    elif post_msg:
         post_comment(review_msg % reviewer, owner, repo, issue, user, token)
 
     warnings = []

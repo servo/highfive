@@ -111,6 +111,8 @@ def post_comment(body, owner, repo, issue, user, token):
             raise e
 
 def set_assignee(assignee, owner, repo, issue, user, token):
+    # TODO debugging code, remove me
+    print "setting assignee", assignee
     global issue_url
     try:
         result = api_req("PATCH", issue_url % (owner, repo, issue), {"assignee": assignee}, user, token)['body']

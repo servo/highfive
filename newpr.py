@@ -279,9 +279,9 @@ def new_pr(payload, user, token):
 
     msg = payload["pull_request"]['body']
     reviewer = find_reviewer(msg)
-    post_msg = false
+    post_msg = False
     if not reviewer:
-        post_msg = true
+        post_msg = True
         diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
         reviewer = choose_reviewer(repo, owner, diff, author)
 

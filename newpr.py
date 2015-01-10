@@ -172,47 +172,48 @@ def find_reviewer(commit_msg):
 
 # Choose a reviewer for the PR
 def choose_reviewer(repo, owner, diff, exclude):
-    if repo != 'rust' or owner != 'rust-lang':
+    if owner != 'rust-lang':
         return 'test_user_selection_ignore_this'
 
-    # Inspect the diff to find the directory (under src) with the most additions.
-    counts = {}
-    cur_dir = None
-    for line in diff.split('\n'):
-        if line.startswith("diff --git "):
-            # update cur_dir
-            cur_dir = None
-            start = line.find(" b/src/") + len(" b/src/")
-            if start == -1:
-                continue
-            end = line.find("/", start)
-            if end == -1:
-                continue
-
-            cur_dir = line[start:end]
-
-            # A few heuristics to get better reviewers
-            if cur_dir.startswith('librustc'):
-                cur_dir = 'librustc'
-            if cur_dir == 'test':
-                cur_dir = None
-            if cur_dir and cur_dir not in counts:
-                counts[cur_dir] = 0
-            continue
-
-        if cur_dir and (not line.startswith('+++')) and line.startswith('+'):
-            counts[cur_dir] += 1
-
-    # Find the largest count.
     most_changed = None
-    most_changes = 0
-    for dir, changes in counts.iteritems():
-        if changes > most_changes:
-            most_changes = changes
-            most_changed = dir
+    # Inspect the diff to find the directory (under src) with the most additions.
+    if repo == 'rust':
+        counts = {}
+        cur_dir = None
+        for line in diff.split('\n'):
+            if line.startswith("diff --git "):
+                # update cur_dir
+                cur_dir = None
+                start = line.find(" b/src/") + len(" b/src/")
+                if start == -1:
+                    continue
+                end = line.find("/", start)
+                if end == -1:
+                    continue
+
+                cur_dir = line[start:end]
+
+                # A few heuristics to get better reviewers
+                if cur_dir.startswith('librustc'):
+                    cur_dir = 'librustc'
+                if cur_dir == 'test':
+                    cur_dir = None
+                if cur_dir and cur_dir not in counts:
+                    counts[cur_dir] = 0
+                continue
+
+            if cur_dir and (not line.startswith('+++')) and line.startswith('+'):
+                counts[cur_dir] += 1
+
+        # Find the largest count.
+        most_changes = 0
+        for dir, changes in counts.iteritems():
+            if changes > most_changes:
+                most_changes = changes
+                most_changed = dir
 
     # Get JSON data on reviewers.
-    rf = open('reviewers.json')
+    rf = open(repo + '.json')
     reviewers = json.load(rf)
     rf.close()
     dirs = reviewers['dirs']

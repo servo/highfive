@@ -219,6 +219,14 @@ def choose_reviewer(repo, owner, diff, exclude):
     dirs = reviewers['dirs']
     groups = reviewers['groups']
 
+    # fill in the default groups, ensuring that overwriting is an
+    # error.
+    with open('global.json') as gf:
+        global_ = json.load(gf)
+    for name, people in global_['groups']:
+        assert name not in groups, "group %s overlaps with global.json" % name
+        groups[name] = people
+
     # lookup that directory in the json file to find the potential reviewers
     potential = []
     if most_changed and most_changed in dirs:

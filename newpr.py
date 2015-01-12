@@ -213,9 +213,8 @@ def choose_reviewer(repo, owner, diff, exclude):
                 most_changed = dir
 
     # Get JSON data on reviewers.
-    rf = open(repo + '.json')
-    reviewers = json.load(rf)
-    rf.close()
+    with open(repo + '.json') as rf:
+        reviewers = json.load(rf)
     dirs = reviewers['dirs']
     groups = reviewers['groups']
 
@@ -228,21 +227,24 @@ def choose_reviewer(repo, owner, diff, exclude):
         groups[name] = people
 
     # lookup that directory in the json file to find the potential reviewers
-    potential = []
+    potential = groups['all']
     if most_changed and most_changed in dirs:
-        potential = dirs[most_changed]
+        potential.extend(dirs[most_changed])
 
     # expand the reviewers list by group
     reviewers = []
-    for p in potential:
+    seen = {"all"}
+    while potential:
+        p = potential.pop()
         if p.startswith('@'):
-            reviewers.append(p)
+            # remove the '@' prefix from each username
+            reviewers.append(p[1:])
         elif p in groups:
-            reviewers.extend(groups[p])
-    reviewers.extend(groups['all'])
-
-    # remove the '@' prefix from each username
-    reviewers = map(lambda r: r[1:], reviewers)
+            # avoid infinite loops
+            assert p not in seen, "group %s refers to itself" % p
+            seen.add(p)
+            # we allow groups in groups, so they need to be queue to be resolved
+            potential.extend(groups[p])
 
     if exclude in reviewers:
         reviewers.remove(exclude)

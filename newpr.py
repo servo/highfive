@@ -220,7 +220,7 @@ def choose_reviewer(repo, owner, diff, exclude):
 
     # fill in the default groups, ensuring that overwriting is an
     # error.
-    with open('global.json') as gf:
+    with open('_global.json') as gf:
         global_ = json.load(gf)
     for name, people in global_['groups']:
         assert name not in groups, "group %s overlaps with global.json" % name

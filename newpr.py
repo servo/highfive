@@ -337,12 +337,16 @@ def new_comment(payload, user, token):
     if payload['issue']['state'] != 'open' or 'pull_request' not in payload['issue']:
         return
 
+    commenter = payload['comment']['user']['login']
+    # Ignore our own comments.
+    if commenter == user:
+        return
+
     owner = payload['repository']['owner']['login']
     repo = payload['repository']['name']
 
     # Check the commenter is the submitter of the PR or the previous assignee.
     author = payload["issue"]['user']['login']
-    commenter = payload['comment']['user']['login']
     if not (author == commenter or (payload['issue']['assignee'] and commenter == payload['issue']['assignee']['login'])):
         # Get collaborators for this repo and check if the commenter is one of them
         if commenter not in get_collaborators(owner, repo, user, token):

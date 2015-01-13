@@ -30,6 +30,6 @@
         "libsyntax":        ["syntax"],
         "libterm":          ["libs"],
         "libtest":          ["libs"],
-        "libunicode":       ["libs"],
+        "libunicode":       ["libs"]
     }
 }

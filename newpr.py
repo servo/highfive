@@ -222,14 +222,17 @@ def choose_reviewer(repo, owner, diff, exclude):
     # error.
     with open('_global.json') as gf:
         global_ = json.load(gf)
-    for name, people in global_['groups']:
-        assert name not in groups, "group %s overlaps with global.json" % name
+    for name, people in global_['groups'].iteritems():
+        assert name not in groups, "group %s overlaps with _global.json" % name
         groups[name] = people
 
+    print "groups:", groups
     # lookup that directory in the json file to find the potential reviewers
     potential = groups['all']
     if most_changed and most_changed in dirs:
         potential.extend(dirs[most_changed])
+
+    print "initial potential:", potential
 
     # expand the reviewers list by group
     reviewers = []
@@ -243,9 +246,10 @@ def choose_reviewer(repo, owner, diff, exclude):
             # avoid infinite loops
             assert p not in seen, "group %s refers to itself" % p
             seen.add(p)
-            # we allow groups in groups, so they need to be queue to be resolved
+            # we allow groups in groups, so they need to be queued to be resolved
             potential.extend(groups[p])
 
+    print "reviewers:", reviewers
     if exclude in reviewers:
         reviewers.remove(exclude)
 

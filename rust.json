@@ -1,0 +1,35 @@
+{
+    "groups": {
+        "all": ["core"],
+        "compiler": ["@pnkfelix", "@nick29581", "@luqmana", "@eddyb"],
+        "syntax": ["@pnkfelix", "@nick29581", "@sfackler", "@kmc"],
+        "libs": ["@aturon"]
+    },
+    "dirs": {
+        "doc":              ["@steveklabnik"],
+        "jemalloc":         ["@thestinger"],
+        "liballoc":         ["libs"],
+        "libarena":         ["libs"],
+        "libbacktrace":     [],
+        "libcollections":   ["libs", "@Gankro"],
+        "libcore":          ["libs"],
+        "libcoretest":      ["libs"],
+        "libflate":         ["libs"],
+        "libfmt_macros":    ["libs"],
+        "libgetopts":       ["libs"],
+        "libgraphviz":      ["@pnkfelix"],
+        "liblibc":          ["libs"],
+        "liblog":           ["libs", "@nick29581"],
+        "librand":          ["libs"],
+        "librbml":          ["libs", "@erickt"],
+        "libregex":         ["libs", "@burntsushi"],
+        "librustc":         ["compiler"],
+        "librustdoc":       ["@cmr"],
+        "libserialize":     ["libs", "@erickt"],
+        "libstd":           ["libs"],
+        "libsyntax":        ["syntax"],
+        "libterm":          ["libs"],
+        "libtest":          ["libs"],
+        "libunicode":       ["libs"]
+    }
+}

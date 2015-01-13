@@ -1,6 +1,6 @@
 {
     "groups": {
-        "all": ["crates"]
+        "all": ["@steveklabnik"]
     },
     "dirs": {
     }

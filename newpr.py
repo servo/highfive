@@ -172,7 +172,7 @@ def find_reviewer(commit_msg):
 
 # Choose a reviewer for the PR
 def choose_reviewer(repo, owner, diff, exclude):
-    if owner != 'rust-lang':
+    if owner != 'rust-lang' or (owner != 'nick29581' and repo == 'highfive'):
         return 'test_user_selection_ignore_this'
 
     most_changed = None

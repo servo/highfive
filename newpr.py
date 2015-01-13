@@ -73,7 +73,7 @@ class IrcClient(object):
         self.ircsock.send("QUIT :bot out\r\n")
 
     def send_then_quit(self, msg):
-        if should_join:
+        if self.should_join:
             self.join()
         time.sleep(2)
         self.send(msg)
@@ -110,7 +110,7 @@ def post_comment(body, owner, repo, issue, user, token):
         else:
             raise e
 
-def set_assignee(assignee, owner, repo, issue, user, token):
+def set_assignee(assignee, owner, repo, issue, user, token, author):
     global issue_url
     try:
         result = api_req("PATCH", issue_url % (owner, repo, issue), {"assignee": assignee}, user, token)['body']
@@ -119,6 +119,14 @@ def set_assignee(assignee, owner, repo, issue, user, token):
             pass
         else:
             raise e
+
+    if assignee:
+        irc_name_of_reviewer = get_irc_nick(assignee)
+        if irc_name_of_reviewer:
+            client = IrcClient(target="#rust-bots")
+            client.send_then_quit("{}: ping to review issue https://www.github.com/{}/{}/pull/{} by {}."
+                .format(irc_name_of_reviewer, owner, repo, issue, author))
+
 
 # This function is adapted from https://github.com/kennethreitz/requests/blob/209a871b638f85e2c61966f82e547377ed4260d9/requests/utils.py#L562
 # Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
@@ -172,7 +180,7 @@ def find_reviewer(commit_msg):
 
 # Choose a reviewer for the PR
 def choose_reviewer(repo, owner, diff, exclude):
-    if owner != 'rust-lang' or (owner != 'nick29581' and repo == 'highfive'):
+    if not (owner == 'rust-lang' or (owner == 'nick29581' and repo == 'highfive')):
         return 'test_user_selection_ignore_this'
 
     most_changed = None
@@ -226,13 +234,11 @@ def choose_reviewer(repo, owner, diff, exclude):
         assert name not in groups, "group %s overlaps with _global.json" % name
         groups[name] = people
 
-    print "groups:", groups
     # lookup that directory in the json file to find the potential reviewers
     potential = groups['all']
     if most_changed and most_changed in dirs:
         potential.extend(dirs[most_changed])
 
-    print "initial potential:", potential
 
     # expand the reviewers list by group
     reviewers = []
@@ -249,7 +255,6 @@ def choose_reviewer(repo, owner, diff, exclude):
             # we allow groups in groups, so they need to be queued to be resolved
             potential.extend(groups[p])
 
-    print "reviewers:", reviewers
     if exclude in reviewers:
         reviewers.remove(exclude)
 
@@ -300,7 +305,7 @@ def new_pr(payload, user, token):
         diff = api_req("GET", payload["pull_request"]["diff_url"])['body']
         reviewer = choose_reviewer(repo, owner, diff, author)
 
-    set_assignee(reviewer, owner, repo, issue, user, token)
+    set_assignee(reviewer, owner, repo, issue, user, token, author)
 
     if is_new_contributor(author, owner, repo, user, token):
         post_comment(welcome_msg % reviewer, owner, repo, issue, user, token)
@@ -315,13 +320,6 @@ def new_pr(payload, user, token):
     if warnings:
         post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)
 
-    if reviewer:
-        irc_name_of_reviewer = get_irc_nick(reviewer)
-        if irc_name_of_reviewer:
-            client = IrcClient(target="#rust-bots")
-            client.send_then_quit("{}: ping to review issue https://www.github.com/rust-lang/rust/pull/{} by {}."
-                .format(get_irc_nick(reviewer), issue, author))
-
 
 def new_comment(payload, user, token):
     # Check the issue is a PR and is open.
@@ -329,7 +327,8 @@ def new_comment(payload, user, token):
         return
 
     # Check the commenter is the submitter of the PR.
-    if payload['issue']['user']['login'] != payload['comment']['user']['login']:
+    author = payload["issue"]['user']['login']
+    if author != payload['comment']['user']['login']:
         return
 
     # Check for r? and set the assignee.
@@ -339,7 +338,7 @@ def new_comment(payload, user, token):
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])
-        set_assignee(reviewer, owner, repo, issue, user, token)
+        set_assignee(reviewer, owner, repo, issue, user, token, author)
 
 
 print "Content-Type: text/html;charset=utf-8"

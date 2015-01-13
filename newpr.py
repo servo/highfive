@@ -20,6 +20,7 @@ cgitb.enable()
 # contributor will happen early,
 contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=100"
 post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
+collabo_url = "https://api.github.com/repos/%s/%s/collaborators"
 issue_url = "https://api.github.com/repos/%s/%s/issues/%s"
 
 welcome_msg = """Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from @%s (or someone else) soon.
@@ -127,6 +128,16 @@ def set_assignee(assignee, owner, repo, issue, user, token, author):
             client.send_then_quit("{}: ping to review issue https://www.github.com/{}/{}/pull/{} by {}."
                 .format(irc_name_of_reviewer, owner, repo, issue, author))
 
+
+def get_collaborators(owner, repo, user, token):
+    try:
+        result = api_req("GET", collabo_url % (owner, repo), None, user, token)['body']
+    except urllib2.HTTPError, e:
+        if e.code == 201:
+            pass
+        else:
+            raise e
+    return [c['login'] for c in json.loads(result)]
 
 # This function is adapted from https://github.com/kennethreitz/requests/blob/209a871b638f85e2c61966f82e547377ed4260d9/requests/utils.py#L562
 # Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
@@ -326,17 +337,21 @@ def new_comment(payload, user, token):
     if payload['issue']['state'] != 'open' or 'pull_request' not in payload['issue']:
         return
 
-    # Check the commenter is the submitter of the PR.
+    owner = payload['repository']['owner']['login']
+    repo = payload['repository']['name']
+
+    # Check the commenter is the submitter of the PR or the previous assignee.
     author = payload["issue"]['user']['login']
-    if author != payload['comment']['user']['login']:
-        return
+    commenter = payload['comment']['user']['login']
+    if not (author == commenter or (payload['issue']['assignee'] and commenter == payload['issue']['assignee']['login'])):
+        # Get collaborators for this repo and check if the commenter is one of them
+        if commenter not in get_collaborators(owner, repo, user, token):
+            return
 
     # Check for r? and set the assignee.
     msg = payload["comment"]['body']
     reviewer = find_reviewer(msg)
     if reviewer:
-        owner = payload['repository']['owner']['login']
-        repo = payload['repository']['name']
         issue = str(payload['issue']['number'])
         set_assignee(reviewer, owner, repo, issue, user, token, author)
 

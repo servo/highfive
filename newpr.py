@@ -315,10 +315,13 @@ def new_pr(payload, user, token):
     if warnings:
         post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)
 
+    print "reviewer:", reviewer
     if reviewer:
         irc_name_of_reviewer = get_irc_nick(reviewer)
+        print "irc_name_of_reviewer:", irc_name_of_reviewer
         if irc_name_of_reviewer:
             client = IrcClient(target="#rust-bots")
+            print client
             client.send_then_quit("{}: ping to review issue https://www.github.com/rust-lang/rust/pull/{} by {}."
                 .format(get_irc_nick(reviewer), issue, author))
 

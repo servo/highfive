@@ -29,10 +29,12 @@ Please see [CONTRIBUTING.md](https://github.com/rust-lang/rust/blob/master/CONTR
 """
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
+submodule_warning_msg = 'These commits modify **submodules**.'
 review_msg = 'r? @%s\n\n(rust_highfive has picked a reviewer for you, use r? to override)'
 
 reviewer_re = re.compile("[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 unsafe_re = re.compile("\\bunsafe\\b|#!?\\[unsafe_")
+submodule_re = re.compile(".*\+Subproject\scommit\s.*", re.DOTALL|re.MULTILINE)
 
 rustaceans_api_url = "http://www.ncameron.org/rustaceans/user?username={username}"
 
@@ -285,6 +287,11 @@ def choose_reviewer(repo, owner, diff, exclude):
 #            return True
 #    return False
 
+def modifies_submodule(diff):
+    if submodule_re.match(diff):
+        return True
+    return False
+
 def get_irc_nick(gh_name):
     """ returns None if the request status code is not 200,
      if the user does not exist on the rustacean database,
@@ -325,6 +332,9 @@ def new_pr(payload, user, token):
     # Lets not check for unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.
     #if modifies_unsafe(diff):
     #    warnings += [unsafe_warning_msg]
+
+    if modifies_submodule(diff):
+        warnings.append(submodule_warning_msgs)
 
     if warnings:
         post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)

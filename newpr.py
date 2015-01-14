@@ -4,7 +4,7 @@ import base64
 import urllib, urllib2
 import cgi
 import cgitb
-import simplejson as json
+import json
 import random
 import sys
 import ConfigParser
@@ -13,8 +13,6 @@ import gzip
 import re
 import time
 import socket
-
-cgitb.enable()
 
 # Maximum per page is 100. Sorted by number of commits, so most of the time the
 # contributor will happen early,
@@ -31,10 +29,12 @@ Please see [CONTRIBUTING.md](https://github.com/rust-lang/rust/blob/master/CONTR
 """
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
+submodule_warning_msg = 'These commits modify **submodules**.'
 review_msg = 'r? @%s\n\n(rust_highfive has picked a reviewer for you, use r? to override)'
 
 reviewer_re = re.compile("[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 unsafe_re = re.compile("\\bunsafe\\b|#!?\\[unsafe_")
+submodule_re = re.compile(".*\+Subproject\scommit\s.*", re.DOTALL|re.MULTILINE)
 
 rustaceans_api_url = "http://www.ncameron.org/rustaceans/user?username={username}"
 
@@ -287,6 +287,11 @@ def choose_reviewer(repo, owner, diff, exclude):
 #            return True
 #    return False
 
+def modifies_submodule(diff):
+    if submodule_re.match(diff):
+        return True
+    return False
+
 def get_irc_nick(gh_name):
     """ returns None if the request status code is not 200,
      if the user does not exist on the rustacean database,
@@ -328,6 +333,9 @@ def new_pr(payload, user, token):
     #if modifies_unsafe(diff):
     #    warnings += [unsafe_warning_msg]
 
+    if modifies_submodule(diff):
+        warnings.append(submodule_warning_msgs)
+
     if warnings:
         post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)), owner, repo, issue, user, token)
 
@@ -360,21 +368,24 @@ def new_comment(payload, user, token):
         set_assignee(reviewer, owner, repo, issue, user, token, author)
 
 
-print "Content-Type: text/html;charset=utf-8"
-print
+if __name__ == "__main__":
+    print "Content-Type: text/html;charset=utf-8"
+    print
 
-config = ConfigParser.RawConfigParser()
-config.read('./config')
-user = config.get('github', 'user')
-token = config.get('github', 'token')
+    cgitb.enable()
 
-post = cgi.FieldStorage()
-payload_raw = post.getfirst("payload",'')
-payload = json.loads(payload_raw)
-if payload["action"] == "opened":
-    new_pr(payload, user, token)
-elif payload["action"] == "created":
-    new_comment(payload, user, token)
-else:
-    print payload["action"]
-    sys.exit(0)
+    config = ConfigParser.RawConfigParser()
+    config.read('./config')
+    user = config.get('github', 'user')
+    token = config.get('github', 'token')
+
+    post = cgi.FieldStorage()
+    payload_raw = post.getfirst("payload",'')
+    payload = json.loads(payload_raw)
+    if payload["action"] == "opened":
+        new_pr(payload, user, token)
+    elif payload["action"] == "created":
+        new_comment(payload, user, token)
+    else:
+        print payload["action"]
+        sys.exit(0)

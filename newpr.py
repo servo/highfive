@@ -14,8 +14,6 @@ import re
 import time
 import socket
 
-cgitb.enable()
-
 # Maximum per page is 100. Sorted by number of commits, so most of the time the
 # contributor will happen early,
 contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=100"
@@ -360,21 +358,24 @@ def new_comment(payload, user, token):
         set_assignee(reviewer, owner, repo, issue, user, token, author)
 
 
-print "Content-Type: text/html;charset=utf-8"
-print
+if __name__ == "__main__":
+    print "Content-Type: text/html;charset=utf-8"
+    print
 
-config = ConfigParser.RawConfigParser()
-config.read('./config')
-user = config.get('github', 'user')
-token = config.get('github', 'token')
+    cgitb.enable()
 
-post = cgi.FieldStorage()
-payload_raw = post.getfirst("payload",'')
-payload = json.loads(payload_raw)
-if payload["action"] == "opened":
-    new_pr(payload, user, token)
-elif payload["action"] == "created":
-    new_comment(payload, user, token)
-else:
-    print payload["action"]
-    sys.exit(0)
+    config = ConfigParser.RawConfigParser()
+    config.read('./config')
+    user = config.get('github', 'user')
+    token = config.get('github', 'token')
+
+    post = cgi.FieldStorage()
+    payload_raw = post.getfirst("payload",'')
+    payload = json.loads(payload_raw)
+    if payload["action"] == "opened":
+        new_pr(payload, user, token)
+    elif payload["action"] == "created":
+        new_comment(payload, user, token)
+    else:
+        print payload["action"]
+        sys.exit(0)

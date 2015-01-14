@@ -194,9 +194,26 @@ def choose_reviewer(repo, owner, diff, exclude):
     if not (owner == 'rust-lang' or (owner == 'nick29581' and repo == 'highfive')):
         return 'test_user_selection_ignore_this'
 
+    # Get JSON data on reviewers.
+    with open(repo + '.json') as rf:
+        reviewers = json.load(rf)
+    dirs = reviewers.get('dirs', {})
+    groups = reviewers['groups']
+
+    # fill in the default groups, ensuring that overwriting is an
+    # error.
+    with open('_global.json') as gf:
+        global_ = json.load(gf)
+    for name, people in global_['groups'].iteritems():
+        assert name not in groups, "group %s overlaps with _global.json" % name
+        groups[name] = people
+
+
     most_changed = None
-    # Inspect the diff to find the directory (under src) with the most additions.
-    if repo == 'rust':
+    # If there's directories with specially assigned groups/users
+    # inspect the diff to find the directory (under src) with the most
+    # additions
+    if dirs:
         counts = {}
         cur_dir = None
         for line in diff.split('\n'):
@@ -230,20 +247,6 @@ def choose_reviewer(repo, owner, diff, exclude):
             if changes > most_changes:
                 most_changes = changes
                 most_changed = dir
-
-    # Get JSON data on reviewers.
-    with open(repo + '.json') as rf:
-        reviewers = json.load(rf)
-    dirs = reviewers['dirs']
-    groups = reviewers['groups']
-
-    # fill in the default groups, ensuring that overwriting is an
-    # error.
-    with open('_global.json') as gf:
-        global_ = json.load(gf)
-    for name, people in global_['groups'].iteritems():
-        assert name not in groups, "group %s overlaps with _global.json" % name
-        groups[name] = people
 
     # lookup that directory in the json file to find the potential reviewers
     potential = groups['all']

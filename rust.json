@@ -1,12 +1,12 @@
 {
     "groups": {
         "all": ["core"],
-        "compiler": ["@pnkfelix", "@nick29581", "@luqmana", "@eddyb"],
+        "compiler": ["@pnkfelix", "@nick29581", "@luqmana", "@eddyb", "@Aatch"],
         "syntax": ["@pnkfelix", "@nick29581", "@sfackler", "@kmc"],
         "libs": ["@aturon"]
     },
     "dirs": {
-        "doc":              ["@steveklabnik"],
+        "doc":              ["doc"],
         "jemalloc":         ["@thestinger"],
         "liballoc":         ["libs"],
         "libarena":         ["libs"],
@@ -24,12 +24,13 @@
         "librbml":          ["libs", "@erickt"],
         "libregex":         ["libs", "@burntsushi"],
         "librustc":         ["compiler"],
-        "librustdoc":       ["@cmr"],
+        "librustdoc":       ["@cmr", "doc"],
         "libserialize":     ["libs", "@erickt"],
         "libstd":           ["libs"],
         "libsyntax":        ["syntax"],
         "libterm":          ["libs"],
         "libtest":          ["libs"],
-        "libunicode":       ["libs"]
+        "libunicode":       ["libs"],
+        "rustbook":         ["doc"]
     }
 }

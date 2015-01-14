@@ -4,7 +4,7 @@ import base64
 import urllib, urllib2
 import cgi
 import cgitb
-import simplejson as json
+import json
 import random
 import sys
 import ConfigParser

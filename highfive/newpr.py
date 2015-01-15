@@ -13,6 +13,7 @@ import gzip
 import re
 import time
 import socket
+import os
 
 # Maximum per page is 100. Sorted by number of commits, so most of the time the
 # contributor will happen early,
@@ -81,6 +82,12 @@ class IrcClient(object):
         time.sleep(3)
         self.quit()
 
+
+def _load_json_file(name):
+    configs_dir = os.path.join(os.path.dirname(__file__), 'configs')
+
+    with open(os.path.join(configs_dir, name)) as config:
+        return json.loads(config.read())
 
 def api_req(method, url, data=None, username=None, token=None, media_type=None):
     data = None if not data else json.dumps(data)
@@ -195,15 +202,13 @@ def choose_reviewer(repo, owner, diff, exclude):
         return 'test_user_selection_ignore_this'
 
     # Get JSON data on reviewers.
-    with open(repo + '.json') as rf:
-        reviewers = json.load(rf)
+    reviewers = _load_json_file(repo + '.json')
     dirs = reviewers.get('dirs', {})
     groups = reviewers['groups']
 
     # fill in the default groups, ensuring that overwriting is an
     # error.
-    with open('_global.json') as gf:
-        global_ = json.load(gf)
+    global_ = _load_json_file('_global.json')
     for name, people in global_['groups'].iteritems():
         assert name not in groups, "group %s overlaps with _global.json" % name
         groups[name] = people

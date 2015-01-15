@@ -1,0 +1,7 @@
+diff --git a/src/jemalloc b/src/jemalloc
+index 2dba541..b001609 160000
+--- a/src/jemalloc
++++ b/src/jemalloc
+@@ -1 +1 @@
+-Subproject commit 2dba541881fb8e35246d653bbe2e7c7088777a4a
++Subproject commit b001609960ca33047e5cbc5a231c1e24b6041d4b

@@ -1,6 +1,6 @@
 {
     "groups": {
-        "all": ["core"]
+        "all": ["@brson"]
     },
     "dirs": {
     }

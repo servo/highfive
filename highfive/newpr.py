@@ -24,16 +24,35 @@ post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
 collabo_url = "https://api.github.com/repos/%s/%s/collaborators"
 issue_url = "https://api.github.com/repos/%s/%s/issues/%s"
 
-welcome_msg = """Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from @%s (or someone else) soon.
+welcome_with_reviewer = '@%s (or someone else)'
+welcome_without_reviewer = "@nick29581 or @huonw (NB. this repo may be misconfigured)"
+raw_welcome = """Thanks for the pull request, and welcome! The Rust team is excited to review your changes, and you should hear from %s soon.
 
 If any changes to this PR are deemed necessary, please add them as extra commits. This ensures that the reviewer can see what has changed since they last reviewed the code. The way Github handles out-of-date commits, this should also make it reasonably obvious what issues have or haven't been addressed. Large or tricky changes may require several passes of review and changes.
 
 Please see [CONTRIBUTING.md](https://github.com/rust-lang/rust/blob/master/CONTRIBUTING.md) for more information.
 """
+
+
+def welcome_msg(reviewer):
+    if reviewer is None:
+        text = welcome_without_reviewer
+    else:
+        text = welcome_with_reviewer % reviewer
+    return raw_welcome % text
+
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
 submodule_warning_msg = 'These commits modify **submodules**.'
-review_msg = 'r? @%s\n\n(rust_highfive has picked a reviewer for you, use r? to override)'
+
+review_with_reviewer = 'r? @%s\n\n(rust_highfive has picked a reviewer for you, use r? to override)'
+review_without_reviewer = '@%s: no appropriate reviewer found, use r? to override'
+def review_msg(reviewer, submitter):
+    if reviewer is None:
+        text = review_without_reviewer % submitter
+    else:
+        text = review_with_reviewer % reviewer
+    return text
 
 reviewer_re = re.compile("[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 unsafe_re = re.compile("\\bunsafe\\b|#!?\\[unsafe_")
@@ -236,9 +255,12 @@ def choose_reviewer(repo, owner, diff, exclude):
     if exclude in reviewers:
         reviewers.remove(exclude)
 
-    random.seed()
-    return random.choice(reviewers)
-
+    if reviewers:
+        random.seed()
+        return random.choice(reviewers)
+    else:
+        # no eligible reviewer found
+        return None
 
 #def modifies_unsafe(diff):
 #    in_rust_code = False
@@ -291,9 +313,9 @@ def new_pr(payload, user, token):
     set_assignee(reviewer, owner, repo, issue, user, token, author)
 
     if is_new_contributor(author, owner, repo, user, token):
-        post_comment(welcome_msg % reviewer, owner, repo, issue, user, token)
+        post_comment(welcome_msg(reviewer), owner, repo, issue, user, token)
     elif post_msg:
-        post_comment(review_msg % reviewer, owner, repo, issue, user, token)
+        post_comment(review_msg(reviewer, author), owner, repo, issue, user, token)
 
     warnings = []
     # Lets not check for unsafe code for now, it doesn't seem to be very useful and gets a lot of false positives.

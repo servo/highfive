@@ -32,5 +32,9 @@
         "libtest":          ["libs"],
         "libunicode":       ["libs"],
         "rustbook":         ["doc"]
-    }
+    },
+    "contributors": [
+        "Aatch",
+        "lifthrasiir"
+    ]
 }

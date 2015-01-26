@@ -1,7 +1,7 @@
 {
     "groups": {
         "all": ["core"],
-        "compiler": ["@pnkfelix", "@nick29581", "@luqmana", "@eddyb", "@Aatch"],
+        "compiler": ["@pnkfelix", "@nick29581", "@eddyb", "@Aatch"],
         "syntax": ["@pnkfelix", "@nick29581", "@sfackler", "@kmc"],
         "libs": ["@aturon"]
     },

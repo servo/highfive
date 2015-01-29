@@ -7,7 +7,6 @@
     },
     "dirs": {
         "doc":              ["doc"],
-        "jemalloc":         ["@thestinger"],
         "liballoc":         ["libs"],
         "libarena":         ["libs"],
         "libbacktrace":     [],

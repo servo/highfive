@@ -1,8 +1,8 @@
 {
     "groups": {
         "all": ["core"],
-        "compiler": ["@pnkfelix", "@nick29581", "@eddyb", "@Aatch"],
-        "syntax": ["@pnkfelix", "@nick29581", "@sfackler", "@kmcallister"],
+        "compiler": ["@pnkfelix", "@nrc", "@eddyb", "@Aatch"],
+        "syntax": ["@pnkfelix", "@nrc", "@sfackler", "@kmcallister"],
         "libs": ["@aturon"]
     },
     "dirs": {
@@ -18,7 +18,7 @@
         "libgetopts":       ["libs"],
         "libgraphviz":      ["@pnkfelix"],
         "liblibc":          ["libs"],
-        "liblog":           ["libs", "@nick29581"],
+        "liblog":           ["libs", "@nrc"],
         "librand":          ["libs"],
         "librbml":          ["libs", "@erickt"],
         "libregex":         ["libs", "@burntsushi"],

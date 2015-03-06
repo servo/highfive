@@ -153,7 +153,7 @@ def parse_header_links(value):
 
 def is_new_contributor(username, owner, repo, user, token):
     config = _load_json_file(repo + '.json')
-    if 'contributors' in config and user in config['contributors']:
+    if 'contributors' in config and username in config['contributors']:
         return False
 
     # iterate through the pages to try and find the contributor

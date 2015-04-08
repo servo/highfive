@@ -92,13 +92,13 @@ repo = payload['pull_request']['base']['repo']['name']
 issue = str(payload["number"])
 
 if payload["action"] in ["synchronized", "opened"]:
-    remove_label("S-awaiting merge", owner, repo, issue, user, token)
-    remove_label("S-tests failed", owner, repo, issue, user, token)
-    remove_label("S-needs code changes", owner, repo, issue, user, token)
-    add_label("S-needs review", owner, repo, issue, user, token)
+    remove_label("S-awaiting-merge", owner, repo, issue, user, token)
+    remove_label("S-tests-failed", owner, repo, issue, user, token)
+    remove_label("S-needs-code-changes", owner, repo, issue, user, token)
+    add_label("S-needs-review", owner, repo, issue, user, token)
 
 if payload["action"] == "synchronized" and payload['pull_request']['mergeable']:
-    remove_label("S-needs rebase", owner, repo, issue, user, token)
+    remove_label("S-needs-rebase", owner, repo, issue, user, token)
 
 if payload["action"] != "opened":
     sys.exit(0)

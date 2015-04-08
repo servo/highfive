@@ -63,6 +63,17 @@ def remove_label(label, owner, repo, issue, user, token):
         #    raise e
         pass
 
+def get_labels(owner, repo, issue, user, token):
+    get_label_url = "https://api.github.com/repos/%s/%s/issues/%s/labels"
+    try:
+        result = api_req("GET", get_label_url % (owner, repo, issue), None, user, token)
+    except urllib2.HTTPError, e:
+        if e.code == 201:
+            pass
+        else:
+            raise e
+    return map(lambda x: x["name"], json.loads(result))
+
 def is_new_contributor(username, stats):
     for contributor in stats:
         if contributor['login'] == username:
@@ -91,14 +102,18 @@ owner = payload['pull_request']['base']['repo']['owner']['login']
 repo = payload['pull_request']['base']['repo']['name']
 issue = str(payload["number"])
 
-if payload["action"] in ["synchronized", "opened"]:
-    remove_label("S-awaiting-merge", owner, repo, issue, user, token)
-    remove_label("S-tests-failed", owner, repo, issue, user, token)
-    remove_label("S-needs-code-changes", owner, repo, issue, user, token)
-    add_label("S-needs-review", owner, repo, issue, user, token)
+labels = get_labels(owner, repo, issue, user, token);
+
+if payload["action"] in ["synchronized", "opened", "reopened"]:
+    for label in ["S-awaiting-merge", "S-tests-failed", "S-needs-code-changes"]:
+        if label in labels:
+            remove_label(label, owner, repo, issue, user, token)
+    if not "S-needs-review" in labels:
+        add_label("S-needs-review", owner, repo, issue, user, token)
 
 if payload["action"] == "synchronized" and payload['pull_request']['mergeable']:
-    remove_label("S-needs-rebase", owner, repo, issue, user, token)
+    if "S-needs-rebase" in labels:
+        remove_label("S-needs-rebase", owner, repo, issue, user, token)
 
 if payload["action"] != "opened":
     sys.exit(0)

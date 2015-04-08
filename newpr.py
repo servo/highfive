@@ -52,7 +52,7 @@ def add_label(label, owner, repo, issue, user, token):
 def remove_label(label, owner, repo, issue, user, token):
     remove_label_url = "https://api.github.com/repos/%s/%s/issues/%s/labels/%s"
     try:
-        result = api_req("DELETE", remove_label_url % (owner, repo, issue label), {}, user, token)
+        result = api_req("DELETE", remove_label_url % (owner, repo, issue, label), {}, user, token)
     except urllib2.HTTPError, e:
         if e.code == 201:
             pass

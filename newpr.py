@@ -12,6 +12,9 @@ from StringIO import StringIO
 import gzip
 cgitb.enable()
 
+print "Content-Type: text/html;charset=utf-8"
+print
+
 def api_req(method, url, data=None, username=None, token=None, media_type=None):
     data = None if not data else json.dumps(data)
     headers = {} if not data else {'Content-Type': 'application/json'}
@@ -42,7 +45,7 @@ def post_comment(body, owner, repo, issue, user, token):
 def add_label(label, owner, repo, issue, user, token):
     add_label_url = "https://api.github.com/repos/%s/%s/issues/%s/labels"
     try:
-        result = api_req("POST", add_label_url % (owner, repo, issue), label, user, token)
+        result = api_req("POST", add_label_url % (owner, repo, issue), [label], user, token)
     except urllib2.HTTPError, e:
         if e.code == 201:
             pass
@@ -74,9 +77,6 @@ warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warni
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
 reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
 smoketest_required_msg = '@%s, please confirm that src/test/html/acid1.html and your favourite wikipedia page still render correctly!'
-
-print "Content-Type: text/html;charset=utf-8"
-print
 
 config = ConfigParser.RawConfigParser()
 config.read('./config')

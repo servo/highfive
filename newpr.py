@@ -21,7 +21,7 @@ def api_req(method, url, data=None, username=None, token=None, media_type=None):
         base64string = base64.standard_b64encode('%s:%s' % (username, token)).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
 
-    if media_type:
+                       if media_type:
         req.add_header("Accept", media_type)
     f = urllib2.urlopen(req)
     if f.info().get('Content-Encoding') == 'gzip':

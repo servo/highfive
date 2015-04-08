@@ -104,14 +104,14 @@ issue = str(payload["number"])
 
 labels = get_labels(owner, repo, issue, user, token);
 
-if payload["action"] in ["synchronized", "opened"]:
+if payload["action"] in ["synchronize", "opened"]:
     for label in ["S-awaiting-merge", "S-tests-failed", "S-needs-code-changes"]:
         if label in labels:
             remove_label(label, owner, repo, issue, user, token)
     if not "S-needs-review" in labels:
         add_label("S-needs-review", owner, repo, issue, user, token)
 
-if payload["action"] == "synchronized" and payload['pull_request']['mergeable']:
+if payload["action"] == "synchronize" and payload['pull_request']['mergeable']:
     if "S-needs-rebase" in labels:
         remove_label("S-needs-rebase", owner, repo, issue, user, token)
 

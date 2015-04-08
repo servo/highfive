@@ -54,10 +54,11 @@ def remove_label(label, owner, repo, issue, user, token):
     try:
         result = api_req("DELETE", remove_label_url % (owner, repo, issue, label), {}, user, token)
     except urllib2.HTTPError, e:
-        if e.code == 201:
-            pass
-	else:
-            raise e
+        #if e.code == 201:
+        #    pass
+	#else:
+        #    raise e
+        pass
 
 def is_new_contributor(username, stats):
     for contributor in stats:

@@ -104,7 +104,7 @@ issue = str(payload["number"])
 
 labels = get_labels(owner, repo, issue, user, token);
 
-if payload["action"] in ["synchronized", "opened", "reopened"]:
+if payload["action"] in ["synchronized", "opened"]:
     for label in ["S-awaiting-merge", "S-tests-failed", "S-needs-code-changes"]:
         if label in labels:
             remove_label(label, owner, repo, issue, user, token)

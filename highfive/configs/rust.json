@@ -2,7 +2,7 @@
     "groups": {
         "all": ["core"],
         "compiler": ["@pnkfelix", "@nrc", "@eddyb", "@Aatch"],
-        "syntax": ["@pnkfelix", "@nrc", "@sfackler", "@kmcallister"],
+        "syntax": ["@pnkfelix", "@nrc", "@sfackler"],
         "libs": ["@aturon"]
     },
     "dirs": {

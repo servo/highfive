@@ -125,7 +125,7 @@ author = payload["pull_request"]['user']['login']
 
 if is_new_contributor(author, stats):
         #collaborators = json.load(urllib2.urlopen(collaborators_url))
-	collaborators = ['jdm', 'larsbergstrom', 'metajack', 'kmcallister', 'mbrubeck', 'Ms2ger', 'Manishearth', 'glennw', 'pcwalton', 'SimonSapin'] if repo == 'servo' and owner == 'servo' else ['test_user_selection_ignore_this']
+	collaborators = ['jdm', 'larsbergstrom', 'metajack', 'mbrubeck', 'Ms2ger', 'Manishearth', 'glennw', 'pcwalton', 'SimonSapin'] if repo == 'servo' and owner == 'servo' else ['test_user_selection_ignore_this']
         random.seed()
         to_notify = random.choice(collaborators)
 	post_comment(welcome_msg % to_notify, owner, repo, issue, user, token)

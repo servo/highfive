@@ -247,6 +247,10 @@ def new_comment(api, payload):
             api.remove_label("S-awaiting-merge")
             api.add_label("S-tests-failed")
 
+        elif 'Please resolve the merge conflicts' in msg:
+            api.remove_label("S-awaiting-merge")
+            api.add_label("S-needs-rebase")
+
 
 def new_pr(api, payload):
     manage_pr_state(api, payload)

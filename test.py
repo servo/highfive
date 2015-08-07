@@ -110,6 +110,14 @@ def test_merge_approved():
     assert api.labels == ['S-awaiting-merge']
     assert api.assignee is None
 
+def test_merge_conflict():
+    payload = get_payload('test_merge_conflict.json')
+    api = TestAPIProvider(payload, 'highfive', False, ['S-awaiting-merge'], None)
+    handle_payload(api, payload)
+    assert api.comments_posted == []
+    assert api.labels == ['S-needs-rebase']
+    assert api.assignee is None
+
 def test_tests_failed():
     payload = get_payload('test_tests_failed.json')
     api = TestAPIProvider(payload, 'highfive', False, ['S-awaiting-merge'], None)
@@ -126,4 +134,5 @@ test_ignored_action()
 test_synchronize()
 test_comment()
 test_merge_approved()
+test_merge_conflict()
 test_tests_failed()

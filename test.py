@@ -92,9 +92,34 @@ def test_synchronize():
     assert api.labels == ['S-awaiting-review']
     assert api.assignee is None
 
+def test_comment():
+    payload = get_payload('test_comment.json')
+    api = TestAPIProvider(payload, 'highfive', False, [], None)
+    handle_payload(api, payload)
+    assert api.comments_posted == []
+    assert api.labels == []
+    assert api.assignee is 'jdm'
+
+def test_merge_approved():
+    payload = get_payload('test_merge_approved.json')
+    api = TestAPIProvider(payload, 'highfive', False, ['S-needs-code-changes','S-needs-rebase', 'S-tests-failed', 'S-needs-squash'], None)
+    handle_payload(api, payload)
+    assert api.comments_posted == []
+    assert api.labels == ['S-awaiting-merge']
+    assert api.assignee is None
+
+def test_tests_failed():
+    payload = get_payload('test_tests_failed.json')
+    api = TestAPIProvider(payload, 'highfive', False, ['S-awaiting-merge'], None)
+    handle_payload(api, payload)
+    assert api.comments_posted == []
+    assert api.labels == ['S-tests-failed']
+    assert api.assignee is None
+
 test_new_pr()
 test_new_pr_unsafe()
 test_new_pr_layout()
 test_new_pr_new_user()
 test_ignored_action()
 test_synchronize()
+test_comment()

@@ -102,7 +102,9 @@ def test_comment():
 
 def test_merge_approved():
     payload = get_payload('test_merge_approved.json')
-    api = TestAPIProvider(payload, 'highfive', False, ['S-needs-code-changes','S-needs-rebase', 'S-tests-failed', 'S-needs-squash'], None)
+    api = TestAPIProvider(payload, 'highfive', False,
+                          ['S-needs-code-changes', 'S-needs-rebase', 'S-tests-failed',
+                           'S-needs-squash', 'S-awaiting-review'], None)
     handle_payload(api, payload)
     assert api.comments_posted == []
     assert api.labels == ['S-awaiting-merge']

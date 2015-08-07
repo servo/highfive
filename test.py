@@ -1,6 +1,8 @@
 from newpr import APIProvider, handle_payload
 import json
 import os
+import sys
+import traceback
 
 class TestAPIProvider(APIProvider):
     def __init__(self, payload, user, new_contributor, labels, assignee, diff=""):
@@ -36,103 +38,76 @@ def get_payload(filename):
     with open(filename) as f:
         return json.load(f)
 
-def test_new_pr():
-    payload = get_payload('test_new_pr.json')
-    api = TestAPIProvider(payload, 'highfive', False, [], None)
-    handle_payload(api, payload)
-    assert api.comments_posted == []
-    assert api.labels == ['S-awaiting-review']
-    assert api.assignee is None
+tests = []
+def add_test(filename, initial, expected):
+    global tests
+    initial_values = {'new_contributor': initial.get('new_contributor', False),
+                      'labels': initial.get('labels', []),
+                      'diff': initial.get('diff', ''),
+                      'assignee': initial.get('assignee', None)}
+    expected_values = {'labels': expected.get('labels', []),
+                       'assignee': expected.get('assignee', None),
+                       'comments': expected.get('comments', 0)}
+    tests += [{'filename': filename,
+               'initial': initial_values,
+               'expected': expected_values}]
 
-def test_new_pr_unsafe():
-    payload = get_payload('test_new_pr.json')
-    api = TestAPIProvider(payload, 'highfive', False, [], None, "+ unsafe fn foo()")
-    handle_payload(api, payload)
-    assert len(api.comments_posted) == 1
-    assert api.labels == ['S-awaiting-review']
-    assert api.assignee is None
+def run_tests(tests):
+    failed = 0
+    for test in tests:
+        try:
+            payload = get_payload(test['filename'])
+            initial = test['initial']
+            api = TestAPIProvider(payload, 'highfive', initial['new_contributor'], initial['labels'],
+                                  initial['assignee'], initial['diff'])
+            handle_payload(api, payload)
+            expected = test['expected']
+            assert len(api.comments_posted) == expected['comments']
+            assert api.labels == expected['labels']
+            assert api.assignee == expected['assignee']
+        except AssertionError:
+            _, _, tb = sys.exc_info()
+            traceback.print_tb(tb) # Fixed format
+            tb_info = traceback.extract_tb(tb)
+            filename, line, func, text = tb_info[-1]
+            print('{}: An error occurred on line {} in statement {}'.format(test['filename'], line, text))
+            failed += 1
 
-def test_new_pr_layout():
-    payload = get_payload('test_new_pr.json')
-    api = TestAPIProvider(payload, 'highfive', False, [], None, "diff --git components/layout/")
-    handle_payload(api, payload)
-    assert len(api.comments_posted) == 1
-    assert api.labels == ['S-awaiting-review']
-    assert api.assignee is None
+    print 'Ran %d tests, %d failed' % (len(tests), failed)
 
-def test_new_pr_layout_with_reftest():
-    payload = get_payload('test_new_pr.json')
-    api = TestAPIProvider(payload, 'highfive', False, [], None, "diff --git components/layout/\ndiff --git tests/wpt")
-    handle_payload(api, payload)
-    assert len(api.comments_posted) == 1
-    assert api.labels == ['S-awaiting-review']
-    assert api.assignee is None
+    if failed:
+        sys.exit(1)
 
-def test_new_pr_new_user():
-    payload = get_payload('test_new_pr.json')
-    api = TestAPIProvider(payload, 'highfive', True, [], None)
-    handle_payload(api, payload)
-    assert len(api.comments_posted) == 1
-    assert api.labels == ['S-awaiting-review']
-    assert api.assignee is None
+add_test('test_new_pr.json', {'new_contributor': True},
+         {'labels': ['S-awaiting-review'], 'comments': 1})
 
-def test_ignored_action():
-    payload = get_payload('test_ignored_action.json')
-    api = TestAPIProvider(payload, 'highfive', False, [], None)
-    handle_payload(api, payload)
-    assert api.comments_posted == []
-    assert api.labels == []
-    assert api.assignee is None
+add_test('test_new_pr.json', {'diff': "+ unsafe fn foo()"},
+         {'labels': ['S-awaiting-review'], 'comments': 1})
 
-def test_synchronize():
-    payload = get_payload('test_synchronize.json')
-    api = TestAPIProvider(payload, 'highfive', False, ['S-needs-code-changes', 'S-tests-failed', 'S-awaiting-merge'], None)
-    handle_payload(api, payload)
-    assert api.comments_posted == []
-    assert api.labels == ['S-awaiting-review']
-    assert api.assignee is None
+add_test('test_new_pr.json', {'diff': "diff --git components/layout/"},
+         {'labels': ['S-awaiting-review'], 'comments': 1})
 
-def test_comment():
-    payload = get_payload('test_comment.json')
-    api = TestAPIProvider(payload, 'highfive', False, [], None)
-    handle_payload(api, payload)
-    assert api.comments_posted == []
-    assert api.labels == []
-    assert api.assignee == 'jdm'
+add_test('test_new_pr.json', {'diff': "diff --git components/layout/\ndiff --git tests/wpt"},
+         {'labels': ['S-awaiting-review'], 'comments': 0})
 
-def test_merge_approved():
-    payload = get_payload('test_merge_approved.json')
-    api = TestAPIProvider(payload, 'highfive', False,
-                          ['S-needs-code-changes', 'S-needs-rebase', 'S-tests-failed',
-                           'S-needs-squash', 'S-awaiting-review'], None)
-    handle_payload(api, payload)
-    assert api.comments_posted == []
-    assert api.labels == ['S-awaiting-merge']
-    assert api.assignee is None
+add_test('test_new_pr.json', {'new_contributor': True},
+         {'labels': ['S-awaiting-review'], 'comments': 1})
 
-def test_merge_conflict():
-    payload = get_payload('test_merge_conflict.json')
-    api = TestAPIProvider(payload, 'highfive', False, ['S-awaiting-merge'], None)
-    handle_payload(api, payload)
-    assert api.comments_posted == []
-    assert api.labels == ['S-needs-rebase']
-    assert api.assignee is None
+add_test('test_ignored_action.json', {}, {})
 
-def test_tests_failed():
-    payload = get_payload('test_tests_failed.json')
-    api = TestAPIProvider(payload, 'highfive', False, ['S-awaiting-merge'], None)
-    handle_payload(api, payload)
-    assert api.comments_posted == []
-    assert api.labels == ['S-tests-failed']
-    assert api.assignee is None
+add_test('test_synchronize.json', {'labels': ['S-needs-code-changes', 'S-tests-failed', 'S-awaiting-merge']},
+         {'labels': ['S-awaiting-review']})
 
-test_new_pr()
-test_new_pr_unsafe()
-test_new_pr_layout()
-test_new_pr_new_user()
-test_ignored_action()
-test_synchronize()
-test_comment()
-test_merge_approved()
-test_merge_conflict()
-test_tests_failed()
+add_test('test_comment.json', {}, {'assignee': 'jdm'})
+
+add_test('test_merge_approved.json', {'labels': ['S-needs-code-changes', 'S-needs-rebase',
+                                                 'S-tests-failed', 'S-needs-squash',
+                                                 'S-awaiting-review']}, {'labels': ['S-awaiting-merge']})
+
+add_test('test_merge_conflict.json', {'labels': ['S-awaiting-merge']},
+         {'labels': ['S-needs-rebase']})
+
+add_test('test_tests_failed.json', {'labels': ['S-awaiting-merge']},
+         {'labels': ['S-tests-failed']})
+
+run_tests(tests)

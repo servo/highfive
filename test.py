@@ -98,7 +98,7 @@ def test_comment():
     handle_payload(api, payload)
     assert api.comments_posted == []
     assert api.labels == []
-    assert api.assignee is 'jdm'
+    assert api.assignee == 'jdm'
 
 def test_merge_approved():
     payload = get_payload('test_merge_approved.json')
@@ -123,3 +123,5 @@ test_new_pr_new_user()
 test_ignored_action()
 test_synchronize()
 test_comment()
+test_merge_approved()
+test_tests_failed()

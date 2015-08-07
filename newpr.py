@@ -221,7 +221,7 @@ def manage_pr_state(api, payload):
 def new_comment(api, payload):
     # We only care about comments in open PRs
     if payload['issue']['state'] != 'open' or 'pull_request' not in payload['issue']:
-        sys.exit(0);
+        return
 
     commenter = payload['comment']['user']['login']
     # Ignore our own comments.
@@ -234,6 +234,8 @@ def new_comment(api, payload):
         api.set_assignee(reviewer)
 
     if commenter == 'bors-servo':
+        labels = api.get_labels();
+
         if 'has been approved by' in msg:
             for label in ["S-needs-rebase", "S-tests-failed", "S-needs-code-changes", "S-needs-squash"]:
                 if label in labels:
@@ -294,8 +296,7 @@ def handle_payload(api, payload):
     elif payload["action"] == "created":
         new_comment(api, payload)
     else:
-        sys.exit(0)
-
+        pass
 
 if __name__ == "__main__":
     print "Content-Type: text/html;charset=utf-8"

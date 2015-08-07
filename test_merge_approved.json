@@ -77,9 +77,7 @@
     },
     "created_at": "2015-08-07T16:45:57Z",
     "updated_at": "2015-08-07T16:45:57Z",
-    "body": ":pushpin: Commit 90d7d11 has been approved by `larsbergstrom+dzbarsky`
-
-<!-- @bors-servo r=larsbergstrom+dzbarsky 90d7d11a23e650e03c0283f49b54e9f748c66fee -->"
+    "body": ":pushpin: Commit 90d7d11 has been approved by `larsbergstrom+dzbarsky`\n\n<!-- @bors-servo r=larsbergstrom+dzbarsky 90d7d11a23e650e03c0283f49b54e9f748c66fee -->"
   },
   "repository": {
     "id": 3390243,

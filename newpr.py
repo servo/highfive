@@ -142,7 +142,7 @@ class GithubAPIProvider(APIProvider):
 
     def remove_label(self, label):
         try:
-            result = self.api_req("DELETE", self.remove_label_url % (self.owner, self.repo, self.issue, self.label), {})
+            result = self.api_req("DELETE", self.remove_label_url % (self.owner, self.repo, self.issue, label), {})
         except urllib2.HTTPError, e:
             #if e.code == 201:
             #    pass

@@ -220,7 +220,7 @@ def manage_pr_state(api, payload):
 
 def new_comment(api, payload):
     # We only care about comments in open PRs
-    if not (payload['issue']['state'] != 'open' or 'pull_request' not in payload['issue']):
+    if payload['issue']['state'] != 'open' or 'pull_request' not in payload['issue']:
         sys.exit(0);
 
     commenter = payload['comment']['user']['login']

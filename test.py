@@ -73,6 +73,11 @@ def run_tests(tests):
             print('{}: An error occurred on line {} in statement {}'.format(test['filename'], line, text))
             failed += 1
 
+    possible_tests = [f for f in os.listdir('.') if f.endswith('.json')]
+    test_files = set([test['filename'] for test in tests])
+    if len(possible_tests) != len(test_files):
+        print 'Found unused JSON test data: %s' % ', '.join(filter(lambda x: x not in test_files, possible_tests))
+        sys.exit(1)
     print 'Ran %d tests, %d failed' % (len(tests), failed)
 
     if failed:

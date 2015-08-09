@@ -109,7 +109,7 @@ class GithubAPIProvider(APIProvider):
         # iterate through the pages to try and find the contributor
         while True:
             stats_raw = self.api_req("GET", url)
-            stats = json.loads(stats_raw['body'])
+            stats = json.loads(stats_raw)
             links = self.parse_header_links(stats_raw['header'].get('Link'))
 
             for contributor in stats:

@@ -118,4 +118,7 @@ add_test('test_tests_failed.json', {'labels': ['S-awaiting-merge']},
 add_test('test_post_retry.json', {'labels': ['S-tests-failed']},
          {'labels': ['S-awaiting-merge']})
 
+add_test('test_post_retry.json', {'labels': ['S-awaiting-merge']},
+         {'labels': ['S-awaiting-merge']})
+
 run_tests(tests)

@@ -242,7 +242,8 @@ def new_comment(api, payload):
                           "S-needs-code-changes", "S-needs-squash", "S-awaiting-answer"]:
                 if label in labels:
                     api.remove_label(label)
-            api.add_label("S-awaiting-merge")
+            if not "S-awaiting-merge" in labels:
+                api.add_label("S-awaiting-merge")
 
         elif 'Test failed' in msg:
             api.remove_label("S-awaiting-merge")

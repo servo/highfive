@@ -237,9 +237,9 @@ def new_comment(api, payload):
     if commenter == 'bors-servo':
         labels = api.get_labels();
 
-        if 'has been approved by' in msg:
+        if 'has been approved by' in msg or 'Testing commit' in msg:
             for label in ["S-awaiting-review", "S-needs-rebase", "S-tests-failed",
-                          "S-needs-code-changes", "S-needs-squash"]:
+                          "S-needs-code-changes", "S-needs-squash", "S-awaiting-answer"]:
                 if label in labels:
                     api.remove_label(label)
             api.add_label("S-awaiting-merge")

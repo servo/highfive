@@ -72,10 +72,11 @@ class GithubAPIProvider(APIProvider):
         if media_type:
             req.add_header("Accept", media_type)
         f = urllib2.urlopen(req)
-        if f.info().get('Content-Encoding') == 'gzip':
+        header = f.info()
+        if header.get('Content-Encoding') == 'gzip':
             buf = StringIO(f.read())
             f = gzip.GzipFile(fileobj=buf)
-        return f.read()
+        return { "header": header, "body": f.read() }
 
     # This function is adapted from https://github.com/kennethreitz/requests/blob/209a871b638f85e2c61966f82e547377ed4260d9/requests/utils.py#L562
     # Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
@@ -109,7 +110,7 @@ class GithubAPIProvider(APIProvider):
         # iterate through the pages to try and find the contributor
         while True:
             stats_raw = self.api_req("GET", url)
-            stats = json.loads(stats_raw)
+            stats = json.loads(stats_raw['body'])
             links = self.parse_header_links(stats_raw['header'].get('Link'))
 
             for contributor in stats:
@@ -158,10 +159,10 @@ class GithubAPIProvider(APIProvider):
                 pass
             else:
                 raise e
-        return map(lambda x: x["name"], json.loads(result))
+        return map(lambda x: x["name"], json.loads(result['body']))
 
     def get_diff(self):
-        return self.api_req("GET", self.diff_url)
+        return self.api_req("GET", self.diff_url)['body']
 
     def set_assignee(self, assignee):
         try:

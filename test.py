@@ -20,30 +20,39 @@ class TestAPIProvider(APIProvider):
         self.assignee = assignee
         self.diff = diff
 
+
     def is_new_contributor(self, username):
         return self.new_contributor
+
 
     def post_comment(self, body):
         self.comments_posted += [body]
 
+
     def add_label(self, label):
         self.labels += [label]
+
 
     def remove_label(self, label):
         self.labels.remove(label)
 
+
     def get_labels(self):
         return self.labels
+
 
     def get_diff(self):
         return self.diff
 
+
     def set_assignee(self, assignee):
         self.assignee = assignee
+
 
 def get_payload(filename):
     with open(filename) as f:
         return json.load(f)
+
 
 tests = []
 def add_test(filename, initial, expected):
@@ -58,6 +67,7 @@ def add_test(filename, initial, expected):
     tests += [{'filename': filename,
                'initial': initial_values,
                'expected': expected_values}]
+
 
 def run_tests(tests):
     failed = 0
@@ -134,6 +144,7 @@ def mock_urllib2_urlopen(url):
     local_file = os.path.normpath('test-files/{}'.format(parsed_url.path[1:].replace('/', '.')))
 
     return open(local_file, 'rb')
+
 
 def setup_mock_urllib2_urlopen(self, module):
     self.patcher = patch('{}.urllib2.urlopen'.format(module), mock_urllib2_urlopen)
@@ -295,6 +306,7 @@ class TestServoErrorLogParser(unittest.TestCase):
     def test_parse_errors(self):
         self.assertEqual(self.expected_multi_errors, list(self.error_parser.parse_log(self.multi_log)))
         self.assertEqual(self.expected_single_errors, list(self.error_parser.parse_log(self.single_log)))
+
 
 if __name__ == "__main__":
     run_tests(tests)

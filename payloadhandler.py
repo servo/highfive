@@ -8,22 +8,21 @@ class PayloadHandler():
 		self.payload = payload
 
 
-	def handle_payload(self, user, token, owner, repo):
+	def handle_payload(self):
 		raise NotImplementedError
-
-
-    def extract_globals_from_payload(self):
-        raise NotImplementedError
 
 
 class TravisPayloadHandler(PayloadHandler):
     msg_template = "Please fix the error below and push your changes when complete:\n\n" + \
                    "File: {}\nLine Number: {}\nError: {}"
 
-	def handle_payload(self, user, token, owner, repo):
-        travis = TravisCiApiProvider()
-        github = GithubApiProvider(user, token, owner, repo)
-        error_parser = ErrorLogParser()
+    def __init__(self, payload, github, travis, error_parser):
+        PayloadHandler.__init__(self, payload)
+        self.travis = travis
+        self.github = github
+        self.error_parser = error_parser
+
+	def handle_payload(self):
         build_id = int(self.payload["target_url"].split("/")[-1])
         commit_id = self.payload["commit"]["sha"]
         build_id, commit_id, owner, repo = self._extract_globals_from_payload()
@@ -34,11 +33,7 @@ class TravisPayloadHandler(PayloadHandler):
 
         for err_datum in err_data:
             err_message = self.msg_template.format(err_datum['file'], err_datum['line'], err_datum['comment'])
-            gh.post_review_comment(pr_num, commit_id, err_message, err_datum['file'], err_datum['line'])
-
-
-    def extract_globals_from_payload(self):
-    	return self.payload["name"].split("/")
+            github.post_review_comment(pr_num, commit_id, err_message, err_datum['file'], err_datum['line'])
 
 
 class GithubPayloadHandler(PayloadHandler):
@@ -47,7 +42,7 @@ class GithubPayloadHandler(PayloadHandler):
     unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
     reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
 
-    def handle_payload(self, user, token, owner, repo):
+    def handle_payload(self):
         if self.payload["action"] == "created":
             issue = str(self.payload['issue']['number'])
         else:
@@ -61,17 +56,6 @@ class GithubPayloadHandler(PayloadHandler):
             self.new_comment(github, issue)
         else:
             pass
-
-    def extract_globals_from_payload(self):
-        if self.payload["action"] == "created":
-            owner = self.payload['repository']['owner']['login']
-            repo = self.payload['repository']['name']
-        else:
-            owner = self.payload['pull_request']['base']['repo']['owner']['login']
-            repo = self.payload['pull_request']['base']['repo']['name']
-        
-        return (owner, repo)
-
 
     def manage_pr_state(self, github, issue):
         labels = github.get_labels(issue);

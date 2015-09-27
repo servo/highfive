@@ -13,34 +13,34 @@ import urlparse
 
 error_sample = [ 
     {
-        "comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull\n\tfound: dom::bindings::conversions::get_dom_class", 
-        "line": "7", 
-        "file": "./components/script/dom/eventtarget.rs"
+        "body": "use statement is not in alphabetical order\nexpected: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull\nfound: dom::bindings::conversions::get_dom_class", 
+        "position": 7, 
+        "path": "./components/script/dom/eventtarget.rs"
     }, 
     {
-        "comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener\n\tfound: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull", 
-        "line": "8", 
-        "file": "./components/script/dom/eventtarget.rs"
+        "body": "use statement is not in alphabetical order\nexpected: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener\nfound: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull", 
+        "position": 8, 
+        "path": "./components/script/dom/eventtarget.rs"
     }, 
     {
-        "comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods\n\tfound: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener", 
-        "line": "9", 
-        "file": "./components/script/dom/eventtarget.rs"
+        "body": "use statement is not in alphabetical order\nexpected: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods\nfound: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener", 
+        "position": 9, 
+        "path": "./components/script/dom/eventtarget.rs"
     }, 
     {
-        "comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::conversions::get_dom_class\n\tfound: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods", 
-        "line": "10", 
-        "file": "./components/script/dom/eventtarget.rs"
+        "body": "use statement is not in alphabetical order\nexpected: dom::bindings::conversions::get_dom_class\nfound: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods", 
+        "position": 10, 
+        "path": "./components/script/dom/eventtarget.rs"
     }, 
     {
-        "comment": "use statement is not in alphabetical order\n\texpected: dom::browsercontext\n\tfound: dom::eventtarget::EventTargetTypeId", 
-        "line": "17", 
-        "file": "./components/script/dom/bindings/utils.rs"
+        "body": "use statement is not in alphabetical order\nexpected: dom::browsercontext\nfound: dom::eventtarget::EventTargetTypeId", 
+        "position": 17, 
+        "path": "./components/script/dom/bindings/utils.rs"
     }, 
     {
-        "comment": "use statement is not in alphabetical order\n\texpected: dom::eventtarget::EventTargetTypeId\n\tfound: dom::browsercontext", 
-        "line": "18", 
-        "file": "./components/script/dom/bindings/utils.rs"
+        "body": "use statement is not in alphabetical order\nexpected: dom::eventtarget::EventTargetTypeId\nfound: dom::browsercontext", 
+        "position": 18, 
+        "path": "./components/script/dom/bindings/utils.rs"
     }
 ]
 
@@ -133,15 +133,15 @@ class TestGithubApiProvider(unittest.TestCase):
             def read(self):
                 return "content"
 
+        faux_request = FakeRequest()
         base64_mock.standard_b64encode = Mock(return_value="User:Token")
-        urllib_mock.Request = Mock(return_value=FakeRequest())
+        urllib_mock.Request = Mock(return_value=faux_request)
         urllib_mock.urlopen = Mock(return_value=FakeResponse(FakeHeader()))
         gzip_mock.GzipFile = Mock(return_value=FakeResponse(FakeHeader()))
         gh_provider = GithubApiProvider("jdm", "a453b3923e893f0383cd2893f...", self.owner, self.repo)
-        gh_provider.api_req("GET", "https://api.github.com/repos/servo/servo/contibutors", data={"test":"data"}, media_type="Test Media")
-
-        header = FakeHeader()
-        print header.get('Content-Encoding')
+        gh_provider.api_req("GET", "https://api.github.com/repos/servo/servo/contributors", data={"test":"data"}, media_type="Test Media")
+        urllib_mock.Request.assert_called_with("https://api.github.com/repos/servo/servo/contributors", json.dumps({"test":"data"}), {'Content-Type':'application/json'})
+        urllib_mock.urlopen.assert_called_with(faux_request)
 
 
     def test_parse_header_links(self):
@@ -187,7 +187,7 @@ class TestGithubApiProvider(unittest.TestCase):
         body = "Revmoe extra newline"
         self.gh_provider.post_review_comment(pr_num, commit_id, path, pos, body)
         
-        self.gh_provider.api_req.assert_called_with("POST", GithubApiProvider.post_review_comment_url % (self.owner, self.repo, pr_num), {"body": body, "commit_id":commit_id, "path":path, "position":pos})
+        self.gh_provider.api_req.assert_called_with("POST", GithubApiProvider.review_comment_url % (self.owner, self.repo, pr_num), {"body": body, "commit_id":commit_id, "path":path, "position":pos})
 
 
     def test_add_label(self):
@@ -287,9 +287,9 @@ class TestServoErrorLogParser(unittest.TestCase):
         self.single_log = open('resources/single-line-comment.log').read()
         self.expected_single_errors = [
             {
-                'comment': 'missing space before {', 
-                'line': '49', 
-                'file': './components/plugins/lints/sorter.rs'
+                'body': 'missing space before {', 
+                'position': 49, 
+                'path': './components/plugins/lints/sorter.rs'
             }
         ]
 
@@ -325,6 +325,10 @@ class TestTravisPayloadHandler(unittest.TestCase):
 
 
         class ErrorParserDouble():
+            path_key = ServoErrorLogParser.path_key
+            body_key = ServoErrorLogParser.body_key
+            position_key = ServoErrorLogParser.position_key
+
             def parse_log(self, log):
                 return error_sample
 
@@ -332,24 +336,35 @@ class TestTravisPayloadHandler(unittest.TestCase):
         travis_dbl = TravisDouble()
         error_parser_dbl = ErrorParserDouble()
         self.github = GithubApiProvider("jdm", "a453b3923e893f0383cd2893f...", "servo", "servo")
-        self.github.post_review_comment = Mock(name="post_review_comment")
+        self.github.post_review_comment = Mock()
+        self.github.get_review_comments = Mock(return_value=json.loads(open('resources/review_comments.json').read()))
 
         self.payload_handler = TravisPayloadHandler(self.github, travis_dbl, error_parser_dbl)
         
+
+    def test_delete_dict_matches(self):
+        subject = [{"body":"Hello","position":1,"path":"/hello"}, {"body":"Goodbye","position":1,"path":"/goodbye"}]
+        test = [{"body":"Hello","position":1,"path":"/hello"}]
+        expected = [{"body":"Goodbye","position":1,"path":"/goodbye"}]
+
+        self.assertEquals(expected, self.payload_handler._delete_existing_comments(subject, test))
+
+
     def test_handle_payload(self):
         payload = json.loads(open('resources/test_travis_payload.json').read())
         self.payload_handler.handle_payload(payload)
         err_msg = TravisPayloadHandler.msg_template
         calls = [ 
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[0]['file'], error_sample[0]['line'], error_sample[0]['comment']), error_sample[0]['file'], error_sample[0]['line']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[1]['file'], error_sample[1]['line'], error_sample[1]['comment']), error_sample[1]['file'], error_sample[1]['line']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[2]['file'], error_sample[2]['line'], error_sample[2]['comment']), error_sample[2]['file'], error_sample[2]['line']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[3]['file'], error_sample[3]['line'], error_sample[3]['comment']), error_sample[3]['file'], error_sample[3]['line']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[4]['file'], error_sample[4]['line'], error_sample[4]['comment']), error_sample[4]['file'], error_sample[4]['line']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[5]['file'], error_sample[5]['line'], error_sample[5]['comment']), error_sample[5]['file'], error_sample[5]['line']),
+            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[0]['path'], error_sample[0]['position'], error_sample[0]['body']), error_sample[0]['path'], error_sample[0]['position']),
+            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[1]['path'], error_sample[1]['position'], error_sample[1]['body']), error_sample[1]['path'], error_sample[1]['position']),
+            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[2]['path'], error_sample[2]['position'], error_sample[2]['body']), error_sample[2]['path'], error_sample[2]['position']),
+            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[3]['path'], error_sample[3]['position'], error_sample[3]['body']), error_sample[3]['path'], error_sample[3]['position']),
+            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[4]['path'], error_sample[4]['position'], error_sample[4]['body']), error_sample[4]['path'], error_sample[4]['position']),
+            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[5]['path'], error_sample[5]['position'], error_sample[5]['body']), error_sample[5]['path'], error_sample[5]['position']),
         ]
 
-        self.github.post_review_comment.assert_has_calls(calls)
+        self.github.post_review_comment.assert_called_with(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[3]['path'], error_sample[3]['position'], error_sample[3]['body']), error_sample[3]['path'], error_sample[3]['position'])
+
 
 class TestGithubPayloadHandler(unittest.TestCase):
     def setUp(self):

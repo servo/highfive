@@ -48,7 +48,7 @@ class APIProvider:
 class GithubApiProvider(APIProvider):
     contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=400"
     post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
-    post_review_comment_url = "https://api.github.com/repos/%s/%s/pulls/%s/comments"
+    review_comment_url = "https://api.github.com/repos/%s/%s/pulls/%s/comments"
     collaborators_url = "https://api.github.com/repos/%s/%s/collaborators"
     issue_url = "https://api.github.com/repos/%s/%s/issues/%s"
     get_label_url = "https://api.github.com/repos/%s/%s/issues/%s/labels"
@@ -141,13 +141,25 @@ class GithubApiProvider(APIProvider):
 
     def post_review_comment(self, pr_num, commit_id, path, pos, body):
         try:
-            result = self.api_req("POST", self.post_review_comment_url % (self.owner, self.repo, pr_num),
+            result = self.api_req("POST", self.review_comment_url % (self.owner, self.repo, pr_num),
         						  {"body": body, "commit_id":commit_id, "path":path, "position":pos})
         except urllib2.HTTPError, e:
         	if e.code == 201:
         		pass
         	else:
         		raise e
+
+
+    def get_review_comments(self, pr_num):
+        try:
+            result = self.api_req("GET", self.review_comment_url % (self.owner, self.repo, pr_num))
+
+            return json.loads(result['body'])
+        except urllib2.HTTPError, e:
+            if e.code == 201:
+                pass
+            else:
+                raise e
 
 
     def add_label(self, label, issue):

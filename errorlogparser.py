@@ -5,6 +5,10 @@ class ErrorLogParser():
 		raise NotImplementedError
 
 class ServoErrorLogParser(ErrorLogParser):
+    path_key = 'path'
+    position_key = 'position'
+    body_key = 'body'
+
     def parse_log(self, log):
         error_re = "\\x1b\[94m(.+?)\\x1b\[0m:\\x1b\[93m(.+?)\\x1b\[0m:\s\\x1b\[91m(.+?)(?:\\x1b\[0m|$)"
         cont_comment_re = "\t\\x1b\[\d{2}m(.+?)\\x1b\[0m"
@@ -13,16 +17,16 @@ class ServoErrorLogParser(ErrorLogParser):
         matches = []
         log_list = log.splitlines()
 
-        abbr_log_list = self._trim_log(log_list, error_re)
+        trimmed_log_list = self._trim_log(log_list, error_re)
 
-        for log_line in abbr_log_list:
+        for log_line in trimmed_log_list:
             err_match = re.match(error_re, log_line)
             if err_match:
                 matches.append(list(err_match.groups()))
             else:
                 cont_comment_match = re.match(cont_comment_re, log_line)
                 if cont_comment_match:
-                    matches[-1][-1] += "\n\t{}".format(list(cont_comment_match.groups())[0])
+                    matches[-1][-1] += "\n{}".format(list(cont_comment_match.groups())[0])
 
         return self._process_errors(matches)
 
@@ -32,7 +36,7 @@ class ServoErrorLogParser(ErrorLogParser):
         Cut off irrelevant details so cont_comment_re doesn't match something
         that isn't an error comment
         """
-        abbr_log_list = log_list
+        trimmed_log_list = log_list
         err_match = None
         i = 0
 
@@ -41,9 +45,9 @@ class ServoErrorLogParser(ErrorLogParser):
             i += 1
 
         if err_match:
-            abbr_log_list = log_list[i - 1:]
+            trimmed_log_list = log_list[i - 1:]
 
-        return abbr_log_list
+        return trimmed_log_list
 
 
     def _process_errors(self, matches):
@@ -51,5 +55,5 @@ class ServoErrorLogParser(ErrorLogParser):
 
 
     def _convert_match_to_dict(self, match):
-        return {"file": match[0], "line": match[1], "comment": match[2]}
+        return {self.path_key: match[0], self.position_key: int(match[1]), self.body_key: match[2]}
     	

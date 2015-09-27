@@ -1,5 +1,7 @@
 import random
 import re
+from copy import copy
+from errorlogparser import ServoErrorLogParser
 
 
 class PayloadHandler():
@@ -8,7 +10,7 @@ class PayloadHandler():
 
 
 class TravisPayloadHandler(PayloadHandler):
-    msg_template = "Please fix the following error:\n\nFile: {}\nLine Number: {}\nError: {}"
+    msg_template = "Please fix the following error:\n\n**File:** {}\n**Line Number:** {}\n**Error:** {}"
 
     def __init__(self, github, travis, error_parser):
         self.travis = travis
@@ -22,9 +24,44 @@ class TravisPayloadHandler(PayloadHandler):
         err_data = self.error_parser.parse_log(log)
         pr_num = self.travis.get_pull_request_number(build_data)
 
-        for err_datum in err_data:
-            err_message = self.msg_template.format(err_datum['file'], err_datum['line'], err_datum['comment'])
-            self.github.post_review_comment(pr_num, commit_id, err_message, err_datum['file'], err_datum['line'])
+        existing_comments = [self._build_existing_comment_dict(comment) for comment in self.github.get_review_comments(pr_num)]
+        new_comments = [self._build_review_comment_dict(err_datum) for err_datum in err_data]
+
+        comments_to_post = self._delete_existing_comments(new_comments, existing_comments)
+
+        for comment in comments_to_post:
+            self.github.post_review_comment(pr_num, commit_id, comment[self.error_parser.body_key], comment[self.error_parser.path_key], comment[self.error_parser.position_key])
+
+    def _build_review_comment_dict(self, err_datum):
+        new_datum = err_datum.copy()
+        new_datum[self.error_parser.body_key] = self.msg_template.format(err_datum[self.error_parser.path_key], err_datum[self.error_parser.position_key], err_datum[self.error_parser.body_key])
+
+        return new_datum
+
+    def _build_existing_comment_dict(self, comment):
+        new_comment = {}
+
+        new_comment[self.error_parser.body_key] = comment[self.error_parser.body_key]
+        new_comment[self.error_parser.path_key] = comment[self.error_parser.path_key]
+        new_comment[self.error_parser.position_key] = comment[self.error_parser.position_key]
+
+        return new_comment
+
+    def _delete_existing_comments(self, new, existing):
+        new_copy = copy(new)
+        to_delete = []
+
+        for subject in reversed(new):
+            for comment in existing:
+                if subject[self.error_parser.body_key] == comment[self.error_parser.body_key] and \
+                   subject[self.error_parser.path_key] == comment[self.error_parser.path_key] and \
+                   subject[self.error_parser.position_key] == comment[self.error_parser.position_key]:
+                    
+                    new_copy.remove(subject)
+                    break
+
+        return new_copy
+
 
     def _get_build_id(self, payload):
         return int(payload["target_url"].split("/")[-1])

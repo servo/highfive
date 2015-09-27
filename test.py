@@ -342,29 +342,12 @@ class TestTravisPayloadHandler(unittest.TestCase):
         self.payload_handler = TravisPayloadHandler(self.github, travis_dbl, error_parser_dbl)
         
 
-    def test_delete_dict_matches(self):
-        subject = [{"body":"Hello","position":1,"path":"/hello"}, {"body":"Goodbye","position":1,"path":"/goodbye"}]
-        test = [{"body":"Hello","position":1,"path":"/hello"}]
-        expected = [{"body":"Goodbye","position":1,"path":"/goodbye"}]
-
-        self.assertEquals(expected, self.payload_handler._delete_existing_comments(subject, test))
-
-
     def test_handle_payload(self):
         payload = json.loads(open('resources/test_travis_payload.json').read())
         self.payload_handler.handle_payload(payload)
         err_msg = TravisPayloadHandler.msg_template
-        calls = [ 
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[0]['path'], error_sample[0]['position'], error_sample[0]['body']), error_sample[0]['path'], error_sample[0]['position']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[1]['path'], error_sample[1]['position'], error_sample[1]['body']), error_sample[1]['path'], error_sample[1]['position']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[2]['path'], error_sample[2]['position'], error_sample[2]['body']), error_sample[2]['path'], error_sample[2]['position']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[3]['path'], error_sample[3]['position'], error_sample[3]['body']), error_sample[3]['path'], error_sample[3]['position']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[4]['path'], error_sample[4]['position'], error_sample[4]['body']), error_sample[4]['path'], error_sample[4]['position']),
-            call(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[5]['path'], error_sample[5]['position'], error_sample[5]['body']), error_sample[5]['path'], error_sample[5]['position']),
-        ]
 
         self.github.post_review_comment.assert_called_with(1, "9b6313fd5ab92de5a3fd9f13f8421a929b2a8ef6", err_msg.format(error_sample[3]['path'], error_sample[3]['position'], error_sample[3]['body']), error_sample[3]['path'], error_sample[3]['position'])
-
 
 class TestGithubPayloadHandler(unittest.TestCase):
     def setUp(self):
@@ -469,7 +452,8 @@ class TestGithubPayloadHandler(unittest.TestCase):
         self.github.add_label.assert_called_with("S-needs-rebase", issue_num)
 
 
-    def test_new_pr_no_msg(self):
+    @patch('payloadhandler.random')
+    def test_new_pr_no_msg(self, random_mock):
         self.github.is_new_contributor = Mock(return_value=True)
         self.github.post_comment = Mock()
         self.github.get_diff = Mock(return_value="")
@@ -480,12 +464,12 @@ class TestGithubPayloadHandler(unittest.TestCase):
         payload = {"pull_request":{"user":{"login":"jdm"},"diff_url":diff_url}}
         issue_num = 1
         rand_val = 'jdm'
+        random_mock.choice.return_value = rand_val
 
-        with patch('payloadhandler.random.choice', return_value=rand_val) as mock_random:
-            pl_handler.new_pr(issue_num, payload)
-            pl_handler.manage_pr_state.assert_called_with(issue_num, payload)
-            self.github.post_comment.assert_called_with(GithubPayloadHandler.welcome_msg % rand_val, issue_num)
-            self.github.get_diff.assert_called_with(diff_url)
+        pl_handler.new_pr(issue_num, payload)
+        pl_handler.manage_pr_state.assert_called_with(issue_num, payload)
+        self.github.post_comment.assert_called_with(GithubPayloadHandler.welcome_msg % rand_val, issue_num)
+        self.github.get_diff.assert_called_with(diff_url)
 
 
     def test_new_pr_unsafe_msg(self):

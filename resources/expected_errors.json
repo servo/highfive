@@ -1,0 +1,32 @@
+[
+	{
+		"comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull\n\tfound: dom::bindings::conversions::get_dom_class", 
+		"line": "7", 
+		"file": "./components/script/dom/eventtarget.rs"
+	}, 
+	{
+		"comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener\n\tfound: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull", 
+		"line": "8", 
+		"file": "./components/script/dom/eventtarget.rs"
+	}, 
+	{
+		"comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods\n\tfound: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener", 
+		"line": "9", 
+		"file": "./components/script/dom/eventtarget.rs"
+	}, 
+	{
+		"comment": "use statement is not in alphabetical order\n\texpected: dom::bindings::conversions::get_dom_class\n\tfound: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods", 
+		"line": "10", 
+		"file": "./components/script/dom/eventtarget.rs"
+	}, 
+	{
+		"comment": "use statement is not in alphabetical order\n\texpected: dom::browsercontext\n\tfound: dom::eventtarget::EventTargetTypeId", 
+		"line": "17", 
+		"file": "./components/script/dom/bindings/utils.rs"
+	}, 
+	{
+		"comment": "use statement is not in alphabetical order\n\texpected: dom::eventtarget::EventTargetTypeId\n\tfound: dom::browsercontext", 
+		"line": "18", 
+		"file": "./components/script/dom/bindings/utils.rs"
+	}
+]

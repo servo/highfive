@@ -1,0 +1,767 @@
+Using worker: worker-linux-docker-176118fe.prod.travis-ci.org:travis-linux-8
+
+travis_fold:start:system_info
+[0K[33;1mBuild system information[0m
+Build language: python
+[34m[1mBuild image provisioning date and time[0m
+Thu Feb  5 15:09:33 UTC 2015
+[34m[1mOperating System Details[0m
+Distributor ID:	Ubuntu
+Description:	Ubuntu 12.04.5 LTS
+Release:	12.04
+Codename:	precise
+[34m[1mLinux Version[0m
+3.13.0-29-generic
+[34m[1mCookbooks Version[0m
+a68419e https://github.com/travis-ci/travis-cookbooks/tree/a68419e
+[34m[1mGCC version[0m
+gcc (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+[34m[1mLLVM version[0m
+clang version 3.4 (tags/RELEASE_34/final)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+[34m[1mPre-installed Ruby versions[0m
+ruby-1.9.3-p551
+[34m[1mPre-installed Node.js versions[0m
+v0.10.36
+[34m[1mPre-installed Go versions[0m
+1.4.1
+[34m[1mRedis version[0m
+redis-server 2.8.19
+[34m[1mriak version[0m
+2.0.2
+[34m[1mMongoDB version[0m
+MongoDB 2.4.12
+[34m[1mCouchDB version[0m
+couchdb 1.6.1
+[34m[1mNeo4j version[0m
+1.9.4
+[34m[1mRabbitMQ Version[0m
+3.4.3
+[34m[1mElasticSearch version[0m
+1.4.0
+[34m[1mInstalled Sphinx versions[0m
+2.0.10
+2.1.9
+2.2.6
+[34m[1mDefault Sphinx version[0m
+2.2.6
+[34m[1mInstalled Firefox version[0m
+firefox 31.0esr
+[34m[1mPhantomJS version[0m
+1.9.8
+[34m[1mant -version[0m
+Apache Ant(TM) version 1.8.2 compiled on December 3 2011
+[34m[1mmvn -version[0m
+Apache Maven 3.2.5 (12a6b3acb947671f09b81f49094c53f426d8cea1; 2014-12-14T17:29:23+00:00)
+Maven home: /usr/local/maven
+Java version: 1.7.0_76, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-7-oracle/jre
+Default locale: en_US, platform encoding: ANSI_X3.4-1968
+OS name: "linux", version: "3.13.0-29-generic", arch: "amd64", family: "unix"
+travis_fold:end:system_info
+[0K
+travis_fold:start:git.checkout
+[0Ktravis_time:start:16daecd0
+[0K$ git clone --depth=50 https://github.com/servo/servo.git servo/servo
+Cloning into 'servo/servo'...
+remote: Counting objects: 101276, done.[K
+remote: Compressing objects:   0% (1/37782)   [K
+remote: Compressing objects:   1% (378/37782)   [K
+remote: Compressing objects:   2% (756/37782)   [K
+remote: Compressing objects:   3% (1134/37782)   [K
+remote: Compressing objects:   4% (1512/37782)   [K
+remote: Compressing objects:   5% (1890/37782)   [K
+remote: Compressing objects:   6% (2267/37782)   [K
+remote: Compressing objects:   7% (2645/37782)   [K
+remote: Compressing objects:   8% (3023/37782)   [K
+remote: Compressing objects:   9% (3401/37782)   [K
+remote: Compressing objects:  10% (3779/37782)   [K
+remote: Compressing objects:  11% (4157/37782)   [K
+remote: Compressing objects:  12% (4534/37782)   [K
+remote: Compressing objects:  13% (4912/37782)   [K
+remote: Compressing objects:  14% (5290/37782)   [K
+remote: Compressing objects:  15% (5668/37782)   [K
+remote: Compressing objects:  16% (6046/37782)   [K
+remote: Compressing objects:  17% (6423/37782)   [K
+remote: Compressing objects:  18% (6801/37782)   [K
+remote: Compressing objects:  19% (7179/37782)   [K
+remote: Compressing objects:  20% (7557/37782)   [K
+remote: Compressing objects:  21% (7935/37782)   [K
+remote: Compressing objects:  22% (8313/37782)   [K
+remote: Compressing objects:  23% (8690/37782)   [K
+remote: Compressing objects:  24% (9068/37782)   [K
+remote: Compressing objects:  25% (9446/37782)   [K
+remote: Compressing objects:  26% (9824/37782)   [K
+remote: Compressing objects:  27% (10202/37782)   [K
+remote: Compressing objects:  28% (10579/37782)   [K
+remote: Compressing objects:  29% (10957/37782)   [K
+remote: Compressing objects:  30% (11335/37782)   [K
+remote: Compressing objects:  31% (11713/37782)   [K
+remote: Compressing objects:  32% (12091/37782)   [K
+remote: Compressing objects:  33% (12469/37782)   [K
+remote: Compressing objects:  34% (12846/37782)   [K
+remote: Compressing objects:  35% (13224/37782)   [K
+remote: Compressing objects:  36% (13602/37782)   [K
+remote: Compressing objects:  37% (13980/37782)   [K
+remote: Compressing objects:  38% (14358/37782)   [K
+remote: Compressing objects:  39% (14735/37782)   [K
+remote: Compressing objects:  40% (15113/37782)   [K
+remote: Compressing objects:  41% (15491/37782)   [K
+remote: Compressing objects:  42% (15869/37782)   [K
+remote: Compressing objects:  43% (16247/37782)   [K
+remote: Compressing objects:  44% (16625/37782)   [K
+remote: Compressing objects:  45% (17002/37782)   [K
+remote: Compressing objects:  46% (17380/37782)   [K
+remote: Compressing objects:  47% (17758/37782)   [K
+remote: Compressing objects:  48% (18136/37782)   [K
+remote: Compressing objects:  49% (18514/37782)   [K
+remote: Compressing objects:  50% (18891/37782)   [K
+remote: Compressing objects:  51% (19269/37782)   [K
+remote: Compressing objects:  52% (19647/37782)   [K
+remote: Compressing objects:  53% (20025/37782)   [K
+remote: Compressing objects:  54% (20403/37782)   [K
+remote: Compressing objects:  55% (20781/37782)   [K
+remote: Compressing objects:  56% (21158/37782)   [K
+remote: Compressing objects:  57% (21536/37782)   [K
+remote: Compressing objects:  58% (21914/37782)   [K
+remote: Compressing objects:  59% (22292/37782)   [K
+remote: Compressing objects:  60% (22670/37782)   [K
+remote: Compressing objects:  61% (23048/37782)   [K
+remote: Compressing objects:  62% (23425/37782)   [K
+remote: Compressing objects:  63% (23803/37782)   [K
+remote: Compressing objects:  64% (24181/37782)   [K
+remote: Compressing objects:  64% (24498/37782)   [K
+remote: Compressing objects:  65% (24559/37782)   [K
+remote: Compressing objects:  66% (24937/37782)   [K
+remote: Compressing objects:  67% (25314/37782)   [K
+remote: Compressing objects:  68% (25692/37782)   [K
+remote: Compressing objects:  69% (26070/37782)   [K
+remote: Compressing objects:  70% (26448/37782)   [K
+remote: Compressing objects:  71% (26826/37782)   [K
+remote: Compressing objects:  72% (27204/37782)   [K
+remote: Compressing objects:  73% (27581/37782)   [K
+remote: Compressing objects:  74% (27959/37782)   [K
+remote: Compressing objects:  75% (28337/37782)   [K
+remote: Compressing objects:  76% (28715/37782)   [K
+remote: Compressing objects:  77% (29093/37782)   [K
+remote: Compressing objects:  78% (29470/37782)   [K
+remote: Compressing objects:  79% (29848/37782)   [K
+remote: Compressing objects:  80% (30226/37782)   [K
+remote: Compressing objects:  81% (30604/37782)   [K
+remote: Compressing objects:  82% (30982/37782)   [K
+remote: Compressing objects:  83% (31360/37782)   [K
+remote: Compressing objects:  84% (31737/37782)   [K
+remote: Compressing objects:  85% (32115/37782)   [K
+remote: Compressing objects:  86% (32493/37782)   [K
+remote: Compressing objects:  87% (32871/37782)   [K
+remote: Compressing objects:  88% (33249/37782)   [K
+remote: Compressing objects:  89% (33626/37782)   [K
+remote: Compressing objects:  90% (34004/37782)   [K
+remote: Compressing objects:  91% (34382/37782)   [K
+remote: Compressing objects:  92% (34760/37782)   [K
+remote: Compressing objects:  93% (35138/37782)   [K
+remote: Compressing objects:  94% (35516/37782)   [K
+remote: Compressing objects:  95% (35893/37782)   [K
+remote: Compressing objects:  96% (36271/37782)   [K
+remote: Compressing objects:  97% (36649/37782)   [K
+remote: Compressing objects:  98% (37027/37782)   [K
+remote: Compressing objects:  99% (37405/37782)   [K
+remote: Compressing objects: 100% (37782/37782)   [K
+remote: Compressing objects: 100% (37782/37782), done.[K
+Receiving objects:   0% (1/101276)   
+Receiving objects:   1% (1013/101276)   
+Receiving objects:   2% (2026/101276)   
+Receiving objects:   3% (3039/101276)   
+Receiving objects:   4% (4052/101276)   
+Receiving objects:   5% (5064/101276)   
+Receiving objects:   6% (6077/101276)   
+Receiving objects:   7% (7090/101276)   
+Receiving objects:   8% (8103/101276)   
+Receiving objects:   9% (9115/101276)   
+Receiving objects:  10% (10128/101276)   
+Receiving objects:  11% (11141/101276)   
+Receiving objects:  12% (12154/101276)   
+Receiving objects:  13% (13166/101276)   
+Receiving objects:  14% (14179/101276)   
+Receiving objects:  15% (15192/101276)   
+Receiving objects:  16% (16205/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  17% (17217/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  18% (18230/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  19% (19243/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  20% (20256/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  21% (21268/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  22% (22281/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  23% (23294/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  24% (24307/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  25% (25319/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  26% (26332/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  27% (27345/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  28% (28358/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  29% (29371/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  30% (30383/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  31% (31396/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  32% (32409/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  33% (33422/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  34% (34434/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  35% (35447/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  36% (36460/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  37% (37473/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  38% (38485/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  39% (39498/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  40% (40511/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  40% (41312/101276), 16.13 MiB | 32.19 MiB/s   
+Receiving objects:  41% (41524/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  42% (42536/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  43% (43549/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  44% (44562/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  45% (45575/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  46% (46587/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  47% (47600/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  48% (48613/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  49% (49626/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  50% (50638/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  51% (51651/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  52% (52664/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  53% (53677/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  54% (54690/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  55% (55702/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  56% (56715/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  57% (57728/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  58% (58741/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  59% (59753/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  60% (60766/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  61% (61779/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  62% (62792/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  63% (63804/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  64% (64817/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  65% (65830/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  66% (66843/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  67% (67855/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  68% (68868/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  69% (69881/101276), 34.46 MiB | 34.39 MiB/s   
+Receiving objects:  70% (70894/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  71% (71906/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  72% (72919/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  73% (73932/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  74% (74945/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  75% (75957/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  76% (76970/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  77% (77983/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  78% (78996/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  79% (80009/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  80% (81021/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  81% (82034/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  82% (83047/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  83% (84060/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  84% (85072/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  85% (86085/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  86% (87098/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  87% (88111/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  87% (88482/101276), 46.09 MiB | 30.67 MiB/s   
+Receiving objects:  88% (89123/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  89% (90136/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  90% (91149/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  91% (92162/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  92% (93174/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  93% (94187/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  94% (95200/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  95% (96213/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  96% (97225/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  97% (98238/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  98% (99251/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects:  99% (100264/101276), 60.51 MiB | 30.19 MiB/s   
+remote: Total 101276 (delta 64964), reused 97481 (delta 62116), pack-reused 0[K
+Receiving objects: 100% (101276/101276), 60.51 MiB | 30.19 MiB/s   
+Receiving objects: 100% (101276/101276), 71.83 MiB | 30.19 MiB/s, done.
+Resolving deltas:   0% (0/64964)   
+Resolving deltas:   1% (719/64964)   
+Resolving deltas:   2% (1326/64964)   
+Resolving deltas:   3% (1970/64964)   
+Resolving deltas:   4% (2608/64964)   
+Resolving deltas:   5% (3250/64964)   
+Resolving deltas:   6% (3921/64964)   
+Resolving deltas:   7% (4548/64964)   
+Resolving deltas:   8% (5234/64964)   
+Resolving deltas:   9% (5847/64964)   
+Resolving deltas:  10% (6558/64964)   
+Resolving deltas:  11% (7160/64964)   
+Resolving deltas:  12% (7800/64964)   
+Resolving deltas:  13% (8446/64964)   
+Resolving deltas:  14% (9106/64964)   
+Resolving deltas:  15% (9747/64964)   
+Resolving deltas:  16% (10412/64964)   
+Resolving deltas:  17% (11044/64964)   
+Resolving deltas:  18% (11731/64964)   
+Resolving deltas:  19% (12381/64964)   
+Resolving deltas:  20% (13002/64964)   
+Resolving deltas:  21% (13644/64964)   
+Resolving deltas:  22% (14312/64964)   
+Resolving deltas:  23% (14952/64964)   
+Resolving deltas:  24% (15607/64964)   
+Resolving deltas:  25% (16304/64964)   
+Resolving deltas:  26% (16894/64964)   
+Resolving deltas:  27% (17541/64964)   
+Resolving deltas:  28% (18202/64964)   
+Resolving deltas:  29% (18841/64964)   
+Resolving deltas:  30% (19496/64964)   
+Resolving deltas:  31% (20144/64964)   
+Resolving deltas:  32% (20799/64964)   
+Resolving deltas:  33% (21703/64964)   
+Resolving deltas:  34% (22121/64964)   
+Resolving deltas:  35% (22907/64964)   
+Resolving deltas:  36% (23425/64964)   
+Resolving deltas:  37% (24146/64964)   
+Resolving deltas:  38% (24798/64964)   
+Resolving deltas:  39% (25511/64964)   
+Resolving deltas:  40% (25992/64964)   
+Resolving deltas:  41% (26691/64964)   
+Resolving deltas:  42% (27305/64964)   
+Resolving deltas:  43% (28051/64964)   
+Resolving deltas:  44% (28654/64964)   
+Resolving deltas:  45% (29257/64964)   
+Resolving deltas:  46% (29895/64964)   
+Resolving deltas:  47% (30534/64964)   
+Resolving deltas:  48% (31201/64964)   
+Resolving deltas:  49% (31852/64964)   
+Resolving deltas:  50% (32496/64964)   
+Resolving deltas:  51% (33137/64964)   
+Resolving deltas:  52% (33782/64964)   
+Resolving deltas:  53% (34442/64964)   
+Resolving deltas:  54% (35081/64964)   
+Resolving deltas:  55% (35731/64964)   
+Resolving deltas:  56% (36380/64964)   
+Resolving deltas:  57% (37030/64964)   
+Resolving deltas:  58% (37686/64964)   
+Resolving deltas:  59% (38377/64964)   
+Resolving deltas:  60% (38980/64964)   
+Resolving deltas:  61% (39712/64964)   
+Resolving deltas:  62% (40287/64964)   
+Resolving deltas:  63% (40929/64964)   
+Resolving deltas:  63% (41089/64964)   
+Resolving deltas:  64% (41590/64964)   
+Resolving deltas:  65% (42231/64964)   
+Resolving deltas:  66% (42880/64964)   
+Resolving deltas:  67% (43528/64964)   
+Resolving deltas:  68% (44176/64964)   
+Resolving deltas:  69% (44828/64964)   
+Resolving deltas:  70% (45531/64964)   
+Resolving deltas:  71% (46132/64964)   
+Resolving deltas:  72% (46805/64964)   
+Resolving deltas:  73% (47479/64964)   
+Resolving deltas:  74% (48074/64964)   
+Resolving deltas:  75% (48740/64964)   
+Resolving deltas:  76% (49450/64964)   
+Resolving deltas:  77% (50030/64964)   
+Resolving deltas:  78% (50672/64964)   
+Resolving deltas:  79% (51327/64964)   
+Resolving deltas:  80% (51972/64964)   
+Resolving deltas:  81% (52621/64964)   
+Resolving deltas:  82% (53276/64964)   
+Resolving deltas:  83% (53921/64964)   
+Resolving deltas:  84% (54589/64964)   
+Resolving deltas:  85% (55243/64964)   
+Resolving deltas:  86% (55871/64964)   
+Resolving deltas:  87% (56520/64964)   
+Resolving deltas:  88% (57360/64964)   
+Resolving deltas:  89% (57822/64964)   
+Resolving deltas:  90% (58468/64964)   
+Resolving deltas:  91% (59120/64964)   
+Resolving deltas:  92% (59768/64964)   
+Resolving deltas:  93% (60422/64964)   
+Resolving deltas:  94% (61069/64964)   
+Resolving deltas:  95% (61721/64964)   
+Resolving deltas:  96% (62679/64964)   
+Resolving deltas:  97% (63035/64964)   
+Resolving deltas:  98% (63671/64964)   
+Resolving deltas:  99% (64317/64964)   
+Resolving deltas: 100% (64964/64964)   
+Resolving deltas: 100% (64964/64964), done.
+Checking connectivity... done.
+Checking out files:  15% (17972/118796)   
+Checking out files:  16% (19008/118796)   
+Checking out files:  17% (20196/118796)   
+Checking out files:  18% (21384/118796)   
+Checking out files:  19% (22572/118796)   
+Checking out files:  20% (23760/118796)   
+Checking out files:  21% (24948/118796)   
+Checking out files:  22% (26136/118796)   
+Checking out files:  23% (27324/118796)   
+Checking out files:  24% (28512/118796)   
+Checking out files:  25% (29699/118796)   
+Checking out files:  26% (30887/118796)   
+Checking out files:  27% (32075/118796)   
+Checking out files:  28% (33263/118796)   
+Checking out files:  29% (34451/118796)   
+Checking out files:  29% (34953/118796)   
+Checking out files:  30% (35639/118796)   
+Checking out files:  31% (36827/118796)   
+Checking out files:  32% (38015/118796)   
+Checking out files:  33% (39203/118796)   
+Checking out files:  34% (40391/118796)   
+Checking out files:  35% (41579/118796)   
+Checking out files:  36% (42767/118796)   
+Checking out files:  37% (43955/118796)   
+Checking out files:  38% (45143/118796)   
+Checking out files:  39% (46331/118796)   
+Checking out files:  40% (47519/118796)   
+Checking out files:  41% (48707/118796)   
+Checking out files:  42% (49895/118796)   
+Checking out files:  42% (50145/118796)   
+Checking out files:  43% (51083/118796)   
+Checking out files:  44% (52271/118796)   
+Checking out files:  45% (53459/118796)   
+Checking out files:  46% (54647/118796)   
+Checking out files:  47% (55835/118796)   
+Checking out files:  48% (57023/118796)   
+Checking out files:  49% (58211/118796)   
+Checking out files:  50% (59398/118796)   
+Checking out files:  51% (60586/118796)   
+Checking out files:  52% (61774/118796)   
+Checking out files:  53% (62962/118796)   
+Checking out files:  54% (64150/118796)   
+Checking out files:  55% (65338/118796)   
+Checking out files:  56% (66526/118796)   
+Checking out files:  56% (66983/118796)   
+Checking out files:  57% (67714/118796)   
+Checking out files:  58% (68902/118796)   
+Checking out files:  59% (70090/118796)   
+Checking out files:  60% (71278/118796)   
+Checking out files:  61% (72466/118796)   
+Checking out files:  62% (73654/118796)   
+Checking out files:  63% (74842/118796)   
+Checking out files:  64% (76030/118796)   
+Checking out files:  65% (77218/118796)   
+Checking out files:  66% (78406/118796)   
+Checking out files:  67% (79594/118796)   
+Checking out files:  68% (80782/118796)   
+Checking out files:  68% (81956/118796)   
+Checking out files:  69% (81970/118796)   
+Checking out files:  70% (83158/118796)   
+Checking out files:  71% (84346/118796)   
+Checking out files:  72% (85534/118796)   
+Checking out files:  73% (86722/118796)   
+Checking out files:  74% (87910/118796)   
+Checking out files:  75% (89097/118796)   
+Checking out files:  76% (90285/118796)   
+Checking out files:  77% (91473/118796)   
+Checking out files:  78% (92661/118796)   
+Checking out files:  79% (93849/118796)   
+Checking out files:  80% (95037/118796)   
+Checking out files:  81% (96225/118796)   
+Checking out files:  82% (97413/118796)   
+Checking out files:  82% (97614/118796)   
+Checking out files:  83% (98601/118796)   
+Checking out files:  84% (99789/118796)   
+Checking out files:  85% (100977/118796)   
+Checking out files:  86% (102165/118796)   
+Checking out files:  87% (103353/118796)   
+Checking out files:  88% (104541/118796)   
+Checking out files:  89% (105729/118796)   
+Checking out files:  90% (106917/118796)   
+Checking out files:  91% (108105/118796)   
+Checking out files:  92% (109293/118796)   
+Checking out files:  93% (110481/118796)   
+Checking out files:  94% (111669/118796)   
+Checking out files:  95% (112857/118796)   
+Checking out files:  95% (113057/118796)   
+Checking out files:  96% (114045/118796)   
+Checking out files:  97% (115233/118796)   
+Checking out files:  98% (116421/118796)   
+Checking out files:  99% (117609/118796)   
+Checking out files: 100% (118796/118796)   
+Checking out files: 100% (118796/118796), done.
+travis_time:end:16daecd0:start=1442012004129913797,finish=1442012018866609279,duration=14736695482
+[0K$ cd servo/servo
+travis_time:start:04bda51d
+[0K$ git fetch origin +refs/pull/7606/merge:
+remote: Counting objects: 61, done.[K
+remote: Compressing objects:   4% (1/22)   [K
+remote: Compressing objects:   9% (2/22)   [K
+remote: Compressing objects:  13% (3/22)   [K
+remote: Compressing objects:  18% (4/22)   [K
+remote: Compressing objects:  22% (5/22)   [K
+remote: Compressing objects:  27% (6/22)   [K
+remote: Compressing objects:  31% (7/22)   [K
+remote: Compressing objects:  36% (8/22)   [K
+remote: Compressing objects:  40% (9/22)   [K
+remote: Compressing objects:  45% (10/22)   [K
+remote: Compressing objects:  50% (11/22)   [K
+remote: Compressing objects:  54% (12/22)   [K
+remote: Compressing objects:  59% (13/22)   [K
+remote: Compressing objects:  63% (14/22)   [K
+remote: Compressing objects:  68% (15/22)   [K
+remote: Compressing objects:  72% (16/22)   [K
+remote: Compressing objects:  77% (17/22)   [K
+remote: Compressing objects:  81% (18/22)   [K
+remote: Compressing objects:  86% (19/22)   [K
+remote: Compressing objects:  90% (20/22)   [K
+remote: Compressing objects:  95% (21/22)   [K
+remote: Compressing objects: 100% (22/22)   [K
+remote: Compressing objects: 100% (22/22), done.[K
+remote: Total 61 (delta 55), reused 44 (delta 39), pack-reused 0[K
+Unpacking objects:   1% (1/61)   
+Unpacking objects:   3% (2/61)   
+Unpacking objects:   4% (3/61)   
+Unpacking objects:   6% (4/61)   
+Unpacking objects:   8% (5/61)   
+Unpacking objects:   9% (6/61)   
+Unpacking objects:  11% (7/61)   
+Unpacking objects:  13% (8/61)   
+Unpacking objects:  14% (9/61)   
+Unpacking objects:  16% (10/61)   
+Unpacking objects:  18% (11/61)   
+Unpacking objects:  19% (12/61)   
+Unpacking objects:  21% (13/61)   
+Unpacking objects:  22% (14/61)   
+Unpacking objects:  24% (15/61)   
+Unpacking objects:  26% (16/61)   
+Unpacking objects:  27% (17/61)   
+Unpacking objects:  29% (18/61)   
+Unpacking objects:  31% (19/61)   
+Unpacking objects:  32% (20/61)   
+Unpacking objects:  34% (21/61)   
+Unpacking objects:  36% (22/61)   
+Unpacking objects:  37% (23/61)   
+Unpacking objects:  39% (24/61)   
+Unpacking objects:  40% (25/61)   
+Unpacking objects:  42% (26/61)   
+Unpacking objects:  44% (27/61)   
+Unpacking objects:  45% (28/61)   
+Unpacking objects:  47% (29/61)   
+Unpacking objects:  49% (30/61)   
+Unpacking objects:  50% (31/61)   
+Unpacking objects:  52% (32/61)   
+Unpacking objects:  54% (33/61)   
+Unpacking objects:  55% (34/61)   
+Unpacking objects:  57% (35/61)   
+Unpacking objects:  59% (36/61)   
+Unpacking objects:  60% (37/61)   
+Unpacking objects:  62% (38/61)   
+Unpacking objects:  63% (39/61)   
+Unpacking objects:  65% (40/61)   
+Unpacking objects:  67% (41/61)   
+Unpacking objects:  68% (42/61)   
+Unpacking objects:  70% (43/61)   
+Unpacking objects:  72% (44/61)   
+Unpacking objects:  73% (45/61)   
+Unpacking objects:  75% (46/61)   
+Unpacking objects:  77% (47/61)   
+Unpacking objects:  78% (48/61)   
+Unpacking objects:  80% (49/61)   
+Unpacking objects:  81% (50/61)   
+Unpacking objects:  83% (51/61)   
+Unpacking objects:  85% (52/61)   
+Unpacking objects:  86% (53/61)   
+Unpacking objects:  88% (54/61)   
+Unpacking objects:  90% (55/61)   
+Unpacking objects:  91% (56/61)   
+Unpacking objects:  93% (57/61)   
+Unpacking objects:  95% (58/61)   
+Unpacking objects:  96% (59/61)   
+Unpacking objects:  98% (60/61)   
+Unpacking objects: 100% (61/61)   
+Unpacking objects: 100% (61/61), done.
+From https://github.com/servo/servo
+ * branch            refs/pull/7606/merge -> FETCH_HEAD
+travis_time:end:04bda51d:start=1442012018870347891,finish=1442012019489804985,duration=619457094
+[0K$ git checkout -qf FETCH_HEAD
+travis_fold:end:git.checkout
+[0Ktravis_fold:start:git.submodule
+[0Ktravis_time:start:04378686
+[0K$ git submodule init
+Submodule 'support/android-rs-glue' (https://github.com/tomaka/android-rs-glue) registered for path 'support/android-rs-glue'
+travis_time:end:04378686:start=1442012020599535551,finish=1442012020975447711,duration=375912160
+[0Ktravis_time:start:326023b0
+[0K$ git submodule update
+Cloning into 'support/android-rs-glue'...
+remote: Counting objects: 564, done.[K
+Receiving objects:   0% (1/564)   
+Receiving objects:   1% (6/564)   
+Receiving objects:   2% (12/564)   
+Receiving objects:   3% (17/564)   
+Receiving objects:   4% (23/564)   
+Receiving objects:   5% (29/564)   
+Receiving objects:   6% (34/564)   
+Receiving objects:   7% (40/564)   
+Receiving objects:   8% (46/564)   
+Receiving objects:   9% (51/564)   
+Receiving objects:  10% (57/564)   
+Receiving objects:  11% (63/564)   
+Receiving objects:  12% (68/564)   
+Receiving objects:  13% (74/564)   
+Receiving objects:  14% (79/564)   
+Receiving objects:  15% (85/564)   
+Receiving objects:  16% (91/564)   
+Receiving objects:  17% (96/564)   
+Receiving objects:  18% (102/564)   
+Receiving objects:  19% (108/564)   
+Receiving objects:  20% (113/564)   
+Receiving objects:  21% (119/564)   
+Receiving objects:  22% (125/564)   
+Receiving objects:  23% (130/564)   
+Receiving objects:  24% (136/564)   
+Receiving objects:  25% (141/564)   
+Receiving objects:  26% (147/564)   
+Receiving objects:  27% (153/564)   
+Receiving objects:  28% (158/564)   
+Receiving objects:  29% (164/564)   
+Receiving objects:  30% (170/564)   
+Receiving objects:  31% (175/564)   
+Receiving objects:  32% (181/564)   
+Receiving objects:  33% (187/564)   
+Receiving objects:  34% (192/564)   
+Receiving objects:  35% (198/564)   
+Receiving objects:  36% (204/564)   
+Receiving objects:  37% (209/564)   
+Receiving objects:  38% (215/564)   
+Receiving objects:  39% (220/564)   
+Receiving objects:  40% (226/564)   
+Receiving objects:  41% (232/564)   
+Receiving objects:  42% (237/564)   
+Receiving objects:  43% (243/564)   
+Receiving objects:  44% (249/564)   
+Receiving objects:  45% (254/564)   
+Receiving objects:  46% (260/564)   
+Receiving objects:  47% (266/564)   
+Receiving objects:  48% (271/564)   
+Receiving objects:  49% (277/564)   
+Receiving objects:  50% (282/564)   
+Receiving objects:  51% (288/564)   
+Receiving objects:  52% (294/564)   
+Receiving objects:  53% (299/564)   
+Receiving objects:  54% (305/564)   
+Receiving objects:  55% (311/564)   
+Receiving objects:  56% (316/564)   
+Receiving objects:  57% (322/564)   
+Receiving objects:  58% (328/564)   
+Receiving objects:  59% (333/564)   
+Receiving objects:  60% (339/564)   
+Receiving objects:  61% (345/564)   
+Receiving objects:  62% (350/564)   
+Receiving objects:  63% (356/564)   
+Receiving objects:  64% (361/564)   
+Receiving objects:  65% (367/564)   
+Receiving objects:  66% (373/564)   
+Receiving objects:  67% (378/564)   
+Receiving objects:  68% (384/564)   
+Receiving objects:  69% (390/564)   
+Receiving objects:  70% (395/564)   
+Receiving objects:  71% (401/564)   
+Receiving objects:  72% (407/564)   
+Receiving objects:  73% (412/564)   
+Receiving objects:  74% (418/564)   
+Receiving objects:  75% (423/564)   
+Receiving objects:  76% (429/564)   
+Receiving objects:  77% (435/564)   
+Receiving objects:  78% (440/564)   
+Receiving objects:  79% (446/564)   
+Receiving objects:  80% (452/564)   
+Receiving objects:  81% (457/564)   
+remote: Total 564 (delta 0), reused 0 (delta 0), pack-reused 564[K
+Receiving objects:  82% (463/564)   
+Receiving objects:  83% (469/564)   
+Receiving objects:  84% (474/564)   
+Receiving objects:  85% (480/564)   
+Receiving objects:  86% (486/564)   
+Receiving objects:  87% (491/564)   
+Receiving objects:  88% (497/564)   
+Receiving objects:  89% (502/564)   
+Receiving objects:  90% (508/564)   
+Receiving objects:  91% (514/564)   
+Receiving objects:  92% (519/564)   
+Receiving objects:  93% (525/564)   
+Receiving objects:  94% (531/564)   
+Receiving objects:  95% (536/564)   
+Receiving objects:  96% (542/564)   
+Receiving objects:  97% (548/564)   
+Receiving objects:  98% (553/564)   
+Receiving objects:  99% (559/564)   
+Receiving objects: 100% (564/564)   
+Receiving objects: 100% (564/564), 133.16 KiB | 0 bytes/s, done.
+Resolving deltas:   0% (0/276)   
+Resolving deltas:   4% (13/276)   
+Resolving deltas:   5% (15/276)   
+Resolving deltas:   6% (17/276)   
+Resolving deltas:   7% (21/276)   
+Resolving deltas:   8% (24/276)   
+Resolving deltas:   9% (25/276)   
+Resolving deltas:  14% (39/276)   
+Resolving deltas:  17% (48/276)   
+Resolving deltas:  19% (54/276)   
+Resolving deltas:  31% (87/276)   
+Resolving deltas:  32% (90/276)   
+Resolving deltas:  35% (99/276)   
+Resolving deltas:  44% (124/276)   
+Resolving deltas:  51% (142/276)   
+Resolving deltas:  57% (160/276)   
+Resolving deltas:  67% (187/276)   
+Resolving deltas:  69% (192/276)   
+Resolving deltas:  70% (194/276)   
+Resolving deltas:  81% (225/276)   
+Resolving deltas:  83% (231/276)   
+Resolving deltas:  84% (232/276)   
+Resolving deltas:  87% (242/276)   
+Resolving deltas:  88% (245/276)   
+Resolving deltas:  92% (255/276)   
+Resolving deltas:  93% (257/276)   
+Resolving deltas:  95% (264/276)   
+Resolving deltas:  96% (267/276)   
+Resolving deltas: 100% (276/276)   
+Resolving deltas: 100% (276/276), done.
+Checking connectivity... done.
+Submodule path 'support/android-rs-glue': checked out '4ed3cb30b289aa0aa84a00e0d5682bc853108e5a'
+travis_time:end:326023b0:start=1442012020979079782,finish=1442012021621488690,duration=642408908
+[0Ktravis_fold:end:git.submodule
+[0K
+[33;1mThis job is running on container-based infrastructure, which does not allow use of 'sudo', setuid and setguid executables.[0m
+[33;1mIf you require sudo, add 'sudo: required' to your .travis.yml[0m
+[33;1mSee http://docs.travis-ci.com/user/workers/container-based-infrastructure/ for details.[0m
+travis_time:start:1d674e1b
+[0K$ source ~/virtualenv/python2.7/bin/activate
+travis_time:end:1d674e1b:start=1442012024198107459,finish=1442012024205105107,duration=6997648
+[0K$ python --version
+Python 2.7.9
+$ pip --version
+pip 6.0.7 from /home/travis/virtualenv/python2.7.9/lib/python2.7/site-packages (python 2.7)
+Could not locate requirements.txt. Override the install: key in your .travis.yml to install dependencies.
+travis_time:start:011277c0
+[0K$ ./mach test-tidy
+Running virtualenv with interpreter /home/travis/virtualenv/python2.7.9/bin/python2
+Using real prefix '/opt/python/2.7.9'
+New python executable in /home/travis/build/servo/servo/python/_virtualenv/bin/python2
+Also creating executable in /home/travis/build/servo/servo/python/_virtualenv/bin/python
+Installing setuptools, pip...done.
+[33mYou are using pip version 6.0.7, however version 7.1.2 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.[0m
+[33mYou are using pip version 6.0.7, however version 7.1.2 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.[0m
+[33mYou are using pip version 6.0.7, however version 7.1.2 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.[0m
+[94m./components/script/dom/eventtarget.rs[0m:[93m7[0m: [91muse statement is not in alphabetical order
+	[93mexpected: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull[0m
+	[91mfound: dom::bindings::conversions::get_dom_class[0m[0m
+[94m./components/script/dom/eventtarget.rs[0m:[93m8[0m: [91muse statement is not in alphabetical order
+	[93mexpected: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener[0m
+	[91mfound: dom::bindings::codegen::Bindings::EventHandlerBinding::EventHandlerNonNull[0m[0m
+[94m./components/script/dom/eventtarget.rs[0m:[93m9[0m: [91muse statement is not in alphabetical order
+	[93mexpected: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods[0m
+	[91mfound: dom::bindings::codegen::Bindings::EventListenerBinding::EventListener[0m[0m
+[94m./components/script/dom/eventtarget.rs[0m:[93m10[0m: [91muse statement is not in alphabetical order
+	[93mexpected: dom::bindings::conversions::get_dom_class[0m
+	[91mfound: dom::bindings::codegen::Bindings::EventTargetBinding::EventTargetMethods[0m[0m
+[94m./components/script/dom/bindings/utils.rs[0m:[93m17[0m: [91muse statement is not in alphabetical order
+	[93mexpected: dom::browsercontext[0m
+	[91mfound: dom::eventtarget::EventTargetTypeId[0m[0m
+[94m./components/script/dom/bindings/utils.rs[0m:[93m18[0m: [91muse statement is not in alphabetical order
+	[93mexpected: dom::eventtarget::EventTargetTypeId[0m
+	[91mfound: dom::browsercontext[0m[0m
+travis_time:end:011277c0:start=1442012024569595079,finish=1442012039323338483,duration=14753743404
+[0K
+[31;1mThe command "./mach test-tidy" exited with 1.[0m
+
+Done. Your build exited with 1.

@@ -1,0 +1,7 @@
+[run]
+include:
+	errorlogparser.py
+	githubapiprovider.py
+	payloadhandler.py
+	payloadreceiver.py
+	travisapiprovider.py

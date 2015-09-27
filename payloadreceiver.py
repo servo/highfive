@@ -1,16 +1,21 @@
 #!/usr/bin/env python
+
 from payloadhandler import TravisPayloadHandler, GithubPayloadHandler
-from 
+from errorlogparser import ServoErrorLogParser
+from githubapiprovider import GithubApiProvider
+from travisciapiprovider import TravisCiApiProvider
 import cgi, cgitb
 import ConfigParser
 
 def extract_globals_from_payload(payload):
     if "action" in payload:
-        owner, repo = extract_globals_from_github_payload(payload)
+        owner, repo = _extract_globals_from_github_payload(payload)
     elif "state" in payload:
-        owner, repo = extract_globals_from_travis_payload(payload)
+        owner, repo = _extract_globals_from_travis_payload(payload)
 
-def extract_globals_from_github_payload(payload):
+    return owner, repo
+
+def _extract_globals_from_github_payload(payload):
     if payload["action"] == "created":
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
@@ -18,9 +23,9 @@ def extract_globals_from_github_payload(payload):
         owner = payload['pull_request']['base']['repo']['owner']['login']
         repo = payload['pull_request']['base']['repo']['name']
     
-    return (owner, repo)
+    return owner, repo
 
-def extract_globals_from_travis_payload(payload):
+def _extract_globals_from_travis_payload(payload):
     return payload['name'].split('/')
 
 if __name__ == "__main__":
@@ -42,13 +47,13 @@ if __name__ == "__main__":
     github = GithubApiProvider(user, token, owner, repo)
     
     if "action" in payload:
-        payload_handler = GithubPayloadHandler(payload, github)
+        payload_handler = GithubPayloadHandler(github)
     elif "state" in payload:
         travis = TravisCiApiProvider()
         error_parser = ServoErrorLogParser()
-        payload_handler = TravisPayloadHandler(payload, github, travis, error_parser)
+        payload_handler = TravisPayloadHandler(github, travis, error_parser)
     else:
         pass
 
     if payload_handler:
-        payload_handler.handle_payload()
+        payload_handler.handle_payload(payload)

@@ -1,0 +1,64 @@
+diff --git a/components/layout/layout_task.rs b/components/layout/layout_task.rs
+index 28eacfd..f0aba98 100644
+--- a/components/layout/layout_task.rs
++++ b/components/layout/layout_task.rs
+@@ -834,19 +834,6 @@ impl LayoutTask {
+                                               traversal);
+     }
+ 
+-    /// Verifies that every node was either marked as a leaf or as a nonleaf in the flow tree.
+-    /// This is only on in debug builds.
+-    #[inline(never)]
+-    #[cfg(debug)]
+-    fn verify_flow_tree(&self, layout_root: &mut FlowRef) {
+-        let mut traversal = traversal::FlowTreeVerification;
+-        layout_root.traverse_preorder(&mut traversal);
+-    }
+-
+-    #[cfg(not(debug))]
+-    fn verify_flow_tree(&self, _: &mut FlowRef) {
+-    }
+-
+     fn process_node_geometry_request<'a>(&'a self,
+                                       requested_node: TrustedNodeAddress,
+                                       layout_root: &mut FlowRef,
+@@ -1338,11 +1325,6 @@ impl LayoutTask {
+                 }
+             });
+ 
+-            // Verification of the flow tree, which ensures that all nodes were either marked as
+-            // leaves or as non-leaves. This becomes a no-op in release builds. (It is
+-            // inconsequential to memory safety but is a useful debugging tool.)
+-            self.verify_flow_tree(&mut root_flow);
+-
+             if opts::get().trace_layout {
+                 layout_debug::begin_trace(root_flow.clone());
+             }
+diff --git a/components/layout/traversal.rs b/components/layout/traversal.rs
+index 43199d7..7742ee3 100644
+--- a/components/layout/traversal.rs
++++ b/components/layout/traversal.rs
+@@ -292,23 +292,6 @@ impl<'a> PostorderDomTraversal for ConstructFlows<'a> {
+     }
+ }
+ 
+-/// The flow tree verification traversal. This is only on in debug builds.
+-#[cfg(debug)]
+-struct FlowTreeVerification;
+-
+-#[cfg(debug)]
+-impl PreorderFlow for FlowTreeVerification {
+-    #[inline]
+-    fn process(&mut self, flow: &mut Flow) {
+-        let base = flow::base(flow);
+-        if !base.flags.is_leaf() && !base.flags.is_nonleaf() {
+-            println!("flow tree verification failed: flow wasn't a leaf or a nonleaf!");
+-            flow.dump();
+-            panic!("flow tree verification failed")
+-        }
+-    }
+-}
+-
+ /// The bubble-inline-sizes traversal, the first part of layout computation. This computes
+ /// preferred and intrinsic inline-sizes and bubbles them up the tree.
+ pub struct BubbleISizes<'a> {

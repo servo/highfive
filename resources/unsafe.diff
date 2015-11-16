@@ -1,0 +1,223 @@
+diff --git a/components/script/dom/domexception.rs b/components/script/dom/domexception.rs
+index 1975128..e63cbed 100644
+--- a/components/script/dom/domexception.rs
++++ b/components/script/dom/domexception.rs
+@@ -104,4 +104,9 @@ impl DOMExceptionMethods for DOMException {
+ 
+         message.to_owned()
+     }
++
++    // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-error.prototype.tostring
++    fn Stringifier(&self) -> String {
++        format!("{}: {}", self.Name(), self.Message())
++    }
+ }
+diff --git a/components/script/dom/htmlbuttonelement.rs b/components/script/dom/htmlbuttonelement.rs
+index 075df00..7023a8f 100644
+--- a/components/script/dom/htmlbuttonelement.rs
++++ b/components/script/dom/htmlbuttonelement.rs
+@@ -15,7 +15,7 @@ use dom::event::Event;
+ use dom::eventtarget::{EventTarget, EventTargetTypeId};
+ use dom::htmlelement::{HTMLElement, HTMLElementTypeId};
+ use dom::htmlformelement::{FormControl, FormSubmitter};
+-use dom::htmlformelement::{SubmittedFrom};
++use dom::htmlformelement::{SubmittedFrom, HTMLFormElement};
+ use dom::node::{Node, NodeTypeId, document_from_node, window_from_node};
+ use dom::validitystate::ValidityState;
+ use dom::virtualmethods::VirtualMethods;
+@@ -82,6 +82,11 @@ impl HTMLButtonElementMethods for HTMLButtonElement {
+     // https://www.whatwg.org/html/#dom-fe-disabled
+     make_bool_setter!(SetDisabled, "disabled");
+ 
++    // https://html.spec.whatwg.org/multipage#dom-fae-form
++    fn GetForm(&self) -> Option<Root<HTMLFormElement>> {
++        self.form_owner()
++    }
++
+     // https://html.spec.whatwg.org/multipage/#dom-button-type
+     fn Type(&self) -> DOMString {
+         let elem = ElementCast::from_ref(self);
+diff --git a/components/script/dom/htmlinputelement.rs b/components/script/dom/htmlinputelement.rs
+index 0de98f1..33098d1 100644
+--- a/components/script/dom/htmlinputelement.rs
++++ b/components/script/dom/htmlinputelement.rs
+@@ -229,6 +229,11 @@ impl HTMLInputElementMethods for HTMLInputElement {
+     // https://www.whatwg.org/html/#dom-fe-disabled
+     make_bool_setter!(SetDisabled, "disabled");
+ 
++    // https://html.spec.whatwg.org/multipage/#dom-fae-form
++    fn GetForm(&self) -> Option<Root<HTMLFormElement>> {
++        self.form_owner()
++    }
++
+     // https://html.spec.whatwg.org/multipage/#dom-input-defaultchecked
+     make_bool_getter!(DefaultChecked, "checked");
+ 
+diff --git a/components/script/dom/webidls/DOMException.webidl b/components/script/dom/webidls/DOMException.webidl
+index 7c09054..0dfb714 100644
+--- a/components/script/dom/webidls/DOMException.webidl
++++ b/components/script/dom/webidls/DOMException.webidl
+@@ -44,4 +44,6 @@ interface DOMException {
+ 
+   // A custom message set by the thrower.
+   readonly attribute DOMString message;
++
++  stringifier;
+ };
+diff --git a/components/script/dom/webidls/HTMLButtonElement.webidl b/components/script/dom/webidls/HTMLButtonElement.webidl
+index 7613bd5..73eec85 100644
+--- a/components/script/dom/webidls/HTMLButtonElement.webidl
++++ b/components/script/dom/webidls/HTMLButtonElement.webidl
+@@ -7,7 +7,7 @@
+ interface HTMLButtonElement : HTMLElement {
+   //         attribute boolean autofocus;
+              attribute boolean disabled;
+-  //readonly attribute HTMLFormElement? form;
++  readonly attribute HTMLFormElement? form;
+              attribute DOMString formAction;
+              attribute DOMString formEnctype;
+              attribute DOMString formMethod;
+diff --git a/components/script/dom/webidls/HTMLInputElement.webidl b/components/script/dom/webidls/HTMLInputElement.webidl
+index afd605b..60c45c4 100644
+--- a/components/script/dom/webidls/HTMLInputElement.webidl
++++ b/components/script/dom/webidls/HTMLInputElement.webidl
+@@ -13,7 +13,7 @@ interface HTMLInputElement : HTMLElement {
+            attribute boolean checked;
+   //         attribute DOMString dirName;
+            attribute boolean disabled;
+-  //readonly attribute HTMLFormElement? form;
++  readonly attribute HTMLFormElement? form;
+   //readonly attribute FileList? files;
+              attribute DOMString formAction;
+              attribute DOMString formEnctype;
+diff --git a/components/script/script_task.rs b/components/script/script_task.rs
+index d8ac155..96ff1a7 100644
+--- a/components/script/script_task.rs
++++ b/components/script/script_task.rs
+@@ -55,6 +55,7 @@ use js::jsapi::{DisableIncrementalGC, JS_AddExtraGCRootsTracer, JS_SetWrapObject
+ use js::jsapi::{GCDescription, GCProgress, JSGCInvocationKind, SetGCSliceCallback};
+ use js::jsapi::{JSAutoRequest, JSGCStatus, JS_GetRuntime, JS_SetGCCallback, SetDOMCallbacks};
+ use js::jsapi::{JSContext, JSRuntime, JSTracer};
++use js::jsapi::{JSObject, SetPreserveWrapperCallback};
+ use js::jsval::UndefinedValue;
+ use js::rust::Runtime;
+ use layout_interface::{ReflowQueryType};
+@@ -654,8 +655,10 @@ impl ScriptTask {
+         }
+ 
+         unsafe {
++            unsafe extern "C" fn empty_wrapper_callback(_: *mut JSContext, _: *mut JSObject) -> u8 { 1 }
+             SetDOMProxyInformation(ptr::null(), 0, Some(shadow_check_callback));
+             SetDOMCallbacks(runtime.rt(), &DOM_CALLBACKS);
++            SetPreserveWrapperCallback(runtime.rt(), Some(empty_wrapper_callback));
+             // Pre barriers aren't working correctly at the moment
+             DisableIncrementalGC(runtime.rt());
+         }
+diff --git a/tests/wpt/metadata/html/dom/interfaces.html.ini b/tests/wpt/metadata/html/dom/interfaces.html.ini
+index 29648c3..f4b6a11 100644
+--- a/tests/wpt/metadata/html/dom/interfaces.html.ini
++++ b/tests/wpt/metadata/html/dom/interfaces.html.ini
+@@ -5079,9 +5079,6 @@
+   [HTMLInputElement interface: attribute dirName]
+     expected: FAIL
+ 
+-  [HTMLInputElement interface: attribute form]
+-    expected: FAIL
+-
+   [HTMLInputElement interface: attribute files]
+     expected: FAIL
+ 
+@@ -5208,9 +5205,6 @@
+   [HTMLInputElement interface: document.createElement("input") must inherit property "dirName" with the proper type (6)]
+     expected: FAIL
+ 
+-  [HTMLInputElement interface: document.createElement("input") must inherit property "form" with the proper type (8)]
+-    expected: FAIL
+-
+   [HTMLInputElement interface: document.createElement("input") must inherit property "files" with the proper type (9)]
+     expected: FAIL
+ 
+@@ -5346,9 +5340,6 @@
+   [HTMLButtonElement interface: attribute autofocus]
+     expected: FAIL
+ 
+-  [HTMLButtonElement interface: attribute form]
+-    expected: FAIL
+-
+   [HTMLButtonElement interface: attribute formNoValidate]
+     expected: FAIL
+ 
+@@ -5376,9 +5367,6 @@
+   [HTMLButtonElement interface: document.createElement("button") must inherit property "autofocus" with the proper type (0)]
+     expected: FAIL
+ 
+-  [HTMLButtonElement interface: document.createElement("button") must inherit property "form" with the proper type (2)]
+-    expected: FAIL
+-
+   [HTMLButtonElement interface: document.createElement("button") must inherit property "formNoValidate" with the proper type (6)]
+     expected: FAIL
+ 
+diff --git a/tests/ref/metadata/html/semantics/forms/form-control-infrastructure/form.html.ini b/tests/wpt/metadata/html/semantics/forms/form-control-infrastructure/form.html.ini
+index 4ba6553..3a4b932 100644
+--- a/tests/wpt/metadata/html/semantics/forms/form-control-infrastructure/form.html.ini
++++ b/tests/wpt/metadata/html/semantics/forms/form-control-infrastructure/form.html.ini
+@@ -1,14 +1,8 @@
+ [form.html]
+   type: testharness
+-  [button.form]
+-    expected: FAIL
+-
+   [fieldset.form]
+     expected: FAIL
+ 
+-  [input.form]
+-    expected: FAIL
+-
+   [keygen.form]
+     expected: FAIL
+ 
+diff --git a/tests/wpt/mozilla/meta/MANIFEST.json b/tests/wpt/mozilla/meta/MANIFEST.json
+index 3cd5550..1449da6 100644
+--- a/tests/wpt/mozilla/meta/MANIFEST.json
++++ b/tests/wpt/mozilla/meta/MANIFEST.json
+@@ -749,6 +749,12 @@
+             "url": "/_mozilla/mozilla/parentnodes.html"
+           }
+         ],
++        "mozilla/preserve_wrapper_callback.html": [
++          {
++            "path": "mozilla/preserve_wrapper_callback.html",
++            "url": "/_mozilla/mozilla/preserve_wrapper_callback.html"
++          }
++        ],
+         "mozilla/proxy_setter.html": [
+           {
+             "path": "mozilla/proxy_setter.html",
+diff --git a/tests/wpt/mozilla/tests/mozilla/preserve_wrapper_callback.html b/tests/wpt/mozilla/tests/mozilla/preserve_wrapper_callback.html
+new file mode 100644
+index 0000000..13369b9
+--- /dev/null
++++ b/tests/wpt/mozilla/tests/mozilla/preserve_wrapper_callback.html
+@@ -0,0 +1,22 @@
++<html>
++    <head>
++        <script src="/resources/testharness.js"></script>
++        <script src="/resources/testharnessreport.js"></script>
++    </head>
++    <body>
++    <input id="a">
++        <script>
++            test(function() {
++                    x = new WeakMap();
++                    x.set(document.getElementById("a"), 2);
++                    assert_equals(x.get(document.getElementById("a")), 2);
++            }, "WeakMaps with DOM objects");
++            test(function() {
++                    x = new WeakMap();
++                    y = {};
++                    x.set(y, 2);
++                    assert_equals(x.get(y), 2);
++            }, "WeakMaps with objects");
++        </script>
++    </body>
++</html>

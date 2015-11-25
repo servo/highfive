@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import base64
+import eventhandler
 import urllib, urllib2
 import cgi
 import cgitb
@@ -296,12 +297,20 @@ def update_pr(api, payload):
 
 
 def handle_payload(api, payload):
+    (modules, handlers) = eventhandler.get_handlers()
+
     if payload["action"] == "opened":
         new_pr(api, payload)
+        for handler in handlers:
+            handler.on_pr_opened(api, payload)
     elif payload["action"] == "synchronize":
         update_pr(api, payload)
+        for handler in handlers:
+            handler.on_pr_updated(api, payload)
     elif payload["action"] == "created":
         new_comment(api, payload)
+        for handler in handlers:
+            handler.on_new_comment(api, payload)
     else:
         pass
 

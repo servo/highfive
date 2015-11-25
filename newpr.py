@@ -184,7 +184,6 @@ def find_reviewer(commit_msg):
     return match.group(1)
 
 
-welcome_msg = "Thanks for the pull request, and welcome! The Servo team is excited to review your changes, and you should hear from @%s (or someone else) soon."
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
 reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
@@ -257,14 +256,6 @@ def new_comment(api, payload):
 
 def new_pr(api, payload):
     manage_pr_state(api, payload)
-
-    author = payload["pull_request"]['user']['login']
-    if api.is_new_contributor(author):
-        #collaborators = json.load(urllib2.urlopen(collaborators_url))
-	collaborators = ['jdm', 'larsbergstrom', 'metajack', 'mbrubeck', 'Ms2ger', 'Manishearth', 'glennw', 'pcwalton', 'SimonSapin'] if api.repo == 'servo' and api.owner == 'servo' else ['test_user_selection_ignore_this']
-        random.seed()
-        to_notify = random.choice(collaborators)
-	api.post_comment(welcome_msg % to_notify)
 
     warn_unsafe = False
     layout_changed = False

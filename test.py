@@ -44,7 +44,6 @@ def create_test(filename, initial, expected):
                       'labels': initial.get('labels', []),
                       'diff': initial.get('diff', ''),
                       'assignee': initial.get('assignee', None)}
-    expected_values = expected
     return {'filename': filename,
             'initial': initial_values,
             'expected': expected}

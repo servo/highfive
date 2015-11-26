@@ -58,6 +58,8 @@ class GithubAPIProvider(APIProvider):
     def __init__(self, payload, user, token):
         APIProvider.__init__(self, payload, user)
         self.token = token
+        self._labels = None
+        self._diff = None
         if "pull_request" in payload:
             self.diff_url = payload["pull_request"]["diff_url"]
 
@@ -133,6 +135,8 @@ class GithubAPIProvider(APIProvider):
                 raise e
 
     def add_label(self, label):
+        if self._labels:
+            self._labels += [label]
         try:
             result = self.api_req("POST", self.add_label_url % (self.owner, self.repo, self.issue),
                                   [label])
@@ -143,6 +147,8 @@ class GithubAPIProvider(APIProvider):
                 raise e
 
     def remove_label(self, label):
+        if self._labels and label in self._labels:
+            self._labels.remove(label)
         try:
             result = self.api_req("DELETE", self.remove_label_url % (self.owner, self.repo, self.issue, label), {})
         except urllib2.HTTPError, e:
@@ -153,6 +159,8 @@ class GithubAPIProvider(APIProvider):
             pass
 
     def get_labels(self):
+        if self._labels is not None:
+            return self._labels
         try:
             result = self.api_req("GET", self.get_label_url % (self.owner, self.repo, self.issue))
         except urllib2.HTTPError, e:
@@ -160,10 +168,14 @@ class GithubAPIProvider(APIProvider):
                 pass
             else:
                 raise e
-        return map(lambda x: x["name"], json.loads(result['body']))
+        self._labels = map(lambda x: x["name"], json.loads(result['body']))
+        return self._labels
 
     def get_diff(self):
-        return self.api_req("GET", self.diff_url)['body']
+        if self._diff:
+            return self._diff;
+        self._diff = self.api_req("GET", self.diff_url)['body']
+        return self._diff
 
     def set_assignee(self, assignee):
         try:

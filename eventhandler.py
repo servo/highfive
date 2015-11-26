@@ -18,6 +18,9 @@ class EventHandler:
         global _warnings
         _warnings += [msg]
 
+    def is_open_pr(self, payload):
+        return payload['issue']['state'] == 'open' and 'pull_request' in payload['issue']
+
     def register_tests(self, path):
         from test import create_test
         tests_location = os.path.join(path, 'tests')

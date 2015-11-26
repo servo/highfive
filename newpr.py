@@ -176,17 +176,7 @@ class GithubAPIProvider(APIProvider):
                 raise e
 
 
-# If the user specified a reviewer, return the username, otherwise returns None.
-def find_reviewer(commit_msg):
-    match = reviewer_re.search(commit_msg)
-    if not match:
-        return None
-    return match.group(1)
-
-
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
-
-reviewer_re = re.compile("\\b[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 
 def extract_globals_from_payload(payload):
     if payload["action"] == "created":
@@ -217,41 +207,6 @@ def manage_pr_state(api, payload):
             api.remove_label("S-needs-rebase")
 
 
-def new_comment(api, payload):
-    # We only care about comments in open PRs
-    if payload['issue']['state'] != 'open' or 'pull_request' not in payload['issue']:
-        return
-
-    commenter = payload['comment']['user']['login']
-    # Ignore our own comments.
-    if commenter == api.user:
-        return
-
-    msg = payload["comment"]["body"]
-    reviewer = find_reviewer(msg)
-    if reviewer:
-        api.set_assignee(reviewer)
-
-    if commenter == 'bors-servo':
-        labels = api.get_labels();
-
-        if 'has been approved by' in msg or 'Testing commit' in msg:
-            for label in ["S-awaiting-review", "S-needs-rebase", "S-tests-failed",
-                          "S-needs-code-changes", "S-needs-squash", "S-awaiting-answer"]:
-                if label in labels:
-                    api.remove_label(label)
-            if not "S-awaiting-merge" in labels:
-                api.add_label("S-awaiting-merge")
-
-        elif 'Test failed' in msg:
-            api.remove_label("S-awaiting-merge")
-            api.add_label("S-tests-failed")
-
-        elif 'Please resolve the merge conflicts' in msg:
-            api.remove_label("S-awaiting-merge")
-            api.add_label("S-needs-rebase")
-
-
 def new_pr(api, payload):
     manage_pr_state(api, payload)
 
@@ -272,7 +227,6 @@ def handle_payload(api, payload):
         for handler in handlers:
             handler.on_pr_updated(api, payload)
     elif payload["action"] == "created":
-        new_comment(api, payload)
         for handler in handlers:
             handler.on_new_comment(api, payload)
     else:

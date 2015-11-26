@@ -109,25 +109,7 @@ def setup_tests():
         create_test('test_ignored_action.json', {}, {}),
 
         create_test('test_synchronize.json', {'labels': ['S-needs-code-changes', 'S-tests-failed', 'S-awaiting-merge']},
-                    {'labels': ['S-awaiting-review']}),
-
-        create_test('test_comment.json', {}, {'assignee': 'jdm'}),
-
-        create_test('test_merge_approved.json', {'labels': ['S-needs-code-changes', 'S-needs-rebase',
-                                                            'S-tests-failed', 'S-needs-squash',
-                                                            'S-awaiting-review']}, {'labels': ['S-awaiting-merge']}),
-
-        create_test('test_merge_conflict.json', {'labels': ['S-awaiting-merge']},
-                    {'labels': ['S-needs-rebase']}),
-
-        create_test('test_tests_failed.json', {'labels': ['S-awaiting-merge']},
-                    {'labels': ['S-tests-failed']}),
-
-        create_test('test_post_retry.json', {'labels': ['S-tests-failed']},
-                    {'labels': ['S-awaiting-merge']}),
-
-        create_test('test_post_retry.json', {'labels': ['S-awaiting-merge']},
-                    {'labels': ['S-awaiting-merge']})
+                    {'labels': ['S-awaiting-review']})
     ]
     return tests
 

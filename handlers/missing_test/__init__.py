@@ -1,5 +1,4 @@
 from eventhandler import EventHandler
-import random
 
 reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
 

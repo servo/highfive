@@ -1,4 +1,12 @@
 {
+  "initial": {
+      "labels": ["S-awaiting-merge"]
+  },
+  "expected": {
+      "labels": ["S-tests-failed"]
+  },
+  "payload":
+{
   "action": "created",
   "issue": {
     "url": "https://api.github.com/repos/servo/servo/issues/7075",
@@ -57,27 +65,27 @@
     "issue_url": "https://api.github.com/repos/servo/servo/issues/7075",
     "id": 128760879,
     "user": {
-      "login": "jdm",
+      "login": "bors-servo",
       "id": 27658,
       "avatar_url": "https://avatars.githubusercontent.com/u/27658?v=3",
       "gravatar_id": "",
-      "url": "https://api.github.com/users/jdm",
-      "html_url": "https://github.com/jdm",
-      "followers_url": "https://api.github.com/users/jdm/followers",
-      "following_url": "https://api.github.com/users/jdm/following{/other_user}",
-      "gists_url": "https://api.github.com/users/jdm/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/jdm/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/jdm/subscriptions",
-      "organizations_url": "https://api.github.com/users/jdm/orgs",
-      "repos_url": "https://api.github.com/users/jdm/repos",
-      "events_url": "https://api.github.com/users/jdm/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/jdm/received_events",
+      "url": "https://api.github.com/users/bors-servo",
+      "html_url": "https://github.com/bors-servo",
+      "followers_url": "https://api.github.com/users/bors-servo/followers",
+      "following_url": "https://api.github.com/users/bors-servo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/bors-servo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/bors-servo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/bors-servo/subscriptions",
+      "organizations_url": "https://api.github.com/users/bors-servo/orgs",
+      "repos_url": "https://api.github.com/users/bors-servo/repos",
+      "events_url": "https://api.github.com/users/bors-servo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/bors-servo/received_events",
       "type": "User",
       "site_admin": false
     },
     "created_at": "2015-08-07T16:45:57Z",
     "updated_at": "2015-08-07T16:45:57Z",
-    "body": "r? @jdm"
+    "body": ":broken_heart: Test failed - [linux2](http://build.servo.org/builders/linux2/builds/2627)"
   },
   "repository": {
     "id": 3390243,
@@ -196,4 +204,5 @@
     "type": "User",
     "site_admin": false
   }
+}
 }

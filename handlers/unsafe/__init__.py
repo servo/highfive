@@ -1,5 +1,4 @@
 from eventhandler import EventHandler
-import random
 
 unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
 

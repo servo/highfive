@@ -38,33 +38,41 @@ def get_payload(filename):
     with open(filename) as f:
         return json.load(f)
 
-tests = []
-def add_test(filename, initial, expected):
+def create_test(filename, initial, expected, new_style=False):
     global tests
     initial_values = {'new_contributor': initial.get('new_contributor', False),
                       'labels': initial.get('labels', []),
                       'diff': initial.get('diff', ''),
                       'assignee': initial.get('assignee', None)}
-    expected_values = {'labels': expected.get('labels', []),
-                       'assignee': expected.get('assignee', None),
-                       'comments': expected.get('comments', 0)}
-    tests += [{'filename': filename,
-               'initial': initial_values,
-               'expected': expected_values}]
+    if new_style:
+        expected_values = expected
+    else:
+        expected_values = {'labels': expected.get('labels', []),
+                           'assignee': expected.get('assignee', None),
+                           'comments': expected.get('comments', 0)}
+    return {'filename': filename,
+            'initial': initial_values,
+            'expected': expected_values,
+            'ignore_missing_expected': new_style}
 
 def run_tests(tests):
     failed = 0
     for test in tests:
         try:
-            payload = get_payload(test['filename'])
+            test_contents = get_payload(test['filename'])
+            payload = test_contents['payload'] if 'payload' in test_contents else test_contents
             initial = test['initial']
             api = TestAPIProvider(payload, 'highfive', initial['new_contributor'], initial['labels'],
                                   initial['assignee'], initial['diff'])
             handle_payload(api, payload)
             expected = test['expected']
-            assert len(api.comments_posted) == expected['comments']
-            assert api.labels == expected['labels']
-            assert api.assignee == expected['assignee']
+            ignore_missing = test['ignore_missing_expected']
+            if not ignore_missing or 'comments' in expected:
+                assert len(api.comments_posted) == expected['comments']
+            if not ignore_missing or 'labels' in expected:
+                assert api.labels == expected['labels']
+            if not ignore_missing or 'assignee' in expected:
+                assert api.assignee == expected['assignee']
         except AssertionError:
             _, _, tb = sys.exc_info()
             traceback.print_tb(tb) # Fixed format
@@ -75,7 +83,7 @@ def run_tests(tests):
 
     possible_tests = [f for f in os.listdir('.') if f.endswith('.json')]
     test_files = set([test['filename'] for test in tests])
-    if len(possible_tests) != len(test_files):
+    if len(possible_tests) > len(test_files):
         print 'Found unused JSON test data: %s' % ', '.join(filter(lambda x: x not in test_files, possible_tests))
         sys.exit(1)
     print 'Ran %d tests, %d failed' % (len(tests), failed)
@@ -83,42 +91,51 @@ def run_tests(tests):
     if failed:
         sys.exit(1)
 
-add_test('test_new_pr.json', {'new_contributor': True},
-         {'labels': ['S-awaiting-review'], 'comments': 1})
+def setup_tests():
+    import eventhandler
+    (modules, handlers) = eventhandler.get_handlers()
+    tests = []
+    for module, handler in zip(modules, handlers):
+        tests.extend(handler.register_tests(module[1]))
 
-add_test('test_new_pr.json', {'diff': "+ unsafe fn foo()"},
-         {'labels': ['S-awaiting-review'], 'comments': 1})
+    tests += [
+        create_test('test_new_pr.json', {'diff': "+ unsafe fn foo()"},
+                    {'labels': ['S-awaiting-review'], 'comments': 1}),
 
-add_test('test_new_pr.json', {'diff': "diff --git components/layout/"},
-         {'labels': ['S-awaiting-review'], 'comments': 1})
+        create_test('test_new_pr.json', {'diff': "diff --git components/layout/"},
+                    {'labels': ['S-awaiting-review'], 'comments': 1}),
 
-add_test('test_new_pr.json', {'diff': "diff --git components/layout/\ndiff --git tests/wpt"},
-         {'labels': ['S-awaiting-review'], 'comments': 0})
+        create_test('test_new_pr.json', {'diff': "diff --git components/layout/\ndiff --git tests/wpt"},
+                    {'labels': ['S-awaiting-review'], 'comments': 0}),
 
-add_test('test_new_pr.json', {'new_contributor': True},
-         {'labels': ['S-awaiting-review'], 'comments': 1})
+        create_test('test_new_pr.json', {'new_contributor': True},
+                    {'labels': ['S-awaiting-review'], 'comments': 1}),
 
-add_test('test_ignored_action.json', {}, {})
+        create_test('test_ignored_action.json', {}, {}),
 
-add_test('test_synchronize.json', {'labels': ['S-needs-code-changes', 'S-tests-failed', 'S-awaiting-merge']},
-         {'labels': ['S-awaiting-review']})
+        create_test('test_synchronize.json', {'labels': ['S-needs-code-changes', 'S-tests-failed', 'S-awaiting-merge']},
+                    {'labels': ['S-awaiting-review']}),
 
-add_test('test_comment.json', {}, {'assignee': 'jdm'})
+        create_test('test_comment.json', {}, {'assignee': 'jdm'}),
 
-add_test('test_merge_approved.json', {'labels': ['S-needs-code-changes', 'S-needs-rebase',
-                                                 'S-tests-failed', 'S-needs-squash',
-                                                 'S-awaiting-review']}, {'labels': ['S-awaiting-merge']})
+        create_test('test_merge_approved.json', {'labels': ['S-needs-code-changes', 'S-needs-rebase',
+                                                            'S-tests-failed', 'S-needs-squash',
+                                                            'S-awaiting-review']}, {'labels': ['S-awaiting-merge']}),
 
-add_test('test_merge_conflict.json', {'labels': ['S-awaiting-merge']},
-         {'labels': ['S-needs-rebase']})
+        create_test('test_merge_conflict.json', {'labels': ['S-awaiting-merge']},
+                    {'labels': ['S-needs-rebase']}),
 
-add_test('test_tests_failed.json', {'labels': ['S-awaiting-merge']},
-         {'labels': ['S-tests-failed']})
+        create_test('test_tests_failed.json', {'labels': ['S-awaiting-merge']},
+                    {'labels': ['S-tests-failed']}),
 
-add_test('test_post_retry.json', {'labels': ['S-tests-failed']},
-         {'labels': ['S-awaiting-merge']})
+        create_test('test_post_retry.json', {'labels': ['S-tests-failed']},
+                    {'labels': ['S-awaiting-merge']}),
 
-add_test('test_post_retry.json', {'labels': ['S-awaiting-merge']},
-         {'labels': ['S-awaiting-merge']})
+        create_test('test_post_retry.json', {'labels': ['S-awaiting-merge']},
+                    {'labels': ['S-awaiting-merge']})
+    ]
+    return tests
 
-run_tests(tests)
+if __name__ == "__main__":
+    tests = setup_tests()
+    run_tests(tests)

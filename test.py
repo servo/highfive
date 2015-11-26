@@ -56,8 +56,7 @@ def run_tests(tests):
         eventhandler.reset_test_state()
 
         try:
-            test_contents = get_payload(test['filename'])
-            payload = test_contents['payload'] if 'payload' in test_contents else test_contents
+            payload = get_payload(test['filename'])['payload']
             initial = test['initial']
             api = TestAPIProvider(payload, 'highfive', initial['new_contributor'], initial['labels'],
                                   initial['assignee'], initial['diff'])
@@ -77,11 +76,6 @@ def run_tests(tests):
             print('{}: An error occurred on line {} in statement {}'.format(test['filename'], line, text))
             failed += 1
 
-    possible_tests = [f for f in os.listdir('.') if f.endswith('.json')]
-    test_files = set([test['filename'] for test in tests])
-    if len(possible_tests) > len(test_files):
-        print 'Found unused JSON test data: %s' % ', '.join(filter(lambda x: x not in test_files, possible_tests))
-        sys.exit(1)
     print 'Ran %d tests, %d failed' % (len(tests), failed)
 
     if failed:

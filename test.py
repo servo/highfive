@@ -38,22 +38,16 @@ def get_payload(filename):
     with open(filename) as f:
         return json.load(f)
 
-def create_test(filename, initial, expected, new_style=False):
+def create_test(filename, initial, expected):
     global tests
     initial_values = {'new_contributor': initial.get('new_contributor', False),
                       'labels': initial.get('labels', []),
                       'diff': initial.get('diff', ''),
                       'assignee': initial.get('assignee', None)}
-    if new_style:
-        expected_values = expected
-    else:
-        expected_values = {'labels': expected.get('labels', []),
-                           'assignee': expected.get('assignee', None),
-                           'comments': expected.get('comments', 0)}
+    expected_values = expected
     return {'filename': filename,
             'initial': initial_values,
-            'expected': expected_values,
-            'ignore_missing_expected': new_style}
+            'expected': expected}
 
 def run_tests(tests):
     import eventhandler
@@ -70,12 +64,11 @@ def run_tests(tests):
                                   initial['assignee'], initial['diff'])
             handle_payload(api, payload)
             expected = test['expected']
-            ignore_missing = test['ignore_missing_expected']
-            if not ignore_missing or 'comments' in expected:
+            if 'comments' in expected:
                 assert len(api.comments_posted) == expected['comments']
-            if not ignore_missing or 'labels' in expected:
+            if 'labels' in expected:
                 assert api.labels == expected['labels']
-            if not ignore_missing or 'assignee' in expected:
+            if 'assignee' in expected:
                 assert api.assignee == expected['assignee']
         except AssertionError:
             _, _, tb = sys.exc_info()
@@ -101,16 +94,6 @@ def setup_tests():
     tests = []
     for module, handler in zip(modules, handlers):
         tests.extend(handler.register_tests(module[1]))
-
-    tests += [
-        create_test('test_new_pr.json', {'new_contributor': True},
-                    {'labels': ['S-awaiting-review'], 'comments': 1}),
-
-        create_test('test_ignored_action.json', {}, {}),
-
-        create_test('test_synchronize.json', {'labels': ['S-needs-code-changes', 'S-tests-failed', 'S-awaiting-merge']},
-                    {'labels': ['S-awaiting-review']})
-    ]
     return tests
 
 if __name__ == "__main__":

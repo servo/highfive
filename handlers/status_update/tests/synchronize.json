@@ -1,4 +1,12 @@
 {
+  "initial": {
+    "labels": ["S-needs-code-changes", "S-tests-failed", "S-awaiting-merge"]
+  },
+  "expected": {
+    "labels": ["S-awaiting-review"]
+  },
+  "payload":
+{
   "action": "synchronize",
   "number": 7062,
   "pull_request": {
@@ -420,4 +428,5 @@
     "type": "User",
     "site_admin": false
   }
+}
 }

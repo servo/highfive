@@ -190,40 +190,13 @@ def extract_globals_from_payload(payload):
     return (owner, repo, issue)
 
 
-def manage_pr_state(api, payload):
-    labels = api.get_labels();
-
-    if payload["action"] in ["synchronize", "opened"]:
-        for label in ["S-awaiting-merge", "S-tests-failed", "S-needs-code-changes"]:
-            if label in labels:
-                api.remove_label(label)
-        if not "S-awaiting-review" in labels:
-            api.add_label("S-awaiting-review")
-
-    # If mergeable is null, the data wasn't available yet. It would be nice to try to fetch that
-    # information again.
-    if payload["action"] == "synchronize" and payload['pull_request']['mergeable']:
-        if "S-needs-rebase" in labels:
-            api.remove_label("S-needs-rebase")
-
-
-def new_pr(api, payload):
-    manage_pr_state(api, payload)
-
-
-def update_pr(api, payload):
-    manage_pr_state(api, payload)
-
-
 def handle_payload(api, payload):
     (modules, handlers) = eventhandler.get_handlers()
 
     if payload["action"] == "opened":
-        new_pr(api, payload)
         for handler in handlers:
             handler.on_pr_opened(api, payload)
     elif payload["action"] == "synchronize":
-        update_pr(api, payload)
         for handler in handlers:
             handler.on_pr_updated(api, payload)
     elif payload["action"] == "created":

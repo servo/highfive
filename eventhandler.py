@@ -35,7 +35,7 @@ class EventHandler:
                     contents['initial'] = [contents['initial']]
                     contents['expected'] = [contents['expected']]
                 for initial, expected in zip(contents['initial'], contents['expected']):
-                    yield create_test(testfile, initial, expected, True)
+                    yield create_test(testfile, initial, expected)
 
 def reset_test_state():
     global _warnings

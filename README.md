@@ -26,8 +26,8 @@ each handler, using the following format:
     // Defaults:
     "labels": [],
     "diff": "",
-    "new_contributor": False,
-    "assignee": None,
+    "new_contributor": false,
+    "assignee": null,
   },
   "expected": {
     // Expected state of the PR after all the handlers process
@@ -42,3 +42,5 @@ each handler, using the following format:
   }
 }
 ```
+Each test runs with a mock Github API provider, so no account information
+or network connection is required to run the test suite.

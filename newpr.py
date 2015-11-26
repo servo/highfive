@@ -185,8 +185,6 @@ def find_reviewer(commit_msg):
 
 
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
-unsafe_warning_msg = 'These commits modify **unsafe code**. Please review it carefully!'
-reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
 
 reviewer_re = re.compile("\\b[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
 
@@ -257,31 +255,6 @@ def new_comment(api, payload):
 def new_pr(api, payload):
     manage_pr_state(api, payload)
 
-    warn_unsafe = False
-    layout_changed = False
-    saw_reftest = False
-    diff = api.get_diff()
-    for line in diff.split('\n'):
-        if line.startswith('+') and not line.startswith('+++') and line.find('unsafe') > -1:
-            warn_unsafe = True
-        if line.startswith('diff --git') and line.find('components/layout/') > -1:
-            layout_changed = True
-        if line.startswith('diff --git') and line.find('tests/ref') > -1:
-            saw_reftest = True
-        if line.startswith('diff --git') and line.find('tests/wpt') > -1:
-            saw_reftest = True
-
-    warnings = []
-    if warn_unsafe:
-        warnings += [unsafe_warning_msg]
-
-    if layout_changed:
-        if not saw_reftest:
-            warnings += [reftest_required_msg]
-
-    if warnings:
-        api.post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)))
-
 
 def update_pr(api, payload):
     manage_pr_state(api, payload)
@@ -304,6 +277,11 @@ def handle_payload(api, payload):
             handler.on_new_comment(api, payload)
     else:
         pass
+
+    warnings = eventhandler.get_warnings()
+    if warnings:
+        api.post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)))
+
 
 if __name__ == "__main__":
     print "Content-Type: text/html;charset=utf-8"

@@ -56,8 +56,12 @@ def create_test(filename, initial, expected, new_style=False):
             'ignore_missing_expected': new_style}
 
 def run_tests(tests):
+    import eventhandler
+
     failed = 0
     for test in tests:
+        eventhandler.reset_test_state()
+
         try:
             test_contents = get_payload(test['filename'])
             payload = test_contents['payload'] if 'payload' in test_contents else test_contents
@@ -99,15 +103,6 @@ def setup_tests():
         tests.extend(handler.register_tests(module[1]))
 
     tests += [
-        create_test('test_new_pr.json', {'diff': "+ unsafe fn foo()"},
-                    {'labels': ['S-awaiting-review'], 'comments': 1}),
-
-        create_test('test_new_pr.json', {'diff': "diff --git components/layout/"},
-                    {'labels': ['S-awaiting-review'], 'comments': 1}),
-
-        create_test('test_new_pr.json', {'diff': "diff --git components/layout/\ndiff --git tests/wpt"},
-                    {'labels': ['S-awaiting-review'], 'comments': 0}),
-
         create_test('test_new_pr.json', {'new_contributor': True},
                     {'labels': ['S-awaiting-review'], 'comments': 1}),
 

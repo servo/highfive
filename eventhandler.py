@@ -2,6 +2,8 @@ import imp
 import json
 import os
 
+_warnings = []
+
 class EventHandler:
     def on_pr_opened(self, api, payload):
         pass
@@ -12,6 +14,10 @@ class EventHandler:
     def on_new_comment(self, api, payload):
         pass
 
+    def warn(self, msg):
+        global _warnings
+        _warnings += [msg]
+
     def register_tests(self, path):
         from test import create_test
         tests_location = os.path.join(path, 'tests')
@@ -21,7 +27,20 @@ class EventHandler:
         for testfile in tests:
             with open(testfile) as f:
                 contents = json.load(f)
-                yield create_test(testfile, contents['initial'], contents['expected'], True)
+                if not isinstance(contents['initial'], list):
+                    assert not isinstance(contents['expected'], list)
+                    contents['initial'] = [contents['initial']]
+                    contents['expected'] = [contents['expected']]
+                for initial, expected in zip(contents['initial'], contents['expected']):
+                    yield create_test(testfile, initial, expected, True)
+
+def reset_test_state():
+    global _warnings
+    _warnings = []
+
+def get_warnings():
+    global _warnings
+    return _warnings
 
 def get_handlers():
     modules = []

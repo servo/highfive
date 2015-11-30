@@ -1,4 +1,13 @@
 {
+  "initial": {
+      "labels": ["S-needs-code-changes", "S-needs-rebase", "S-tests-failed",
+                 "S-needs-squash", "S-awaiting-review"]
+  },
+  "expected": {
+      "labels": ["S-awaiting-merge"]
+  },
+  "payload":
+{
   "action": "created",
   "issue": {
     "url": "https://api.github.com/repos/servo/servo/issues/7075",
@@ -77,7 +86,7 @@
     },
     "created_at": "2015-08-07T16:45:57Z",
     "updated_at": "2015-08-07T16:45:57Z",
-    "body": ":broken_heart: Test failed - [linux2](http://build.servo.org/builders/linux2/builds/2627)"
+    "body": ":pushpin: Commit 90d7d11 has been approved by `larsbergstrom+dzbarsky`\n\n<!-- @bors-servo r=larsbergstrom+dzbarsky 90d7d11a23e650e03c0283f49b54e9f748c66fee -->"
   },
   "repository": {
     "id": 3390243,
@@ -196,4 +205,5 @@
     "type": "User",
     "site_admin": false
   }
+}
 }

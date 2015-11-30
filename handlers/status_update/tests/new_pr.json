@@ -1,4 +1,11 @@
 {
+  "initial": {
+  },
+  "expected": {
+    "labels": ["S-awaiting-review"]
+  },
+  "payload":
+{
   "action": "opened",
   "number": 7076,
   "pull_request": {
@@ -420,4 +427,5 @@
     "type": "User",
     "site_admin": false
   }
+}
 }

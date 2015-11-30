@@ -1,4 +1,12 @@
 {
+  "initial": {
+      "labels": ["S-awaiting-merge"]
+  },
+  "expected": {
+      "labels": ["S-needs-rebase"]
+  },
+  "payload":
+{
   "action": "created",
   "issue": {
     "url": "https://api.github.com/repos/servo/servo/issues/7075",
@@ -77,7 +85,7 @@
     },
     "created_at": "2015-08-07T16:45:57Z",
     "updated_at": "2015-08-07T16:45:57Z",
-    "body": ":pushpin: Commit 90d7d11 has been approved by `larsbergstrom+dzbarsky`\n\n<!-- @bors-servo r=larsbergstrom+dzbarsky 90d7d11a23e650e03c0283f49b54e9f748c66fee -->"
+    "body": ":umbrella: The latest upstream changes (presumably #6741) made this pull request unmergeable. Please resolve the merge conflicts."
   },
   "repository": {
     "id": 3390243,
@@ -196,4 +204,5 @@
     "type": "User",
     "site_admin": false
   }
+}
 }

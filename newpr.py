@@ -204,19 +204,8 @@ def extract_globals_from_payload(payload):
 
 def handle_payload(api, payload):
     (modules, handlers) = eventhandler.get_handlers()
-
-    if payload["action"] == "opened":
-        for handler in handlers:
-            handler.on_pr_opened(api, payload)
-    elif payload["action"] == "synchronize":
-        for handler in handlers:
-            handler.on_pr_updated(api, payload)
-    elif payload["action"] == "created":
-        for handler in handlers:
-            handler.on_new_comment(api, payload)
-    else:
-        pass
-
+    for handler in handlers:
+        handler.handle_payload(api, payload)
     warnings = eventhandler.get_warnings()
     if warnings:
         api.post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)))

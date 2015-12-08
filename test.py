@@ -76,7 +76,7 @@ def run_tests(tests):
             print('{}: An error occurred on line {} in statement {}'.format(test['filename'], line, text))
             failed += 1
 
-    print 'Ran %d tests, %d failed' % (len(tests), failed)
+    print("Ran %d tests, %d failed" % (len(tests), failed))
 
     if failed:
         sys.exit(1)

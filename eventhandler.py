@@ -3,6 +3,12 @@ import json
 import os
 
 _warnings = []
+_payload_action = {
+    'opened': 'on_pr_opened',
+    'synchronize': 'on_pr_updated',
+    'created': 'on_new_comment'
+}
+
 
 class EventHandler:
     def on_pr_opened(self, api, payload):
@@ -13,6 +19,11 @@ class EventHandler:
 
     def on_new_comment(self, api, payload):
         pass
+
+    def handle_payload(self, api, payload):
+        action = payload['action']
+        if action in _payload_action:
+            getattr(self, _payload_action[action])(api, payload)
 
     def warn(self, msg):
         global _warnings

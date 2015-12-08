@@ -3,10 +3,58 @@
       "diff": "diff --git components/layout/"
   },
   {
+      "diff": "diff --git components/script/"
+  },
+  {
+      "diff": "diff --git components/gfx/"
+  },
+  {
+      "diff": "diff --git components/style/"
+  },
+  {
+      "diff": "diff --git components/net/"
+  },
+  {
       "diff": "diff --git components/layout/\ndiff --git tests/wpt"
+  },
+  {
+      "diff": "diff --git components/gfx/\ndiff --git tests/unit"
+  },
+  {
+      "diff": "diff --git components/style/\ndiff --git tests/unit"
+  },
+  {
+      "diff": "diff --git components/net/\ndiff --git tests/unit"
+  },
+  {
+      "diff": "diff --git components/script/\ndiff --git tests/unit"
   }],
   "expected": [{
       "comments": 1
+  },
+  {
+      "comments": 1
+  },
+  {
+      "comments": 1
+  },
+  {
+      "comments": 1
+  },
+  {
+      "comments": 1
+  },
+  {
+      "comments": 0
+  },
+  {
+      "comments": 0
+  },
+  {
+      "comments": 0
+  },
+  {
+      "comments": 0
   },
   {
       "comments": 0

@@ -1,20 +1,36 @@
 from eventhandler import EventHandler
 
-reftest_required_msg = 'These commits modify layout code, but no reftests are modified. Please consider adding a reftest!'
+TEST_REQUIRED_MSG = 'These commits modify {0} code, but no tests are modified. Please consider adding a test!'
 
 class MissingTestHandler(EventHandler):
+    COMPONENT_DIRS_TO_CHECK = ('layout', 'script', 'gfx', 'style', 'net')
+    TEST_DIRS_TO_CHECK = ('ref', 'wpt', 'unit')
+
     def on_pr_opened(self, api, payload):
         diff = api.get_diff()
-        layout_changed = False
-        for line in diff.split('\n'):
-            if line.startswith('diff --git') and line.find('components/layout/') > -1:
-                layout_changed = True
-            if line.startswith('diff --git') and \
-               (line.find('tests/ref') > -1 or line.find('tests/wpt') > -1):
-                return
+        components_changed = set()
 
-        if layout_changed:
-            self.warn(reftest_required_msg)
+        for line in diff.split('\n'):
+            if line.startswith('diff --git'):
+                for component in self.COMPONENT_DIRS_TO_CHECK:
+                    if 'components/{0}/'.format(component) in line:
+                        components_changed.add(component)
+
+                for directory in self.TEST_DIRS_TO_CHECK:
+                    if 'tests/{0}'.format(directory) in line:
+                        return
+
+        if components_changed:
+            # Build a readable list of changed components
+            if len(components_changed) == 1:
+                components_msg = components_changed.pop()
+            elif len(components_changed) == 2:
+                components_msg = '{} and {}'.format(*components_changed)
+            else:
+                components_msg = ', '.join(components_changed)
+                components_msg = ", and ".join(components_msg.rsplit(", ", 1))
+
+            self.warn(TEST_REQUIRED_MSG.format(components_msg))
 
 
 handler_interface = MissingTestHandler

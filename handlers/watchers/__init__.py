@@ -1,16 +1,17 @@
 from eventhandler import EventHandler
-from ConfigParser import ConfigParser
+from collections import defaultdict
+import ConfigParser
 import os
 
 WATCHERS_CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'watchers.ini')
 
 def get_config():
-    config = ConfigParser()
+    config = ConfigParser.ConfigParser()
     config.read(WATCHERS_CONFIG_FILE)
     return config
 
 def build_message(mentions):
-    message = [ 'Watched files:' ]
+    message = [ 'Heads up! This PR modifies the following files:' ]
     for (watcher, file_names) in mentions.items():
         message.append(" * @{}: {}".format(watcher, ', '.join(file_names)))
 
@@ -24,24 +25,29 @@ class WatchersHandler(EventHandler):
             if line.startswith('diff --git'):
                 changed_files.extend(line.split('diff --git ')[-1].split(' '))
 
+        # Remove the `a/` and `b/` parts of paths,
+        # And get unique values using `set()`
+        changed_files = set(map(lambda f: f if f.startswith('/') else f[2:], changed_files))
         config = get_config()
-        mentions = {}
-        for section in config.sections():
+
+        repo = api.owner + '/' + api.repo
+        try:
+            watchers = config.items(repo)
+        except ConfigParser.NoSectionError:
+            return # No watchers
+
+        mentions = defaultdict(list)
+        for (watcher, watched_files) in watchers:
+            watched_files = watched_files.split(' ')
             for changed_file in changed_files:
-                if section in changed_file:
-                    for watcher in config.get(section, "watchers").split(' '):
-                        if not watcher in mentions:
-                            mentions[watcher] = []
+                for watched_file in watched_files:
+                    if changed_file.startswith(watched_file):
                         mentions[watcher].append(changed_file)
 
         if not mentions:
             return
 
         message = build_message(mentions)
-        print(message)
         api.post_comment(message)
-
-
-
 
 handler_interface = WatchersHandler

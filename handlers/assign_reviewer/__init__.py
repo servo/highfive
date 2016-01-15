@@ -28,6 +28,6 @@ class AssignReviewerHandler(EventHandler):
                              'SimonSapin']
             random.seed()
             to_notify = random.choice(collaborators)
-            api.post_comment(pr_opened % to_notify)
+            api.post_comment(on_pr_opened % to_notify)
 
 handler_interface = AssignReviewerHandler

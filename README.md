@@ -44,3 +44,15 @@ each handler, using the following format:
 ```
 Each test runs with a mock Github API provider, so no account information
 or network connection is required to run the test suite.
+
+## Configuring a Highfive
+
+Copy `config.sample` to `config`. Add the username of the account that will be
+commenting as highfive. When logged into that account, visit
+`https://github.com/settings/tokens` and create a token with the permissions:
+
+* repo
+* public_repo
+* user
+
+Add that access token's value to the `token` field of the config. 

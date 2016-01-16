@@ -44,3 +44,17 @@ each handler, using the following format:
 ```
 Each test runs with a mock Github API provider, so no account information
 or network connection is required to run the test suite.
+
+## Enabling a repo
+
+Visit the repo's webhook settings page at
+`https://github.com/org/repo/settings/hooks`. 
+
+Create a new webhook, pointing at your highfive instance's location:
+
+Payload URL: `http://99.88.777.666/highfive/newpr.py`
+Content type: `application/x-www-form-urlencoded`
+Leave the 'secret' field blank.
+Let me select individual events: Issue Comment, Pull Request, Status
+Check the box by 'Active'
+

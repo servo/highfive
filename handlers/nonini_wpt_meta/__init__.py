@@ -3,20 +3,25 @@ from eventhandler import EventHandler
 NON_INI_MSG = 'This pull request adds {0} without the .ini \
 file extension to {1}. Please consider removing {2}!'
 
+
 class NonINIWPTMetaFileHandler(EventHandler):
-    TEST_DIRS_TO_CHECK = (
-        'wpt/metadata',
-        'wpt/mozilla/meta',
+    DIRS_TO_CHECK = (
+        'tests/wpt/metadata',
+        'tests/wpt/mozilla/meta',
     )
+
+    def _wpt_ini_dirs(self, line):
+        if line.startswith('diff --git') and ('.' in line and '.ini' not in line):
+            return set(directory for directory in self.DIRS_TO_CHECK if directory in line)
+        else:
+            return set()
 
     def on_pr_opened(self, api, payload):
         diff = api.get_diff()
         test_dirs_with_offending_files = set()
 
         for line in diff.split('\n'):
-            for directory in self.TEST_DIRS_TO_CHECK:
-                if 'tests/{0}'.format(directory) in line and ('.' in line and '.ini' not in line):
-                    test_dirs_with_offending_files.add('tests/{0}'.format(directory))
+            test_dirs_with_offending_files |= self._wpt_ini_dirs(line)
 
         if test_dirs_with_offending_files:
             if len(test_dirs_with_offending_files) == 1:

@@ -10,6 +10,9 @@
   },
   {
       "diff": "diff --git tests/wpt/metadata"
+  },
+  {
+      "diff": "not diff tests/wpt/metadata/eggs.delicious"
   }],
   "expected": [{
       "comments": 0
@@ -19,6 +22,9 @@
   },
   {
       "comments": 1
+  },
+  {
+      "comments": 0
   },
   {
       "comments": 0

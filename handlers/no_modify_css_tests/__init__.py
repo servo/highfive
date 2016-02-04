@@ -9,7 +9,7 @@ class NoModifyCSSTestsHandler(EventHandler):
 
     def on_pr_opened(self, api, payload):
         for line in api.get_diff().split('\n'):
-            if self.DIR_TO_CHECK in line:
+            if line.startswith("diff --git") and self.DIR_TO_CHECK in line:
                 self.warn(NO_MODIFY_CSS_TESTS_MSG)
                 break
 

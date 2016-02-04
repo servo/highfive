@@ -10,6 +10,9 @@
   },
   {
     "diff": "diff --git tests/wpt/css-tests/LICENSE"
+  },
+  {
+    "diff": "not diff --git tests/wpt/css-tests/manifest"
   }],
   "expected": [{
     "comments": 1
@@ -22,6 +25,9 @@
   },
   {
     "comments": 1
+  },
+  {
+    "comments": 0
   }],
   "payload":
 {

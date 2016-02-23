@@ -39,7 +39,7 @@
       "type": "User",
       "site_admin": false
     },
-    "body": null,
+    "body": "",
     "created_at": "2015-08-07T14:24:50Z",
     "updated_at": "2015-08-07T14:24:50Z",
     "closed_at": null,

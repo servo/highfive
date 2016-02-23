@@ -10,6 +10,11 @@ def find_reviewer(commit_msg):
     return match.group(1)
 
 class AssignReviewerHandler(EventHandler):
+    def on_pr_opened(self, api, payload):
+        reviewer = find_reviewer(payload["pull_request"]["body"])
+        if reviewer:
+            api.set_assignee(reviewer)
+
     def on_new_comment(self, api, payload):
         if not self.is_open_pr(payload):
             return

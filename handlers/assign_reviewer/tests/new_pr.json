@@ -1,9 +1,8 @@
 {
   "initial": {
-      "new_contributor": true
   },
   "expected": {
-    "comments": 1
+      "assignee": "jdm"
   },
   "payload":
 {
@@ -39,7 +38,7 @@
       "type": "User",
       "site_admin": false
     },
-    "body": "",
+    "body": "r? @jdm",
     "created_at": "2015-08-07T14:24:50Z",
     "updated_at": "2015-08-07T14:24:50Z",
     "closed_at": null,

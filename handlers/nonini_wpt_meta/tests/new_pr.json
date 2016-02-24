@@ -13,6 +13,12 @@
   },
   {
       "diff": "not diff tests/wpt/metadata/eggs.delicious"
+  },
+  {
+      "diff": "diff --git tests/wpt/metadata/MANIFEST.json"
+  },
+  {
+      "diff": "diff --git tests/wpt/metadata/mozilla-sync"
   }],
   "expected": [{
       "comments": 0
@@ -22,6 +28,12 @@
   },
   {
       "comments": 1
+  },
+  {
+      "comments": 0
+  },
+  {
+      "comments": 0
   },
   {
       "comments": 0

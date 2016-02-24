@@ -63,17 +63,18 @@ def run_tests(tests):
             handle_payload(api, payload)
             expected = test['expected']
             if 'comments' in expected:
-                assert len(api.comments_posted) == expected['comments']
+                assert len(api.comments_posted) == expected['comments'], "%d == %d" % (len(api.comments_posted), expected['comments'])
             if 'labels' in expected:
-                assert api.labels == expected['labels']
+                assert api.labels == expected['labels'], "%s == %s" % (api.labels, expected['labels'])
             if 'assignee' in expected:
-                assert api.assignee == expected['assignee']
-        except AssertionError:
+                assert api.assignee == expected['assignee'], "%s == %s" % (api.assignee, expected['assignee'])
+        except AssertionError, error:
             _, _, tb = sys.exc_info()
             traceback.print_tb(tb) # Fixed format
             tb_info = traceback.extract_tb(tb)
             filename, line, func, text = tb_info[-1]
             print('{}: An error occurred on line {} in statement {}'.format(test['filename'], line, text))
+            print(error)
             failed += 1
 
     print 'Ran %d tests, %d failed' % (len(tests), failed)

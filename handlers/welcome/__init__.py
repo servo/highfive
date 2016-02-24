@@ -7,11 +7,7 @@ class WelcomeHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         author = payload["pull_request"]['user']['login']
         if api.is_new_contributor(author):
-            collaborators = ['jdm', 'larsbergstrom', 'metajack', 'mbrubeck',
-                             'Ms2ger', 'Manishearth', 'glennw', 'pcwalton',
-                             'SimonSapin'] \
-                if api.repo == 'servo' and api.owner == 'servo' \
-                else ['test_user_selection_ignore_this']
+            collaborators = get_collaborators(api) or ['test_user_selection_ignore_this']
             random.seed()
             to_notify = random.choice(collaborators)
             api.post_comment(welcome_msg % to_notify)

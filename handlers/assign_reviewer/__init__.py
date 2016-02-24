@@ -4,7 +4,7 @@ import re
 # If the user specified a reviewer, return the username, otherwise returns None.
 def find_reviewer(commit_msg):
     reviewer_re = re.compile("\\b[rR]\?[:\- ]*@([a-zA-Z0-9\-]+)")
-    match = reviewer_re.search(commit_msg)
+    match = commit_msg and reviewer_re.search(commit_msg)
     if not match:
         return None
     return match.group(1)

@@ -10,8 +10,15 @@ class NonINIWPTMetaFileHandler(EventHandler):
         'tests/wpt/mozilla/meta',
     )
 
+    FALSE_POSITIVE_SUBSTRINGS = (
+        '.ini',
+        'MANIFEST.json',
+        'mozilla-sync',
+    )
+
     def _wpt_ini_dirs(self, line):
-        if line.startswith('diff --git') and ('.' in line and '.ini' not in line):
+        if line.startswith('diff --git') and '.' in line \
+            and not any(fp in line for fp in self.FALSE_POSITIVE_SUBSTRINGS):
             return set(directory for directory in self.DIRS_TO_CHECK if directory in line)
         else:
             return set()

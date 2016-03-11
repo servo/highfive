@@ -37,6 +37,9 @@ def choose_reviewer(api, pull_number):
 
 class AssignReviewerHandler(EventHandler):
     def on_pr_opened(self, api, payload):
+        # If the pull request already has an assignee, don't try to set one ourselves.
+        if payload["pull_request"]["assignee"] is not None:
+            return
         reviewer = find_reviewer(payload["pull_request"]["body"]) \
             or choose_reviewer(api, payload["pull_request"]["number"])
         if reviewer:

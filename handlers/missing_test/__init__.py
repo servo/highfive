@@ -5,6 +5,7 @@ TEST_REQUIRED_MSG = 'These commits modify {0} code, but no tests are modified. P
 class MissingTestHandler(EventHandler):
     COMPONENT_DIRS_TO_CHECK = ('layout', 'script', 'gfx', 'style', 'net')
     TEST_DIRS_TO_CHECK = ('ref', 'wpt', 'unit')
+    TEST_BINDING_TO_CHECK = ('testbinding.rs', 'TestBinding.webidl')
 
     def on_pr_opened(self, api, payload):
         diff = api.get_diff()
@@ -18,6 +19,10 @@ class MissingTestHandler(EventHandler):
 
                 for directory in self.TEST_DIRS_TO_CHECK:
                     if 'tests/{0}'.format(directory) in line:
+                        return
+
+                for file in self.TEST_BINDING_TO_CHECK:
+                    if 'tests/{0}'.format(file) in line:
                         return
 
         if components_changed:

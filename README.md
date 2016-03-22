@@ -49,10 +49,7 @@ or network connection is required to run the test suite.
 
 Copy `config.sample` to `config`. Add the username of the account that will be
 commenting as highfive. When logged into that account, visit
-`https://github.com/settings/tokens` and create a token with the permissions:
+`https://github.com/settings/tokens` and create a token with the `public_repo`
+permission.
 
-* repo
-* public_repo
-* user
-
-Add that access token's value to the `token` field of the config. 
+Add that access token's value to the `token` field of the config.

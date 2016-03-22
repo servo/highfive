@@ -48,7 +48,7 @@ or network connection is required to run the test suite.
 ## Enabling a repo
 
 Visit the repo's webhook settings page at
-`https://github.com/org/repo/settings/hooks`. 
+`https://github.com/org/repo/settings/hooks`.
 
 Create a new webhook, pointing at your highfive instance's location:
 
@@ -58,3 +58,11 @@ Leave the 'secret' field blank.
 Let me select individual events: Issue Comment, Pull Request, Status
 Check the box by 'Active'
 
+## Configuring a Highfive
+
+Copy `config.sample` to `config`. Add the username of the account that will be
+commenting as highfive. When logged into that account, visit
+`https://github.com/settings/tokens` and create a token with the `public_repo`
+permission.
+
+Add that access token's value to the `token` field of the config.

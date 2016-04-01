@@ -39,10 +39,20 @@ class WatchersHandler(EventHandler):
         mentions = defaultdict(list)
         for (watcher, watched_files) in watchers:
             watched_files = watched_files.split(' ')
+            unwatched_files = []
+            for watched_file in watched_files:
+                if watched_file.startswith('s'):
+                    unwatched_files.append(watched_file[1:])
+            for unwatched_file in unwatched_files:
+                watched_file.remove('-' + unwatched_file)
             for changed_file in changed_files:
-                for watched_file in watched_files:
-                    if changed_file.startswith(watched_file):
-                        mentions[watcher].append(changed_file)
+                for unwatched_file in unwatched_files:
+                    if changed_file.startswith(unwatched_file):
+                        break
+                else:
+                    for watched_file in watched_files:
+                        if changed_file.startswith(watched_file):
+                            mentions[watcher].append(changed_file)
 
         if not mentions:
             return

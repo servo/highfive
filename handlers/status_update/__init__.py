@@ -22,5 +22,8 @@ class StatusUpdateHandler(EventHandler):
     def on_pr_updated(self, api, payload):
         manage_pr_state(api, payload)
 
+    def on_pr_closed(self, api, payload):
+        if payload['pull_request']['merged']:
+            api.remove_label("S-awaiting-merge")
 
 handler_interface = StatusUpdateHandler

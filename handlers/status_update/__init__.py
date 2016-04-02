@@ -1,3 +1,4 @@
+import time
 from eventhandler import EventHandler
 
 def manage_pr_state(api, payload):
@@ -9,10 +10,16 @@ def manage_pr_state(api, payload):
     if not "S-awaiting-review" in labels:
         api.add_label("S-awaiting-review")
 
-    # If mergeable is null, the data wasn't available yet. It would be nice to try to fetch that
-    # information again.
-    if payload["action"] == "synchronize" and payload['pull_request']['mergeable']:
-        if "S-needs-rebase" in labels:
+    if payload["action"] == "synchronize" and "S-needs-rebase" in labels:
+        mergeable = payload['pull_request']['mergeable']
+        # If mergeable is null, the data wasn't available yet. Once it is, mergeable
+        # will be either true or false.
+        while mergeable is None:
+            time.sleep(1)  # wait for GitHub to finish determine mergeability
+            pull_request = api.get_pull()
+            mergeable = pull_request['mergeable']
+
+        if mergeable:
             api.remove_label("S-needs-rebase")
 
 class StatusUpdateHandler(EventHandler):

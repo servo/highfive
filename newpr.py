@@ -45,6 +45,9 @@ class APIProvider:
     def set_assignee(self, assignee):
         raise NotImplementedError
 
+    def get_pull(self):
+        raise NotImplementedError
+
 
 class GithubAPIProvider(APIProvider):
     contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=400"
@@ -62,6 +65,7 @@ class GithubAPIProvider(APIProvider):
         self._diff = None
         if "pull_request" in payload:
             self.diff_url = payload["pull_request"]["diff_url"]
+            self.pull_url = payload["pull_request"]["url"]
 
     def api_req(self, method, url, data=None, media_type=None):
         data = None if not data else json.dumps(data)
@@ -186,6 +190,9 @@ class GithubAPIProvider(APIProvider):
                 pass
             else:
                 raise e
+
+    def get_pull(self):
+        return self.api_req("GET", self.pull_url)["body"]
 
 
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'

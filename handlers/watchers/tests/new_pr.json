@@ -10,6 +10,15 @@
   },
   {
       "diff": "diff --git a/not-watched/dir/not-watched-file.rs b/not-watched/dir/watched-file.rs"
+  },
+  {
+      "diff": "diff --git a/blacklisted/dir/watched-file.rs b/blacklisted/dir/watched-file.rs"
+  },
+  {
+      "diff": "diff --git a/watched/dir/blacklisted-file.rs b/watched/dir/file.rs"
+  },
+  {
+      "diff": "diff --git a/watched/dir/file.rs b/watched/dir/blacklisted-file.rs"
   }],
   "expected": [{
       "comments": 1
@@ -19,6 +28,15 @@
   },
   {
       "comments": 0
+  },
+  {
+      "comments": 1
+  },
+  {
+      "comments": 0
+  },
+  {
+      "comments": 1
   },
   {
       "comments": 1

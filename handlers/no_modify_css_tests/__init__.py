@@ -11,8 +11,8 @@ class NoModifyCSSTestsHandler(EventHandler):
     DIR_TO_CHECK = "tests/wpt/css-tests"
 
     def on_pr_opened(self, api, payload):
-        for line in api.get_diff().split('\n'):
-            if line.startswith("diff --git") and self.DIR_TO_CHECK in line:
+        for line in self.get_diff_headers(api):
+            if self.DIR_TO_CHECK in line:
                 self.warn(NO_MODIFY_CSS_TESTS_MSG)
                 break
 

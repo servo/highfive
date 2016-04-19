@@ -13,6 +13,8 @@ _payload_actions = {
     'labeled': 'on_issue_labeled'
 }
 
+DIFF_HEADER_LINE_START = 'diff --git '
+
 
 class EventHandler:
     def on_pr_opened(self, api, payload):
@@ -45,12 +47,16 @@ class EventHandler:
                 'pull_request' in payload['issue'])
 
 
-    def get_changed_files(self, api):
-        changed_files = []
+    def get_diff_headers(self, api):
         diff = api.get_diff()
         for line in diff.split('\n'):
-            if line.startswith('diff --git'):
-                changed_files.extend(line.split('diff --git ')[-1].split(' '))
+            if line.startswith(DIFF_HEADER_LINE_START):
+                yield line
+
+    def get_changed_files(self, api):
+        changed_files = []
+        for line in self.get_diff_headers(api):
+            changed_files.extend(line.split(DIFF_HEADER_LINE_START)[-1].split(' '))
 
         # Remove the `a/` and `b/` parts of paths,
         # And get unique values using `set()`

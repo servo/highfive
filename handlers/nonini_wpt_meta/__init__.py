@@ -18,19 +18,16 @@ class NonINIWPTMetaFileHandler(EventHandler):
         'mozilla-sync',
     )
 
-    def _wpt_ini_dirs(self, line):
-        if line.startswith('diff --git') and '.' in line \
-           and not any(fp in line for fp in self.FALSE_POSITIVE_SUBSTRINGS):
-            return set(directory for directory in self.DIRS_TO_CHECK
-                       if directory in line)
+    def _wpt_ini_dirs(self, diff_line):
+        if '.' in diff_line and not any(fp in diff_line for fp in self.FALSE_POSITIVE_SUBSTRINGS):
+            return set(directory for directory in self.DIRS_TO_CHECK if directory in diff_line)
         else:
             return set()
 
     def on_pr_opened(self, api, payload):
-        diff = api.get_diff()
         test_dirs_with_offending_files = set()
 
-        for line in diff.split('\n'):
+        for line in self.get_diff_headers(api):
             test_dirs_with_offending_files |= self._wpt_ini_dirs(line)
 
         if test_dirs_with_offending_files:

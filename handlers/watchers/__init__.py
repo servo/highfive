@@ -20,20 +20,14 @@ def build_message(mentions):
 class WatchersHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         user = payload['pull_request']['user']['login']
-        diff = api.get_diff()
-        changed_files = []
-        for line in diff.split('\n'):
-            if line.startswith('diff --git'):
-                changed_files.extend(line.split('diff --git ')[-1].split(' '))
+        config = get_config()
+        changed_files = self.get_changed_files(api)
 
-        # Remove the `a/` and `b/` parts of paths,
-        # And get unique values using `set()`
-        changed_files = set(map(lambda f: f if f.startswith('/') else f[2:],
-                                changed_files))
-
-        watchers = get_people_from_config(api, WATCHERS_CONFIG_FILE)
-        if not watchers:
-            return
+        repo = api.owner + '/' + api.repo
+        try:
+            watchers = config.items(repo)
+        except ConfigParser.NoSectionError:
+            return # No watchers
 
         mentions = defaultdict(list)
         for (watcher, watched_files) in watchers:

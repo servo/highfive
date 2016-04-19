@@ -45,6 +45,18 @@ class EventHandler:
                 'pull_request' in payload['issue'])
 
 
+    def get_changed_files(self, api):
+        changed_files = []
+        diff = api.get_diff()
+        for line in diff.split('\n'):
+            if line.startswith('diff --git'):
+                changed_files.extend(line.split('diff --git ')[-1].split(' '))
+
+        # Remove the `a/` and `b/` parts of paths,
+        # And get unique values using `set()`
+        return set(map(lambda f: f if f.startswith('/') else f[2:], changed_files))
+
+
 def reset_test_state():
     global _warnings
     _warnings = []

@@ -49,13 +49,13 @@ class EventHandler:
 
     def get_diff_headers(self, api):
         diff = api.get_diff()
-        for line in diff.split('\n'):
+        for line in diff.splitlines():
             if line.startswith(DIFF_HEADER_LINE_START):
                 yield line
 
     def get_added_lines(self, api):
         diff = api.get_diff()
-        for line in diff.split('\n'):
+        for line in diff.splitlines():
             if line.startswith('+') and not line.startswith('+++'):
                 # prefix of one or two pluses (+)
                 yield line

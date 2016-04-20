@@ -67,7 +67,7 @@ class EventHandler:
 
         # Remove the `a/` and `b/` parts of paths,
         # And get unique values using `set()`
-        return set(map(lambda f: f if f.startswith('/') else f[2:], changed_files))
+        return set(f if f.startswith('/') else f[2:] for f in changed_files)
 
 
 def reset_test_state():

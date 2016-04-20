@@ -53,6 +53,13 @@ class EventHandler:
             if line.startswith(DIFF_HEADER_LINE_START):
                 yield line
 
+    def get_added_lines(self, api):
+        diff = api.get_diff()
+        for line in diff.split('\n'):
+            if line.startswith('+') and not line.startswith('+++'):
+                # prefix of one or two pluses (+)
+                yield line
+
     def get_changed_files(self, api):
         changed_files = []
         for line in self.get_diff_headers(api):

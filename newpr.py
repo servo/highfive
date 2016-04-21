@@ -48,6 +48,9 @@ class APIProvider:
     def get_pull(self):
         raise NotImplementedError
 
+    def get_page_content(self, url):
+        raise NotImplementedError
+
 
 class GithubAPIProvider(APIProvider):
     contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=400"
@@ -193,6 +196,10 @@ class GithubAPIProvider(APIProvider):
 
     def get_pull(self):
         return self.api_req("GET", self.pull_url)["body"]
+
+    def get_page_content(self, url):
+        with urllib2.urlopen(url) as fd:
+            return fd.read()
 
 
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'

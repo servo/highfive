@@ -1,7 +1,6 @@
 from eventhandler import EventHandler
 import json
 import re
-import urllib2
 
 def check_failure_log(api, bors_comment):
     # bors_comment would be something like,
@@ -13,8 +12,8 @@ def check_failure_log(api, bors_comment):
 
     # substitute and get the new url - http://build.servo.org/json/builders/linux2/builds/2627
     json_url = re.sub(r'(.*)(builders/.*)', r'\1json/\2', url)
-    fd = urllib2.urlopen(json_url)
-    build_stats = json.loads(fd.read())
+    json_stuff = api.get_page_content(json_url)
+    build_stats = json.loads(json_stuff)
 
     build_log = []
     for step in build_stats['steps']:
@@ -31,8 +30,7 @@ def check_failure_log(api, bors_comment):
     if not failed_url:
         return
 
-    fd = urllib2.urlopen(failed_url)
-    stdio = fd.read()
+    stdio = api.get_page_content(failed_url)
     failures = iter(re.findall(r'.*Tests with unexpected results:\n(.*)\n</span><span',
                                stdio, re.DOTALL)).next()
     if failures:

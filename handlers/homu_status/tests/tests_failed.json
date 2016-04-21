@@ -3,7 +3,8 @@
       "labels": ["S-awaiting-merge"]
   },
   "expected": {
-      "labels": ["S-tests-failed"]
+      "labels": ["S-tests-failed"],
+      "comments": 1
   },
   "payload":
 {
@@ -85,7 +86,7 @@
     },
     "created_at": "2015-08-07T16:45:57Z",
     "updated_at": "2015-08-07T16:45:57Z",
-    "body": ":broken_heart: Test failed - [linux2](http://build.servo.org/builders/linux2/builds/2627)"
+    "body": ":broken_heart: Test failed - [linux2](handlers/homu_status/tests/builders/test_builder_result.json)"
   },
   "repository": {
     "id": 3390243,

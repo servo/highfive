@@ -1,0 +1,12 @@
+// fooooooooooooo barrrrrrrrrrrrrrrrrrr
+
+Tests with unexpected results:
+  ▶ OK [expected CRASH] /something/foo/something.html
+
+  ▶ Unexpected subtest result in /something/blah/something.html
+  │ FAIL [expected PASS] totally-something-else
+  │
+  │ reporting...
+  └ I won't report anymore...
+
+</span><span>

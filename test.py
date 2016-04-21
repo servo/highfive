@@ -38,6 +38,11 @@ class TestAPIProvider(APIProvider):
     def set_assignee(self, assignee):
         self.assignee = assignee
 
+    def get_page_content(self, path):
+        with open(path) as fd:
+            return fd.read()
+
+
 def get_payload(filename):
     with open(filename) as f:
         return json.load(f)

@@ -3,7 +3,8 @@
       "new_contributor": true
   },
   "expected": {
-    "comments": 1
+    "comments": 1,
+    "assignee": "manishearth"
   },
   "payload":
 {

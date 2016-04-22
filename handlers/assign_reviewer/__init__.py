@@ -35,6 +35,9 @@ def choose_reviewer(api, pull_number):
 
     return collaborators[pull_number % len(collaborators)]
 
+welcome_msg = "Thanks for the pull request, and welcome! The Servo team is excited to review "\
+              "your changes, and you should hear from @%s (or someone else) soon."
+
 class AssignReviewerHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         # If the pull request already has an assignee, don't try to set one ourselves.
@@ -42,8 +45,11 @@ class AssignReviewerHandler(EventHandler):
             return
         reviewer = find_reviewer(payload["pull_request"]["body"]) \
             or choose_reviewer(api, payload["pull_request"]["number"])
-        if reviewer:
-            api.set_assignee(reviewer)
+        # Add welcome message for new contributors
+        author = payload["pull_request"]['user']['login']
+        if api.is_new_contributor(author):
+            api.post_comment(welcome_msg % reviewer)
+        api.set_assignee(reviewer)
 
     def on_new_comment(self, api, payload):
         if not self.is_open_pr(payload):

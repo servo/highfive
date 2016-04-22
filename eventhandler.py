@@ -66,14 +66,10 @@ def get_handlers():
     possiblehandlers = os.listdir('handlers')
     for i in possiblehandlers:
         location = os.path.join('handlers', i)
-        module = '__init__'
-        if not os.path.isdir(location) or not module + ".py" in os.listdir(location):
-            continue
         try:
-            (file, pathname, description) = imp.find_module(module, [location])
-            module = imp.load_module(module, file, pathname, description)
+            module = imp.load_module('handlers.'+i, None, location, ('', '', imp.PKG_DIRECTORY))
             handlers.append(module.handler_interface())
             modules.append((module, location))
-        finally:
-            file.close()
+        except ImportError:
+            pass
     return (modules, handlers)

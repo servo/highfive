@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import base64
+import contextlib
 import eventhandler
 import urllib, urllib2
 import cgi
@@ -198,8 +199,11 @@ class GithubAPIProvider(APIProvider):
         return self.api_req("GET", self.pull_url)["body"]
 
     def get_page_content(self, url):
-        with urllib2.urlopen(url) as fd:
-            return fd.read()
+        try:
+            with contextlib.closing(urllib2.urlopen(url)) as fd:
+                return fd.read()
+        except urllib2.URLError:
+            return None
 
 
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'

@@ -210,7 +210,8 @@ def extract_globals_from_payload(payload):
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         travisCiApiProvider = TravisCiApiProvider()
-        issue = travisCiApiProvider.get_pull_request_number(travisCiApiProvider.get_build(payload['target_url'].split('/')[-1]))
+        build = travisCiApiProvider.get_build(payload['target_url'].split('/')[-1])
+        issue = travisCiApiProvider.get_pull_request_number(build)
     elif payload['action'] == 'created':
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']

@@ -29,10 +29,7 @@ class EventHandler:
         pass
 
     def handle_payload(self, api, payload):
-        if 'context' in payload:
-            action = 'status'
-        else:
-            action = payload['action']
+        action = 'status' if 'context' in payload else payload['action']
         if action in _payload_action:
             getattr(self, _payload_action[action])(api, payload)
 

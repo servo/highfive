@@ -12,6 +12,7 @@ _payload_actions = {
     'closed': 'on_pr_closed',
     'labeled': 'on_issue_labeled'
 }
+_test_path_roots = ['a/', 'b/']
 
 DIFF_HEADER_LINE_START = 'diff --git '
 
@@ -65,9 +66,16 @@ class EventHandler:
         for line in self.get_diff_headers(api):
             changed_files.extend(line.split(DIFF_HEADER_LINE_START)[-1].split(' '))
 
-        # Remove the `a/` and `b/` parts of paths,
         # And get unique values using `set()`
-        return set(f if f.startswith('/') else f[2:] for f in changed_files)
+        return set(f for f in map(self.normalize_file_path, changed_files) if f is not None)
+
+    def normalize_file_path(self, filepath):
+        if filepath is None or filepath.strip() == '':
+            return None
+        for prefix in _test_path_roots:
+            if filepath.startswith(prefix):
+                return filepath[len(prefix):]
+        return filepath
 
 
 def reset_test_state():
@@ -83,8 +91,8 @@ def get_warnings():
 def get_handlers():
     modules = []
     handlers = []
-    possiblehandlers = os.listdir('handlers')
-    for i in possiblehandlers:
+    possible_handlers = os.listdir('handlers')
+    for i in possible_handlers:
         location = os.path.join('handlers', i)
         try:
             module = imp.load_module('handlers.' + i, None, location,

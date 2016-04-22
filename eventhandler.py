@@ -10,7 +10,8 @@ _payload_actions = {
     'synchronize': 'on_pr_updated',
     'created': 'on_new_comment',
     'closed': 'on_pr_closed',
-    'labeled': 'on_issue_labeled'
+    'labeled': 'on_issue_labeled',
+    'status': 'on_build_status'
 }
 
 
@@ -30,10 +31,14 @@ class EventHandler:
     def on_issue_labeled(self, api, payload):
         pass
 
+    def on_build_status(self, api, payload):
+        pass
+
     def handle_payload(self, api, payload):
         def callback(action):
             getattr(self, _payload_actions[action])(api, payload)
-        payload_action = payload['action']
+        payload_action = 'status' if 'context' in payload \
+            else payload['action']
         linear_search(_payload_actions, payload_action, callback)
 
     def warn(self, msg):

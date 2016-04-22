@@ -70,6 +70,9 @@ class NodeMarker(object):
     def __int__(self):
         return int(self._node)
 
+    def split(self, sep):
+        return self._node.split(sep)
+
 
 class JsonCleaner(object):
     def __init__(self, json_obj):

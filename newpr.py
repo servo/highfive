@@ -15,6 +15,7 @@ except:
 from StringIO import StringIO
 import urllib2
 
+from travisciapiprovider import TravisCiApiProvider
 import eventhandler
 
 
@@ -215,7 +216,14 @@ warning_summary = warning_header + '\n\n%s'
 
 
 def extract_globals_from_payload(payload):
-    if payload["action"] == "created" or payload["action"] == "labeled":
+    if 'context' in payload:
+        owner = payload['repository']['owner']['login']
+        repo = payload['repository']['name']
+        travis = TravisCiApiProvider()
+        build_number = payload['target_url'].split('/')[-1]
+        build = travis.get_build(build_number)
+        issue = travis.get_pull_request_number(build)
+    elif payload['action'] == 'created' or payload['action'] == 'labeled':
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])

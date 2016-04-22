@@ -1,0 +1,21 @@
+{
+  "expected": {
+    "labels": [
+      "S-needs-code-changes"
+    ]
+  },
+  "initial": {
+    "labels": []
+  },
+  "payload": {
+    "target_url": "https://travis-ci.org/servo/servo/builds/120670455",
+    "context": "continuous-integration/travis-ci/pr",
+    "repository": {
+      "owner": {
+        "login": "servo"
+      },
+      "name": "servo"
+    },
+    "state": "failure"
+  }
+}

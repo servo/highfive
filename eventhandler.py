@@ -7,7 +7,8 @@ _payload_action = {
     'opened': 'on_pr_opened',
     'synchronize': 'on_pr_updated',
     'created': 'on_new_comment',
-    'closed': 'on_pr_closed'
+    'closed': 'on_pr_closed',
+    'status': 'on_build_status'
 }
 
 
@@ -24,8 +25,14 @@ class EventHandler:
     def on_pr_closed(self, api, payload):
         pass
 
+    def on_build_status(self, api, payload):
+        pass
+
     def handle_payload(self, api, payload):
-        action = payload['action']
+        if 'context' in payload:
+            action = 'status'
+        else:
+            action = payload['action']
         if action in _payload_action:
             getattr(self, _payload_action[action])(api, payload)
 

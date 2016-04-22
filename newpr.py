@@ -15,6 +15,7 @@ import sys
 import ConfigParser
 from StringIO import StringIO
 import gzip
+from travisciapiprovider import TravisCiApiProvider
 
 class APIProvider:
     def __init__(self, payload, user):
@@ -205,7 +206,12 @@ class GithubAPIProvider(APIProvider):
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 
 def extract_globals_from_payload(payload):
-    if payload["action"] == "created":
+    if 'context' in payload:
+        owner = payload['repository']['owner']['login']
+        repo = payload['repository']['name']
+        travisCiApiProvider = TravisCiApiProvider()
+        issue = travisCiApiProvider.get_pull_request_number(travisCiApiProvider.get_build(payload['target_url'].split('/')[-1]))
+    elif payload['action'] == 'created':
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])

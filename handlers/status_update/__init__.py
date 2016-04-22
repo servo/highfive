@@ -33,4 +33,9 @@ class StatusUpdateHandler(EventHandler):
         if payload['pull_request']['merged']:
             api.remove_label("S-awaiting-merge")
 
+    def on_build_status(self, api, payload):
+        if payload['context'] == 'continuous-integration/travis-ci/pr':
+            if payload['state'] == 'failure' or payload['state'] == 'error':
+                api.add_label("S-needs-code-changes")
+
 handler_interface = StatusUpdateHandler

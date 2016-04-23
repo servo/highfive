@@ -209,7 +209,7 @@ class GithubAPIProvider(APIProvider):
 warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
 
 def extract_globals_from_payload(payload):
-    if payload["action"] == "created":
+    if payload["action"] == "created" or payload["action"] == "labeled":
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])

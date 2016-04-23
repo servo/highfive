@@ -7,7 +7,8 @@ _payload_action = {
     'opened': 'on_pr_opened',
     'synchronize': 'on_pr_updated',
     'created': 'on_new_comment',
-    'closed': 'on_pr_closed'
+    'closed': 'on_pr_closed',
+    'labeled': 'on_issue_labeled'
 }
 
 
@@ -22,6 +23,9 @@ class EventHandler:
         pass
 
     def on_pr_closed(self, api, payload):
+        pass
+
+    def on_issue_labeled(self, api, payload):
         pass
 
     def handle_payload(self, api, payload):

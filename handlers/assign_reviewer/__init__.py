@@ -1,26 +1,10 @@
 from eventhandler import EventHandler
-import re
-import ConfigParser
+from helpers import get_collaborators
 import os
-
-COLLABORATORS_CONFIG_FILE = os.path.join(os.path.dirname(__file__), '../../collaborators.ini')
+import re
 
 WELCOME_MSG = "Thanks for the pull request, and welcome! The Servo team is excited to review "\
               "your changes, and you should hear from @%s (or someone else) soon."
-
-def get_collaborators_config():
-    config = ConfigParser.ConfigParser()
-    config.read(COLLABORATORS_CONFIG_FILE)
-    return config
-
-def get_collaborators(api):
-    config = get_collaborators_config()
-    repo = api.owner + '/' + api.repo
-
-    try:
-        return [username for (username, _) in config.items(repo)]
-    except ConfigParser.NoSectionError:
-        return [] # No collaborators
 
 # If the user specified a reviewer, return the username, otherwise returns None.
 def find_reviewer(comment, collaborators):

@@ -1,14 +1,9 @@
-from eventhandler import EventHandler
 from collections import defaultdict
-import ConfigParser
+from eventhandler import EventHandler
+from helpers import get_people_from_config
 import os
 
 WATCHERS_CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'watchers.ini')
-
-def get_config():
-    config = ConfigParser.ConfigParser()
-    config.read(WATCHERS_CONFIG_FILE)
-    return config
 
 def build_message(mentions):
     message = [ 'Heads up! This PR modifies the following files:' ]
@@ -28,13 +23,10 @@ class WatchersHandler(EventHandler):
         # Remove the `a/` and `b/` parts of paths,
         # And get unique values using `set()`
         changed_files = set(map(lambda f: f if f.startswith('/') else f[2:], changed_files))
-        config = get_config()
 
-        repo = api.owner + '/' + api.repo
-        try:
-            watchers = config.items(repo)
-        except ConfigParser.NoSectionError:
-            return # No watchers
+        watchers = get_people_from_config(api, WATCHERS_CONFIG_FILE)
+        if not watchers:
+            return
 
         mentions = defaultdict(list)
         for (watcher, watched_files) in watchers:

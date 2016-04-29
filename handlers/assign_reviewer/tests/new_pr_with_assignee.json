@@ -1,8 +1,9 @@
 {
   "initial": {
+    "assignee": "SimonSapin"
   },
   "expected": {
-      "assignee": null
+      "assignee": "SimonSapin"
   },
   "payload":
 {

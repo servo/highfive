@@ -16,7 +16,7 @@ def find_reviewer(comment, collaborators):
     otherwise returns None.
     """
     reviewer = re.search(r'.*r\?[:\- ]*@([a-zA-Z0-9\-]*)', comment)
-    if reviewer and reviewer.group(1) in collaborators:
+    if reviewer:
         return reviewer.group(1)
     return None
 
@@ -42,11 +42,10 @@ def get_approver(payload, collaborators):
     approval_regex = r'.*@bors-servo[: ]*r([\+=])([a-zA-Z0-9\-]*)'
     approval = re.search(approval_regex, comment)
 
-    if approval and user in collaborators:
+    if approval:
         if approval.group(1) == '=':  # "r=username"
             reviewer = approval.group(2)
-            if reviewer in collaborators:
-                return reviewer
+            return reviewer
         return user  # fall back and assign the approver
     return None
 

@@ -1,6 +1,8 @@
 language: python
 python:
   - "2.7"
-script: python test.py
+script:
+  - flake8 .
+  - python test.py
 notifications:
   webhooks: http://build.servo.org:54856/travis

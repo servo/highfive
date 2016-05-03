@@ -5,12 +5,14 @@ import os
 
 WATCHERS_CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'watchers.ini')
 
+
 def build_message(mentions):
-    message = [ 'Heads up! This PR modifies the following files:' ]
+    message = ['Heads up! This PR modifies the following files:']
     for (watcher, file_names) in mentions.items():
         message.append(" * @{}: {}".format(watcher, ', '.join(file_names)))
 
     return '\n'.join(message)
+
 
 class WatchersHandler(EventHandler):
     def on_pr_opened(self, api, payload):
@@ -22,7 +24,8 @@ class WatchersHandler(EventHandler):
 
         # Remove the `a/` and `b/` parts of paths,
         # And get unique values using `set()`
-        changed_files = set(map(lambda f: f if f.startswith('/') else f[2:], changed_files))
+        changed_files = set(map(lambda f: f if f.startswith('/') else f[2:],
+                                changed_files))
 
         watchers = get_people_from_config(api, WATCHERS_CONFIG_FILE)
         if not watchers:

@@ -1,6 +1,8 @@
 from eventhandler import EventHandler
 
-TEST_REQUIRED_MSG = 'These commits modify {0} code, but no tests are modified. Please consider adding a test!'
+TEST_REQUIRED_MSG = ('These commits modify {} code, but no tests are modified.'
+                     'Please consider adding a test!')
+
 
 class MissingTestHandler(EventHandler):
     COMPONENT_DIRS_TO_CHECK = ('layout', 'script', 'gfx', 'style', 'net')

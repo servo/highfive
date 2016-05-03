@@ -2,15 +2,17 @@ from eventhandler import EventHandler
 import json
 import re
 
+
 def check_failure_log(api, bors_comment):
     # bors_comment would be something like,
-    # ":broken_heart: Test failed - [linux2](http://build.servo.org/builders/linux2/builds/2627)"
+    # ":broken_heart: Test failed - [linux2](http://build.servo.org/builders/linux2/builds/2627)"  # noqa
     # ... from which we get the relevant build result url
     url = iter(re.findall(r'.*\((.*)\)', bors_comment)).next()
     if not url:
         return
 
-    # substitute and get the new url - http://build.servo.org/json/builders/linux2/builds/2627
+    # Substitute and get the new url
+    # (e.g. http://build.servo.org/json/builders/linux2/builds/2627)
     json_url = re.sub(r'(.*)(builders/.*)', r'\1json/\2', url)
     json_stuff = api.get_page_content(json_url)
     if not json_stuff:
@@ -34,11 +36,11 @@ def check_failure_log(api, bors_comment):
         return
 
     stdio = api.get_page_content(failed_url)
-    failures = iter(re.findall(r'.*Tests with unexpected results:\n(.*)\n</span><span',
-                               stdio, re.DOTALL)).next()
+    failure_regex = r'.*Tests with unexpected results:\n(.*)\n</span><span'
+    failures = iter(re.findall(failure_regex, stdio, re.DOTALL)).next()
     if failures:
-        comment_body = '\n'.join(map(lambda line: ' ' * 4 + line, failures.split('\n')))
-        api.post_comment(comment_body)
+        comments = [' ' * 4 + line for line in failures.split('\n')]
+        api.post_comment('\n'.join(comments))
 
 
 class HomuStatusHandler(EventHandler):
@@ -49,7 +51,7 @@ class HomuStatusHandler(EventHandler):
         if payload['comment']['user']['login'] != 'bors-servo':
             return
 
-        labels = api.get_labels();
+        labels = api.get_labels()
         msg = payload["comment"]["body"]
 
         def remove_if_exists(label):
@@ -57,16 +59,18 @@ class HomuStatusHandler(EventHandler):
                 api.remove_label(label)
 
         if 'has been approved by' in msg or 'Testing commit' in msg:
-            for label in ["S-awaiting-review", "S-needs-rebase", "S-tests-failed",
-                          "S-needs-code-changes", "S-needs-squash", "S-awaiting-answer"]:
+            for label in ["S-awaiting-review", "S-needs-rebase",
+                          "S-tests-failed", "S-needs-code-changes",
+                          "S-needs-squash", "S-awaiting-answer"]:
                 remove_if_exists(label)
-            if not "S-awaiting-merge" in labels:
+            if "S-awaiting-merge" not in labels:
                 api.add_label("S-awaiting-merge")
 
         elif 'Test failed' in msg:
             remove_if_exists("S-awaiting-merge")
             api.add_label("S-tests-failed")
-            # get the homu build stats url, extract the failed tests and post them!
+            # Get the homu build stats url,
+            # extract the failed tests and post them!
             check_failure_log(api, msg)
 
         elif 'Please resolve the merge conflicts' in msg:

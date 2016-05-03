@@ -18,6 +18,21 @@ def find_reviewer(comment, collaborators):
     return None
 
 
+def choose_reviewer(pr, collaborators):
+    """
+    Choose a (pseudo-)random reviewer from the collaborators, who is not the
+    author. If there are no collaborators other than the author, return None.
+    """
+    author = pr['user']['login']
+    # Avoid using sets to maintain the order of reviewers and
+    # thus ensure an even rotation of reviewers
+    potential_reviewers = [collaborator for collaborator in collaborators
+                           if collaborator != author]
+    if not potential_reviewers:
+        return None
+    return potential_reviewers[pr['number'] % len(potential_reviewers)]
+
+
 def get_approver(payload, collaborators):
     user = payload['comment']['user']['login']
     comment = payload['comment']['body']
@@ -48,13 +63,15 @@ class AssignReviewerHandler(EventHandler):
             return
 
         reviewer = find_reviewer(pr["body"], collaborators) or \
-            collaborators[pr["number"] % len(collaborators)]
-        api.set_assignee(reviewer)
+            choose_reviewer(pr, collaborators)
 
-        # Add welcome message for new contributors.
-        author = pr['user']['login']
-        if api.is_new_contributor(author):
-            api.post_comment(WELCOME_MSG % reviewer)
+        if reviewer:
+            api.set_assignee(reviewer)
+
+            # Add welcome message for new contributors.
+            author = pr['user']['login']
+            if api.is_new_contributor(author):
+                api.post_comment(WELCOME_MSG % reviewer)
 
     def on_new_comment(self, api, payload):
         collaborators = get_collaborators(api)

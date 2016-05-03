@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from base64 import standard_b64encode
-import contextlib
-import eventhandler
-import urllib2
 import cgi
 import cgitb
+import ConfigParser
+import contextlib
+import gzip
 try:
     import simplejson as json
 except:
     import json
-import ConfigParser
 from StringIO import StringIO
-import gzip
+import urllib2
+
+import eventhandler
 
 
 class APIProvider:

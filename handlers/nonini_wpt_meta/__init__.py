@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from eventhandler import EventHandler
 
 NON_INI_MSG = 'This pull request adds {0} without the .ini \

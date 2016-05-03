@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from eventhandler import EventHandler
 from helpers import is_addition
 

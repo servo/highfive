@@ -1,4 +1,7 @@
+from __future__ import absolute_import
+
 import time
+
 from eventhandler import EventHandler
 
 PR_UPDATE_MSG = "New code was committed to pull request."

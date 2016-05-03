@@ -1,9 +1,12 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from newpr import APIProvider, handle_payload
 import json
+import os
 import sys
 import traceback
+
+import eventhandler
+from newpr import APIProvider, handle_payload
 
 
 class TestAPIProvider(APIProvider):
@@ -52,20 +55,21 @@ def get_payload(filename):
 
 
 def create_test(filename, initial, expected):
-    global tests
-    initial_values = {'new_contributor': initial.get('new_contributor', False),
-                      'labels': initial.get('labels', []),
-                      'diff': initial.get('diff', ''),
-                      'pull_request': initial.get('pull_request', ''),
-                      'assignee': initial.get('assignee', None)}
-    return {'filename': filename,
-            'initial': initial_values,
-            'expected': expected}
+    initial_values = {
+        'new_contributor': initial.get('new_contributor', False),
+        'labels': initial.get('labels', []),
+        'diff': initial.get('diff', ''),
+        'pull_request': initial.get('pull_request', ''),
+        'assignee': initial.get('assignee', None),
+    }
+    return {
+        'filename': filename,
+        'initial': initial_values,
+        'expected': expected,
+    }
 
 
 def run_tests(tests):
-    import eventhandler
-
     failed = 0
     for test in tests:
         eventhandler.reset_test_state()
@@ -108,13 +112,32 @@ def run_tests(tests):
         sys.exit(1)
 
 
+def register_tests(path):
+    tests_location = os.path.join(path, 'tests')
+    if not os.path.isdir(tests_location):
+        return
+    tests = [os.path.join(tests_location, f)
+             for f in os.listdir(tests_location)
+             if f.endswith('.json')]
+    for testfile in tests:
+        with open(testfile) as f:
+            contents = json.load(f)
+            if not isinstance(contents['initial'], list):
+                assert not isinstance(contents['expected'], list)
+                contents['initial'] = [contents['initial']]
+                contents['expected'] = [contents['expected']]
+            for initial, expected in zip(contents['initial'],
+                                         contents['expected']):
+                yield create_test(testfile, initial, expected)
+
+
 def setup_tests():
-    import eventhandler
     (modules, handlers) = eventhandler.get_handlers()
     tests = []
     for module, handler in zip(modules, handlers):
-        tests.extend(handler.register_tests(module[1]))
+        tests.extend(register_tests(module[1]))
     return tests
+
 
 if __name__ == "__main__":
     tests = setup_tests()

@@ -18,8 +18,9 @@ class NonINIWPTMetaFileHandler(EventHandler):
 
     def _wpt_ini_dirs(self, line):
         if line.startswith('diff --git') and '.' in line \
-            and not any(fp in line for fp in self.FALSE_POSITIVE_SUBSTRINGS):
-            return set(directory for directory in self.DIRS_TO_CHECK if directory in line)
+           and not any(fp in line for fp in self.FALSE_POSITIVE_SUBSTRINGS):
+            return set(directory for directory in self.DIRS_TO_CHECK
+                       if directory in line)
         else:
             return set()
 
@@ -33,14 +34,14 @@ class NonINIWPTMetaFileHandler(EventHandler):
         if test_dirs_with_offending_files:
             if len(test_dirs_with_offending_files) == 1:
                 files = "a file"
-                test_dirs_list = test_dirs_with_offending_files.pop()
+                test_dirs = test_dirs_with_offending_files.pop()
                 remove = "it"
             else:
                 files = "files"
-                test_dirs_list = '{} and {}'.format(*test_dirs_with_offending_files)
+                test_dirs = '{} and {}'.format(*test_dirs_with_offending_files)
                 remove = "them"
 
-            self.warn(NON_INI_MSG.format(files, test_dirs_list, remove))
+            self.warn(NON_INI_MSG.format(files, test_dirs, remove))
 
 
 handler_interface = NonINIWPTMetaFileHandler

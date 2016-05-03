@@ -4,18 +4,20 @@ from eventhandler import EventHandler
 PR_UPDATE_MSG = "New code was committed to pull request."
 
 def manage_pr_state(api, payload):
-    labels = api.get_labels();
+    labels = api.get_labels()
 
-    for label in ["S-awaiting-merge", "S-tests-failed", "S-needs-code-changes"]:
+    for label in ["S-awaiting-merge",
+                  "S-tests-failed",
+                  "S-needs-code-changes"]:
         if label in labels:
             api.remove_label(label)
-    if not "S-awaiting-review" in labels:
+    if "S-awaiting-review" not in labels:
         api.add_label("S-awaiting-review")
 
     if payload["action"] == "synchronize" and "S-needs-rebase" in labels:
         mergeable = payload['pull_request']['mergeable']
-        # If mergeable is null, the data wasn't available yet. Once it is, mergeable
-        # will be either true or false.
+        # If mergeable is null, the data wasn't available yet.
+        # Once it is, mergeable will be either true or false.
         while mergeable is None:
             time.sleep(1)  # wait for GitHub to finish determine mergeability
             pull_request = api.get_pull()

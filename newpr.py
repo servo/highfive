@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 
-import base64
+from __future__ import print_function
+
+from base64 import standard_b64encode
 import contextlib
 import eventhandler
-import urllib, urllib2
+import urllib2
 import cgi
 import cgitb
 try:
     import simplejson as json
 except:
     import json
-import random
-import re
-import sys
 import ConfigParser
 from StringIO import StringIO
 import gzip
+
 
 class APIProvider:
     def __init__(self, payload, user):
@@ -54,13 +54,14 @@ class APIProvider:
 
 
 class GithubAPIProvider(APIProvider):
-    contributors_url = "https://api.github.com/repos/%s/%s/contributors?per_page=400"
-    post_comment_url = "https://api.github.com/repos/%s/%s/issues/%s/comments"
-    collaborators_url = "https://api.github.com/repos/%s/%s/collaborators"
-    issue_url = "https://api.github.com/repos/%s/%s/issues/%s"
-    get_label_url = "https://api.github.com/repos/%s/%s/issues/%s/labels"
-    add_label_url = "https://api.github.com/repos/%s/%s/issues/%s/labels"
-    remove_label_url = "https://api.github.com/repos/%s/%s/issues/%s/labels/%s"
+    BASE_URL = "https://api.github.com/repos/"
+    contributors_url = BASE_URL + "%s/%s/contributors?per_page=400"
+    post_comment_url = BASE_URL + "%s/%s/issues/%s/comments"
+    collaborators_url = BASE_URL + "%s/%s/collaborators"
+    issue_url = BASE_URL + "%s/%s/issues/%s"
+    get_label_url = BASE_URL + "%s/%s/issues/%s/labels"
+    add_label_url = BASE_URL + "%s/%s/issues/%s/labels"
+    remove_label_url = BASE_URL + "%s/%s/issues/%s/labels/%s"
 
     def __init__(self, payload, user, token):
         APIProvider.__init__(self, payload, user)
@@ -77,7 +78,8 @@ class GithubAPIProvider(APIProvider):
         req = urllib2.Request(url, data, headers)
         req.get_method = lambda: method
         if token:
-            base64string = base64.standard_b64encode('%s:%s' % (self.user, self.token)).replace('\n', '')
+            authorization = '%s:%s' % (self.user, self.token)
+            base64string = standard_b64encode(authorization).replace('\n', '')
             req.add_header("Authorization", "Basic %s" % base64string)
 
         if media_type:
@@ -87,9 +89,9 @@ class GithubAPIProvider(APIProvider):
         if header.get('Content-Encoding') == 'gzip':
             buf = StringIO(f.read())
             f = gzip.GzipFile(fileobj=buf)
-        return { "header": header, "body": f.read() }
+        return {"header": header, "body": f.read()}
 
-    # This function is adapted from https://github.com/kennethreitz/requests/blob/209a871b638f85e2c61966f82e547377ed4260d9/requests/utils.py#L562
+    # This function is adapted from https://github.com/kennethreitz/requests/blob/209a871b638f85e2c61966f82e547377ed4260d9/requests/utils.py#L562  # noqa
     # Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
     def parse_header_links(self, value):
         if not value:
@@ -133,45 +135,44 @@ class GithubAPIProvider(APIProvider):
             url = links['next']
 
     def post_comment(self, body):
+        url = self.post_comment_url % (self.owner, self.repo, self.issue)
         try:
-            result = self.api_req("POST", self.post_comment_url % (self.owner, self.repo, self.issue),
-                                  {"body": body})
-        except urllib2.HTTPError, e:
+            self.api_req("POST", url, {"body": body})
+        except urllib2.HTTPError as e:
             if e.code == 201:
                 pass
             else:
                 raise e
 
     def add_label(self, label):
+        url = self.add_label_url % (self.owner, self.repo, self.issue)
         if self._labels:
             self._labels += [label]
         try:
-            result = self.api_req("POST", self.add_label_url % (self.owner, self.repo, self.issue),
-                                  [label])
-        except urllib2.HTTPError, e:
+            self.api_req("POST", url, [label])
+        except urllib2.HTTPError as e:
             if e.code == 201:
                 pass
             else:
                 raise e
 
     def remove_label(self, label):
+        url = self.remove_label_url % (self.owner, self.repo, self.issue,
+                                       label)
         if self._labels and label in self._labels:
             self._labels.remove(label)
         try:
-            result = self.api_req("DELETE", self.remove_label_url % (self.owner, self.repo, self.issue, label), {})
-        except urllib2.HTTPError, e:
-            #if e.code == 201:
-            #    pass
-            #else:
-            #    raise e
+            self.api_req("DELETE", url, {})
+        except urllib2.HTTPError:
             pass
 
     def get_labels(self):
+        url = self.get_label_url % (self.owner, self.repo, self.issue)
         if self._labels is not None:
             return self._labels
         try:
-            result = self.api_req("GET", self.get_label_url % (self.owner, self.repo, self.issue))
-        except urllib2.HTTPError, e:
+            result = self.api_req("GET", url)
+        except urllib2.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -181,15 +182,15 @@ class GithubAPIProvider(APIProvider):
 
     def get_diff(self):
         if self._diff:
-            return self._diff;
+            return self._diff
         self._diff = self.api_req("GET", self.diff_url)['body']
         return self._diff
 
     def set_assignee(self, assignee):
+        url = self.issue_url % (self.owner, self.repo, self.issue)
         try:
-            result = self.api_req("PATCH", self.issue_url % (self.owner, self.repo, self.issue),
-                                  {"assignee": assignee})['body']
-        except urllib2.HTTPError, e:
+            self.api_req("PATCH", url, {"assignee": assignee})['body']
+        except urllib2.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -206,7 +207,11 @@ class GithubAPIProvider(APIProvider):
             return None
 
 
-warning_summary = '<img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20> **Warning** <img src="http://www.joshmatthews.net/warning.svg" alt="warning" height=20>\n\n%s'
+img = ('<img src="http://www.joshmatthews.net/warning.svg" '
+       'alt="warning" height=20>')
+warning_header = '{} **Warning** {}'.format(img, img)
+warning_summary = warning_header + '\n\n%s'
+
 
 def extract_globals_from_payload(payload):
     if payload["action"] == "created":
@@ -226,12 +231,13 @@ def handle_payload(api, payload):
         handler.handle_payload(api, payload)
     warnings = eventhandler.get_warnings()
     if warnings:
-        api.post_comment(warning_summary % '\n'.join(map(lambda x: '* ' + x, warnings)))
+        formatted_warnings = '\n'.join(map(lambda x: '* ' + x, warnings))
+        api.post_comment(warning_summary % formatted_warnings)
 
 
 if __name__ == "__main__":
-    print "Content-Type: text/html;charset=utf-8"
-    print
+    print("Content-Type: text/html;charset=utf-8")
+    print()
 
     cgitb.enable()
 
@@ -241,7 +247,7 @@ if __name__ == "__main__":
     token = config.get('github', 'token')
 
     post = cgi.FieldStorage()
-    payload_raw = post.getfirst("payload",'')
+    payload_raw = post.getfirst("payload", '')
     payload = json.loads(payload_raw)
 
     handle_payload(GithubAPIProvider(payload, user, token), payload)

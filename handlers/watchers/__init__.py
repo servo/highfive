@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+
 from collections import defaultdict
+import os
+
 from eventhandler import EventHandler
 from helpers import get_people_from_config
-import os
 
 WATCHERS_CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'watchers.ini')
 

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from eventhandler import EventHandler
 
 NO_MODIFY_CSS_TESTS_MSG = '''This pull request modifies the contents of

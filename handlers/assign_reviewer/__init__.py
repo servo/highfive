@@ -1,6 +1,9 @@
+from __future__ import absolute_import
+
+import re
+
 from eventhandler import EventHandler
 from helpers import get_collaborators
-import re
 
 WELCOME_MSG = ("Thanks for the pull request, and welcome! "
                "The Servo team is excited to review your changes, "

@@ -1,6 +1,9 @@
-from eventhandler import EventHandler
+from __future__ import absolute_import
+
 import json
 import re
+
+from eventhandler import EventHandler
 
 
 def check_failure_log(api, bors_comment):

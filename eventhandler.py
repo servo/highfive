@@ -1,5 +1,6 @@
+from __future__ import absolute_import
+
 import imp
-import json
 import os
 
 _warnings = []
@@ -36,25 +37,6 @@ class EventHandler:
     def is_open_pr(self, payload):
         return (payload['issue']['state'] == 'open' and
                 'pull_request' in payload['issue'])
-
-    def register_tests(self, path):
-        from test import create_test
-        tests_location = os.path.join(path, 'tests')
-        if not os.path.isdir(tests_location):
-            return
-        tests = [os.path.join(tests_location, f)
-                 for f in os.listdir(tests_location)
-                 if f.endswith('.json')]
-        for testfile in tests:
-            with open(testfile) as f:
-                contents = json.load(f)
-                if not isinstance(contents['initial'], list):
-                    assert not isinstance(contents['expected'], list)
-                    contents['initial'] = [contents['initial']]
-                    contents['expected'] = [contents['expected']]
-                for initial, expected in zip(contents['initial'],
-                                             contents['expected']):
-                    yield create_test(testfile, initial, expected)
 
 
 def reset_test_state():

@@ -15,6 +15,7 @@ except:
 import ConfigParser
 from StringIO import StringIO
 import gzip
+from travisciapiprovider import TravisCiApiProvider
 
 
 class APIProvider:
@@ -214,7 +215,13 @@ warning_summary = warning_header + '\n\n%s'
 
 
 def extract_globals_from_payload(payload):
-    if payload["action"] == "created":
+    if 'context' in payload:
+        owner = payload['repository']['owner']['login']
+        repo = payload['repository']['name']
+        travisCiApiProvider = TravisCiApiProvider()
+        build = travisCiApiProvider.get_build(payload['target_url'].split('/')[-1])
+        issue = travisCiApiProvider.get_pull_request_number(build)
+    elif payload['action'] == 'created':
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])

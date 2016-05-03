@@ -10,13 +10,13 @@ WELCOME_MSG = ("Thanks for the pull request, and welcome! "
                "and you should hear from @%s (or someone else) soon.")
 
 
-def find_reviewer(comment, collaborators):
+def find_reviewer(comment):
     """
     If the user specified a reviewer, return the username,
     otherwise returns None.
     """
     reviewer = re.search(r'.*r\?[:\- ]*@([a-zA-Z0-9\-]*)', comment)
-    if reviewer and reviewer.group(1) in collaborators:
+    if reviewer:
         return reviewer.group(1)
     return None
 
@@ -36,17 +36,16 @@ def choose_reviewer(pr, collaborators):
     return potential_reviewers[pr['number'] % len(potential_reviewers)]
 
 
-def get_approver(payload, collaborators):
+def get_approver(payload):
     user = payload['comment']['user']['login']
     comment = payload['comment']['body']
     approval_regex = r'.*@bors-servo[: ]*r([\+=])([a-zA-Z0-9\-]*)'
     approval = re.search(approval_regex, comment)
 
-    if approval and user in collaborators:
+    if approval:
         if approval.group(1) == '=':  # "r=username"
             reviewer = approval.group(2)
-            if reviewer in collaborators:
-                return reviewer
+            return reviewer
         return user  # fall back and assign the approver
     return None
 
@@ -54,40 +53,42 @@ def get_approver(payload, collaborators):
 class AssignReviewerHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         pr = payload["pull_request"]
-        collaborators = get_collaborators(api)
         # If the pull request already has an assignee,
         # don't try to set one ourselves.
         if pr["assignee"] is not None:
             return
 
+        reviewer = find_reviewer(pr["body"])
+
         # Find a reviewer from PR comment (like "r? username"),
         # or assign one ourselves.
-        if not collaborators:
+        if not reviewer:
+            collaborators = get_collaborators(api)
+            if not collaborators:
+                return
+            reviewer = choose_reviewer(pr, collaborators)
+
+        if not reviewer:
             return
 
-        reviewer = find_reviewer(pr["body"], collaborators) or \
-            choose_reviewer(pr, collaborators)
+        api.set_assignee(reviewer)
 
-        if reviewer:
-            api.set_assignee(reviewer)
-
-            # Add welcome message for new contributors.
-            author = pr['user']['login']
-            if api.is_new_contributor(author):
-                api.post_comment(WELCOME_MSG % reviewer)
+        # Add welcome message for new contributors.
+        author = pr['user']['login']
+        if api.is_new_contributor(author):
+            api.post_comment(WELCOME_MSG % reviewer)
 
     def on_new_comment(self, api, payload):
-        collaborators = get_collaborators(api)
         if not self.is_open_pr(payload):
             return
 
         # If this is an approval comment from a reviewer, then assign them
-        reviewer = get_approver(payload, collaborators)
+        reviewer = get_approver(payload)
         if reviewer:
             api.set_assignee(reviewer)
             return
 
-        reviewer = find_reviewer(payload["comment"]["body"], collaborators)
+        reviewer = find_reviewer(payload["comment"]["body"])
         if reviewer:
             api.set_assignee(reviewer)
 

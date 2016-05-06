@@ -18,7 +18,7 @@ import urllib2
 import eventhandler
 
 
-class APIProvider:
+class APIProvider(object):
     def __init__(self, payload, user):
         (owner, repo, issue) = extract_globals_from_payload(payload)
         self.owner = owner

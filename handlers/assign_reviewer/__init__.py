@@ -15,7 +15,7 @@ def find_reviewer(comment):
     If the user specified a reviewer, return the username,
     otherwise returns None.
     """
-    reviewer = re.search(r'.*r\?[:\- ]*@([a-zA-Z0-9\-]*)', comment)
+    reviewer = re.search(r'.*r\?[:\- ]*@([a-zA-Z0-9\-]*)', str(comment))
     if reviewer:
         return reviewer.group(1)
     return None
@@ -40,7 +40,7 @@ def get_approver(payload):
     user = payload['comment']['user']['login']
     comment = payload['comment']['body']
     approval_regex = r'.*@bors-servo[: ]*r([\+=])([a-zA-Z0-9\-]*)'
-    approval = re.search(approval_regex, comment)
+    approval = re.search(approval_regex, str(comment))
 
     if approval:
         if approval.group(1) == '=':  # "r=username"
@@ -55,7 +55,7 @@ class AssignReviewerHandler(EventHandler):
         pr = payload["pull_request"]
         # If the pull request already has an assignee,
         # don't try to set one ourselves.
-        if pr["assignee"] is not None:
+        if pr["assignee"] != None:
             return
 
         reviewer = find_reviewer(pr["body"])

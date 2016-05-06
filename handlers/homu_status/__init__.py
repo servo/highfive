@@ -10,7 +10,7 @@ def check_failure_log(api, bors_comment):
     # bors_comment would be something like,
     # ":broken_heart: Test failed - [linux2](http://build.servo.org/builders/linux2/builds/2627)"  # noqa
     # ... from which we get the relevant build result url
-    url = iter(re.findall(r'.*\((.*)\)', bors_comment)).next()
+    url = iter(re.findall(r'.*\((.*)\)', str(bors_comment))).next()
     if not url:
         return
 

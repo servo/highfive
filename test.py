@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function
+from copy import deepcopy
 
 import json
 import os
@@ -6,19 +7,21 @@ import sys
 import traceback
 
 import eventhandler
+from json_cleanup import JsonCleaner
 from newpr import APIProvider, handle_payload
 
 
 class TestAPIProvider(APIProvider):
     def __init__(self, payload, user, new_contributor, labels, assignee,
                  diff="", pull_request=""):
-        APIProvider.__init__(self, payload, user)
+        super(TestAPIProvider, self).__init__(payload, user)
         self.new_contributor = new_contributor
         self.comments_posted = []
         self.labels = labels
         self.assignee = assignee
         self.diff = diff
         self.pull_request = pull_request
+        self.repo = str(self.repo)      # workaround for testing
 
     def is_new_contributor(self, username):
         return self.new_contributor
@@ -49,12 +52,7 @@ class TestAPIProvider(APIProvider):
             return fd.read()
 
 
-def get_payload(filename):
-    with open(filename) as f:
-        return json.load(f)
-
-
-def create_test(filename, initial, expected):
+def create_test(filename, initial, expected, payload_wrapper, to_clean, clean_dict):
     initial_values = {
         'new_contributor': initial.get('new_contributor', False),
         'labels': initial.get('labels', []),
@@ -62,12 +60,15 @@ def create_test(filename, initial, expected):
         'pull_request': initial.get('pull_request', ''),
         'assignee': initial.get('assignee', None),
     }
+
     return {
         'filename': filename,
         'initial': initial_values,
         'expected': expected,
+        'wrapper': payload_wrapper,
+        'clean': to_clean,
+        'dict': clean_dict,
     }
-
 
 def run_tests(tests):
     failed = 0
@@ -75,8 +76,8 @@ def run_tests(tests):
         eventhandler.reset_test_state()
 
         try:
-            payload = get_payload(test['filename'])['payload']
-            initial = test['initial']
+            initial, expected, wrapper = test['initial'], test['expected'], test['wrapper']
+            payload = wrapper.json['payload']
             api = TestAPIProvider(payload,
                                   'highfive',
                                   initial['new_contributor'],
@@ -85,7 +86,7 @@ def run_tests(tests):
                                   initial['diff'],
                                   initial['pull_request'])
             handle_payload(api, payload, [handler])
-            expected = test['expected']
+
             if 'comments' in expected:
                 assert len(api.comments_posted) == expected['comments'], \
                     "%d == %d" % (len(api.comments_posted),
@@ -96,12 +97,21 @@ def run_tests(tests):
             if 'assignee' in expected:
                 assert api.assignee == expected['assignee'], \
                     "%s == %s" % (api.assignee, expected['assignee'])
+
+            if test['clean']:
+                cleaned = wrapper.clean(warn = True)
+
+                if wrapper.unused:
+                    error = '\033[91m%s\033[0m: The file has %s unused nodes'
+                    print(error % (test['filename'], wrapper.unused))
+                    failed += 1
+
         except AssertionError as error:
             _, _, tb = sys.exc_info()
             traceback.print_tb(tb)  # Fixed format
             tb_info = traceback.extract_tb(tb)
             filename, line, func, text = tb_info[-1]
-            error_template = '{}: An error occurred on line {} in statement {}'
+            error_template = '\033[91m{}\033[0m: An error occurred on line {} in statement {}'
             print(error_template.format(test['filename'], line, text))
             print(error)
             failed += 1
@@ -116,19 +126,32 @@ def register_tests(path):
     tests_location = os.path.join(path, 'tests')
     if not os.path.isdir(tests_location):
         return
+
     tests = [os.path.join(tests_location, f)
              for f in os.listdir(tests_location)
              if f.endswith('.json')]
+
     for testfile in tests:
         with open(testfile) as f:
             contents = json.load(f)
-            if not isinstance(contents['initial'], list):
-                assert not isinstance(contents['expected'], list)
-                contents['initial'] = [contents['initial']]
-                contents['expected'] = [contents['expected']]
-            for initial, expected in zip(contents['initial'],
-                                         contents['expected']):
-                yield create_test(testfile, initial, expected)
+
+            # backup the initial/expected values so that we can restore later
+            # (if we plan to fix the JSON files)
+            clean_dict = {'initial': deepcopy(contents['initial']),
+                          'expected': deepcopy(contents['expected']) }
+
+            initial_values = contents['initial']
+            expected_values = contents['expected']
+            if not isinstance(initial_values, list):
+                assert not isinstance(expected_values, list)
+                initial_values = [initial_values]
+                expected_values = [expected_values]
+
+            wrapper = JsonCleaner({'payload': contents['payload']})
+            for i, (initial, expected) in enumerate(zip(initial_values, expected_values)):
+                is_last_test = i == min(len(initial_values), len(expected_values)) - 1
+                yield create_test(testfile, initial, expected,
+                                  wrapper, is_last_test, clean_dict)
 
 
 def setup_tests():

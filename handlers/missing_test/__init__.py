@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from eventhandler import EventHandler
 
-TEST_REQUIRED_MSG = ('These commits modify {} code, but no tests are modified.'
+TEST_REQUIRED_MSG = ('These commits modify {} code, but no tests are modified. '
                      'Please consider adding a test!')
 
 

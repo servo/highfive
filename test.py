@@ -71,7 +71,7 @@ def create_test(filename, initial, expected):
 
 def run_tests(tests):
     failed = 0
-    for test in tests:
+    for handler, test in tests:
         eventhandler.reset_test_state()
 
         try:
@@ -84,7 +84,7 @@ def run_tests(tests):
                                   initial['assignee'],
                                   initial['diff'],
                                   initial['pull_request'])
-            handle_payload(api, payload)
+            handle_payload(api, payload, [handler])
             expected = test['expected']
             if 'comments' in expected:
                 assert len(api.comments_posted) == expected['comments'], \
@@ -135,7 +135,8 @@ def setup_tests():
     (modules, handlers) = eventhandler.get_handlers()
     tests = []
     for module, handler in zip(modules, handlers):
-        tests.extend(register_tests(module[1]))
+        for test in register_tests(module[1]):
+            tests.append((handler, test))
     return tests
 
 

@@ -84,7 +84,7 @@ def run_tests(tests):
                                   initial['assignee'],
                                   initial['diff'],
                                   initial['pull_request'])
-            handle_payload(api, payload)
+            handle_payload(api, payload, [handler])
             expected = test['expected']
             if 'comments' in expected:
                 assert len(api.comments_posted) == expected['comments'], \

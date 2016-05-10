@@ -226,8 +226,9 @@ def extract_globals_from_payload(payload):
     return (owner, repo, issue)
 
 
-def handle_payload(api, payload):
-    (modules, handlers) = eventhandler.get_handlers()
+def handle_payload(api, payload, handlers=None):
+    if not handlers:
+        modules, handlers = eventhandler.get_handlers()
     for handler in handlers:
         handler.handle_payload(api, payload)
     warnings = eventhandler.get_warnings()

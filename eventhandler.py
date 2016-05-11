@@ -31,8 +31,9 @@ class EventHandler:
         pass
 
     def handle_payload(self, api, payload):
+        def callback(action):
+            getattr(self, _payload_actions[action])(api, payload)
         payload_action = payload['action']
-        callback = lambda action: getattr(self, _payload_actions[action])(api, payload)
         linear_search(_payload_actions, payload_action, callback)
 
     def warn(self, msg):

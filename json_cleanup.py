@@ -25,7 +25,8 @@ class NodeMarker(object):
     # The following methods blindly assume that the method is supported by the
     # particular type (i.e., exceptions should be handled explicitly)
 
-    def __getitem__(self, key):     # if you access the element in the usual way, then "bam!"
+    # if you access the element in the usual way, then "bam!"
+    def __getitem__(self, key):
         self._node[key].mark()      # it will be marked as used!
         return self._node[key]
 
@@ -76,22 +77,25 @@ class JsonCleaner(object):
         self.json = visit_nodes(json_obj)
         self.json.mark()        # root node should be marked initially
 
-    def clean(self, warn = True):
+    def clean(self, warn=True):
         return self._filter_nodes(self.json, warn)
 
-    def _filter_nodes(self, marker_node, warn, path = ''):
+    def _filter_nodes(self, marker_node, warn, path=''):
         if marker_node._is_used:
             node = marker_node._node
             if hasattr(node, '__iter__'):
                 # it's either 'list' or 'dict' when it comes to JSONs
-                iterator = xrange(len(node)) if isinstance(node, list) else node.keys()
+                iterator = xrange(len(node)) if isinstance(node, list) \
+                    else node.keys()
                 for thing in iterator:
                     new_path = path + thing + NODE_SEP
-                    node[thing] = self._filter_nodes(node[thing], warn, new_path)
+                    node[thing] = self._filter_nodes(node[thing],
+                                                     warn, new_path)
                     if node[thing] == ():
                         self.unused += 1
                         if warn:
-                            print 'unused node at "%s"' % new_path.strip(NODE_SEP)
+                            new_path = new_path.strip(NODE_SEP)
+                            print 'unused node at "%s"' % new_path
                         node.pop(thing)
             return node
         return ()

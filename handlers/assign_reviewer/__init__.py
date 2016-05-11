@@ -55,7 +55,7 @@ class AssignReviewerHandler(EventHandler):
         pr = payload["pull_request"]
         # If the pull request already has an assignee,
         # don't try to set one ourselves.
-        if pr["assignee"] != None:
+        if pr["assignee"] != None:      # NOQA (silence flake8 here)
             return
 
         reviewer = find_reviewer(pr["body"])

@@ -52,7 +52,8 @@ class TestAPIProvider(APIProvider):
             return fd.read()
 
 
-def create_test(filename, initial, expected, payload_wrapper, to_clean, clean_dict):
+def create_test(filename, initial, expected,
+                payload_wrapper, to_clean, clean_dict):
     initial_values = {
         'new_contributor': initial.get('new_contributor', False),
         'labels': initial.get('labels', []),
@@ -71,13 +72,14 @@ def create_test(filename, initial, expected, payload_wrapper, to_clean, clean_di
     }
 
 
-def run_tests(tests, warn = True, overwrite = False):
+def run_tests(tests, warn=True, overwrite=False):
     failed = 0
     for handler, test in tests:
         eventhandler.reset_test_state()
 
         try:
-            initial, expected, wrapper = test['initial'], test['expected'], test['wrapper']
+            initial, expected, = test['initial'], test['expected']
+            wrapper = test['wrapper']
             payload = wrapper.json['payload']
             api = TestAPIProvider(payload,
                                   'highfive',
@@ -99,7 +101,7 @@ def run_tests(tests, warn = True, overwrite = False):
                 assert api.assignee == expected['assignee'], \
                     "%s == %s" % (api.assignee, expected['assignee'])
 
-            # if this is the last test in the file, then it's time for cleanup
+            # If this is the last test in the file, then it's time for cleanup
             if test['clean']:
                 cleaned = wrapper.clean(warn)
 
@@ -112,15 +114,17 @@ def run_tests(tests, warn = True, overwrite = False):
                     clean_dict = test['dict']
                     clean_dict['payload'] = cleaned['payload']
                     with open(test['filename'], 'w') as fd:
-                        json.dump(clean_dict, fd, indent = 2)
-                    print('\033[91m%s\033[0m: Rewrote the JSON file' % test['filename'])
+                        json.dump(clean_dict, fd, indent=2)
+                    error = '\033[91m%s\033[0m: Rewrote the JSON file'
+                    print(error % test['filename'])
 
         except AssertionError as error:
             _, _, tb = sys.exc_info()
-            traceback.print_tb(tb)  # Fixed format
+            traceback.print_tb(tb)      # Fixed format
             tb_info = traceback.extract_tb(tb)
             filename, line, func, text = tb_info[-1]
-            error_template = '\033[91m{}\033[0m: An error occurred on line {} in statement {}'
+            error_template = '\033[91m{}\033[0m: An error occurred on ' + \
+                             'line {} in statement {}'
             print(error_template.format(test['filename'], line, text))
             print(error)
             failed += 1
@@ -147,7 +151,7 @@ def register_tests(path):
             # backup the initial/expected values so that we can restore later
             # (if we plan to fix the JSON files)
             clean_dict = {'initial': deepcopy(contents['initial']),
-                          'expected': deepcopy(contents['expected']) }
+                          'expected': deepcopy(contents['expected'])}
 
             initial_values = contents['initial']
             expected_values = contents['expected']
@@ -157,8 +161,10 @@ def register_tests(path):
                 expected_values = [expected_values]
 
             wrapper = JsonCleaner({'payload': contents['payload']})
-            for i, (initial, expected) in enumerate(zip(initial_values, expected_values)):
-                is_last_test = i == min(len(initial_values), len(expected_values)) - 1
+            for i, (initial, expected) in enumerate(zip(initial_values,
+                                                        expected_values)):
+                min_length = min(len(initial_values), len(expected_values))
+                is_last_test = i == min_length - 1
                 yield create_test(testfile, initial, expected,
                                   wrapper, is_last_test, clean_dict)
 

@@ -30,7 +30,7 @@ def is_addition(diff_line):
     return diff_line.startswith('+') and not diff_line.startswith('+++')
 
 
-def linear_search(sequence, element, callback = lambda thing: thing):
+def linear_search(sequence, element, callback=lambda thing: thing):
     '''
     The 'in' operator also does a linear search over a sequence, but it checks
     for the exact match of the given object, whereas this makes use of '==',

@@ -70,7 +70,8 @@ def create_test(filename, initial, expected, payload_wrapper, to_clean, clean_di
         'dict': clean_dict,
     }
 
-def run_tests(tests):
+
+def run_tests(tests, warn = True, overwrite = False):
     failed = 0
     for handler, test in tests:
         eventhandler.reset_test_state()
@@ -98,13 +99,21 @@ def run_tests(tests):
                 assert api.assignee == expected['assignee'], \
                     "%s == %s" % (api.assignee, expected['assignee'])
 
+            # if this is the last test in the file, then it's time for cleanup
             if test['clean']:
-                cleaned = wrapper.clean(warn = True)
+                cleaned = wrapper.clean(warn)
 
-                if wrapper.unused:
+                if wrapper.unused and not overwrite:
                     error = '\033[91m%s\033[0m: The file has %s unused nodes'
                     print(error % (test['filename'], wrapper.unused))
                     failed += 1
+
+                if overwrite:   # useful for cleaning up the tests locally
+                    clean_dict = test['dict']
+                    clean_dict['payload'] = cleaned['payload']
+                    with open(test['filename'], 'w') as fd:
+                        json.dump(clean_dict, fd, indent = 2)
+                    print('\033[91m%s\033[0m: Rewrote the JSON file' % test['filename'])
 
         except AssertionError as error:
             _, _, tb = sys.exc_info()
@@ -164,5 +173,8 @@ def setup_tests():
 
 
 if __name__ == "__main__":
+    args = ' '.join(sys.argv)
+    overwrite = True if 'write' in args else False
+
     tests = setup_tests()
-    run_tests(tests)
+    run_tests(tests, not overwrite, overwrite)

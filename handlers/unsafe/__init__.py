@@ -11,7 +11,7 @@ unsafe_warning_msg = ('These commits modify **unsafe code**. '
 
 class UnsafeHandler(EventHandler):
     def on_pr_opened(self, api, payload):
-        for line in self.get_added_lines(api):
+        for line in api.get_added_lines():
             if line.find('unsafe ') > -1:
                 self.warn(unsafe_warning_msg)
                 return

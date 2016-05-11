@@ -12,9 +12,6 @@ _payload_actions = {
     'closed': 'on_pr_closed',
     'labeled': 'on_issue_labeled'
 }
-_test_path_roots = ['a/', 'b/']
-
-DIFF_HEADER_LINE_START = 'diff --git '
 
 
 class EventHandler:
@@ -46,36 +43,6 @@ class EventHandler:
     def is_open_pr(self, payload):
         return (payload['issue']['state'] == 'open' and
                 'pull_request' in payload['issue'])
-
-
-    def get_diff_headers(self, api):
-        diff = api.get_diff()
-        for line in diff.splitlines():
-            if line.startswith(DIFF_HEADER_LINE_START):
-                yield line
-
-    def get_added_lines(self, api):
-        diff = api.get_diff()
-        for line in diff.splitlines():
-            if line.startswith('+') and not line.startswith('+++'):
-                # prefix of one or two pluses (+)
-                yield line
-
-    def get_changed_files(self, api):
-        changed_files = []
-        for line in self.get_diff_headers(api):
-            changed_files.extend(line.split(DIFF_HEADER_LINE_START)[-1].split(' '))
-
-        # And get unique values using `set()`
-        return set(f for f in map(self.normalize_file_path, changed_files) if f is not None)
-
-    def normalize_file_path(self, filepath):
-        if filepath is None or filepath.strip() == '':
-            return None
-        for prefix in _test_path_roots:
-            if filepath.startswith(prefix):
-                return filepath[len(prefix):]
-        return filepath
 
 
 def reset_test_state():

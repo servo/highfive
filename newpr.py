@@ -17,6 +17,10 @@ import urllib2
 
 import eventhandler
 
+_test_path_roots = ['a/', 'b/']
+
+DIFF_HEADER_LINE_START = 'diff --git '
+
 
 class APIProvider(object):
     def __init__(self, payload, user):
@@ -25,6 +29,7 @@ class APIProvider(object):
         self.repo = repo
         self.issue = issue
         self.user = user
+        self.changed_files = None
 
     def is_new_contributor(self, username):
         raise NotImplementedError
@@ -52,6 +57,38 @@ class APIProvider(object):
 
     def get_page_content(self, url):
         raise NotImplementedError
+
+    def get_diff_headers(self):
+        diff = self.get_diff()
+        for line in diff.splitlines():
+            if line.startswith(DIFF_HEADER_LINE_START):
+                yield line
+
+    def get_changed_files(self):
+        if self.changed_files is None:
+            changed_files = []
+            for line in self.get_diff_headers():
+                changed_files.extend(line.split(DIFF_HEADER_LINE_START)[-1].split(' '))
+
+            # And get unique values using `set()`
+            self.changed_files = set(f for f in map(APIProvider.normalize_file_path, changed_files) if f is not None)
+        return self.changed_files
+
+    def get_added_lines(self):
+        diff = self.get_diff()
+        for line in diff.splitlines():
+            if line.startswith('+') and not line.startswith('+++'):
+                # prefix of one or two pluses (+)
+                yield line
+
+    @staticmethod
+    def normalize_file_path(filepath):
+        if filepath is None or filepath.strip() == '':
+            return None
+        for prefix in _test_path_roots:
+            if filepath.startswith(prefix):
+                return filepath[len(prefix):]
+        return filepath
 
 
 class GithubAPIProvider(APIProvider):

@@ -20,8 +20,7 @@ def build_message(mentions):
 class WatchersHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         user = payload['pull_request']['user']['login']
-        config = get_config()
-        changed_files = self.get_changed_files(api)
+        changed_files = api.get_changed_files()
 
         watchers = get_people_from_config(api, WATCHERS_CONFIG_FILE)
         if not watchers:

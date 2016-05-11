@@ -23,11 +23,9 @@ class WatchersHandler(EventHandler):
         config = get_config()
         changed_files = self.get_changed_files(api)
 
-        repo = api.owner + '/' + api.repo
-        try:
-            watchers = config.items(repo)
-        except ConfigParser.NoSectionError:
-            return # No watchers
+        watchers = get_people_from_config(api, WATCHERS_CONFIG_FILE)
+        if not watchers:
+            return
 
         mentions = defaultdict(list)
         for (watcher, watched_files) in watchers:

@@ -11,7 +11,7 @@ class NoModifyCSSTestsHandler(EventHandler):
     DIR_TO_CHECK = "tests/wpt/css-tests"
 
     def on_pr_opened(self, api, payload):
-        for line in api.get_diff_headers():
+        for line in api.get_changed_files():
             if self.DIR_TO_CHECK in line:
                 self.warn(NO_MODIFY_CSS_TESTS_MSG)
                 break

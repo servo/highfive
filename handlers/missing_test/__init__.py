@@ -14,7 +14,7 @@ class MissingTestHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         components_changed = set()
 
-        for line in api.get_diff_headers():
+        for line in api.get_changed_files():
             for component in self.COMPONENT_DIRS_TO_CHECK:
                 if 'components/{0}/'.format(component) in line:
                     components_changed.add(component)

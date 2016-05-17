@@ -28,3 +28,15 @@ def is_addition(diff_line):
     Checks if a line from a unified diff is an addition.
     """
     return diff_line.startswith('+') and not diff_line.startswith('+++')
+
+
+def linear_search(sequence, element, callback=lambda thing: thing):
+    '''
+    The 'in' operator also does a linear search over a sequence, but it checks
+    for the exact match of the given object, whereas this makes use of '==',
+    which calls the '__eq__' magic method, which could've been overridden in
+    a custom class (which is the case for our test lint)
+    '''
+    for thing in sequence:
+        if element == thing:    # element could have an overridden '__eq__'
+            callback(thing)

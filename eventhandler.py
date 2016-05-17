@@ -1,10 +1,11 @@
 from __future__ import absolute_import
+from helpers import linear_search
 
 import imp
 import os
 
 _warnings = []
-_payload_action = {
+_payload_actions = {
     'opened': 'on_pr_opened',
     'synchronize': 'on_pr_updated',
     'created': 'on_new_comment',
@@ -30,9 +31,10 @@ class EventHandler:
         pass
 
     def handle_payload(self, api, payload):
-        action = payload['action']
-        if action in _payload_action:
-            getattr(self, _payload_action[action])(api, payload)
+        def callback(action):
+            getattr(self, _payload_actions[action])(api, payload)
+        payload_action = payload['action']
+        linear_search(_payload_actions, payload_action, callback)
 
     def warn(self, msg):
         global _warnings

@@ -1,7 +1,7 @@
 NODE_SEP = ' -> '
 
 
-def visit_nodes(node):       # simple recursive tree traversal
+def visit_nodes(node):          # simple recursive tree traversal
     if hasattr(node, 'mark'):   # it's already a NodeMarker
         return node
     if hasattr(node, '__iter__'):
@@ -11,13 +11,32 @@ def visit_nodes(node):       # simple recursive tree traversal
     return NodeMarker(node)
 
 
+# We need the roots of each node, so that we can trace our way back to the
+# root from a specific node (marking nodes along the way).
+# Since `visit_nodes` makes a pre-order traversal, it assigns `NodeMarker`
+# to each node from inside-out, which makes it difficult to assign roots
+# So, we do another traversal to store the references of the root nodes
+def assign_roots(marker_node, root=None):
+    node = marker_node._node
+    if hasattr(node, '__iter__'):
+        iterator = xrange(len(node)) if isinstance(node, list) else node
+        for thing in iterator:
+            assign_roots(node[thing], marker_node)
+    marker_node._root = root
+
+
 class NodeMarker(object):
-    def __init__(self, node):
+    def __init__(self, node, root=None):
+        self._root = root
         self._node = node        # actual value
         self._is_used = False    # marker
 
     def mark(self):
         self._is_used = True
+        root = self._root
+        while root and not root._is_used:
+            root._is_used = True
+            root = root._root
 
     def get_object(self, obj):
         return obj._node if hasattr(obj, 'mark') else obj
@@ -75,7 +94,7 @@ class JsonCleaner(object):
     def __init__(self, json_obj):
         self.unused = 0
         self.json = visit_nodes(json_obj)
-        self.json.mark()        # root node should be marked initially
+        assign_roots(self.json)
 
     def clean(self, warn=True):
         return self._filter_nodes(self.json, warn)
@@ -85,10 +104,15 @@ class JsonCleaner(object):
             node = marker_node._node
             if hasattr(node, '__iter__'):
                 # it's either 'list' or 'dict' when it comes to JSONs
+                removed = 0
                 iterator = xrange(len(node)) if isinstance(node, list) \
                     else node.keys()
                 for thing in iterator:
-                    new_path = path + thing + NODE_SEP
+                    new_path = path + str(thing) + NODE_SEP
+                    # since lists maintain order, once we pop them,
+                    # we decrement their indices as their length is reduced
+                    if isinstance(node, list):
+                        thing -= removed
                     node[thing] = self._filter_nodes(node[thing],
                                                      warn, new_path)
                     if node[thing] == ():
@@ -97,5 +121,6 @@ class JsonCleaner(object):
                             new_path = new_path.strip(NODE_SEP)
                             print 'unused node at "%s"' % new_path
                         node.pop(thing)
+                        removed += 1
             return node
         return ()

@@ -73,7 +73,7 @@ def create_test(filename, initial, expected,
 
 
 def run_tests(tests, warn=True, overwrite=False):
-    failed = 0
+    failed, dirty = 0, 0
     for handler, test in tests:
         eventhandler.reset_test_state()
 
@@ -108,7 +108,7 @@ def run_tests(tests, warn=True, overwrite=False):
                 if wrapper.unused and not overwrite:
                     error = '\033[91m%s\033[0m: The file has %s unused nodes'
                     print(error % (test['filename'], wrapper.unused))
-                    failed += 1
+                    dirty += 1
 
                 if overwrite:   # useful for cleaning up the tests locally
                     clean_dict = test['dict']
@@ -129,10 +129,7 @@ def run_tests(tests, warn=True, overwrite=False):
             print(error)
             failed += 1
 
-    print('Ran %d tests, %d failed' % (len(tests), failed))
-
-    if failed:
-        sys.exit(1)
+    return failed, dirty
 
 
 def register_tests(path):
@@ -183,4 +180,12 @@ if __name__ == "__main__":
     overwrite = True if 'write' in args else False
 
     tests = setup_tests()
-    run_tests(tests, not overwrite, overwrite)
+    failed, dirty = run_tests(tests, not overwrite, overwrite)
+
+    print('Ran %d tests, %d failed, %d file(s) dirty' %
+          (len(tests), failed, dirty))
+
+    if failed or dirty:
+        if dirty:
+            print('Run `python %s write` to cleanup the dirty files' % args)
+        sys.exit(1)

@@ -53,6 +53,9 @@ class APIProvider(object):
     def get_page_content(self, url):
         raise NotImplementedError
 
+    def get_intermittents(self, labels):
+        raise NotImplementedError
+
 
 class GithubAPIProvider(APIProvider):
     BASE_URL = "https://api.github.com/repos/"
@@ -63,6 +66,7 @@ class GithubAPIProvider(APIProvider):
     get_label_url = BASE_URL + "%s/%s/issues/%s/labels"
     add_label_url = BASE_URL + "%s/%s/issues/%s/labels"
     remove_label_url = BASE_URL + "%s/%s/issues/%s/labels/%s"
+    search_url = "https://api.github.com/search/issues?q=user:%s+repo:%s"
 
     def __init__(self, payload, user, token):
         APIProvider.__init__(self, payload, user)
@@ -206,6 +210,13 @@ class GithubAPIProvider(APIProvider):
                 return fd.read()
         except urllib2.URLError:
             return None
+
+    def get_intermittents(self, title):
+        filters = ['in:title', 'is:issue', 'label:I-intermittent']
+        query = [self.search_url % (self.owner, self.repo), title]
+        query.extend(filters)
+        result = self.api_req("GET", '+'.join(query))
+        return result['items']
 
 
 img = ('<img src="http://www.joshmatthews.net/warning.svg" '

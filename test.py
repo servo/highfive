@@ -22,6 +22,8 @@ class TestAPIProvider(APIProvider):
         self.diff = diff
         self.pull_request = pull_request
         self.repo = str(self.repo)      # workaround for testing
+        self.search_results = payload['search'] if 'search' in payload \
+            else {'items': []}
 
     def is_new_contributor(self, username):
         return self.new_contributor
@@ -50,6 +52,9 @@ class TestAPIProvider(APIProvider):
     def get_page_content(self, path):
         with open(path) as fd:
             return fd.read()
+
+    def get_intermittents(self, labels):
+        return self.search_results['items']
 
 
 def create_test(filename, initial, expected,
@@ -113,10 +118,11 @@ def run_tests(tests, warn=True, overwrite=False):
                 if overwrite:   # useful for cleaning up the tests locally
                     clean_dict = test['dict']
                     clean_dict['payload'] = cleaned['payload']
-                    with open(test['filename'], 'w') as fd:
-                        json.dump(clean_dict, fd, indent=2)
-                    error = '\033[91m%s\033[0m: Rewrote the JSON file'
-                    print(error % test['filename'])
+                    if wrapper.unused:
+                        with open(test['filename'], 'w') as fd:
+                            json.dump(clean_dict, fd, indent=2)
+                        message = '\033[91m%s\033[0m: Rewrote the JSON file'
+                        print(message % test['filename'])
 
         except AssertionError as error:
             _, _, tb = sys.exc_info()

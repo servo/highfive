@@ -1,0 +1,40 @@
+{
+  "expected": {
+    "labels": [
+      "S-tests-failed"
+    ],
+    "comments": 1
+  },
+  "initial": {
+    "labels": [
+      "S-awaiting-merge"
+    ]
+  },
+  "payload": {
+    "action": "created",
+    "comment": {
+      "body": ":broken_heart: Test failed - [linux2](handlers/homu_status/tests/builders/test_builder_result.json)",
+      "user": {
+        "login": "bors-servo"
+      }
+    },
+    "search": {
+      "items": [
+        {
+          "number": 10760
+        }
+      ]
+    },
+    "issue": {
+      "number": 7075,
+      "state": "open",
+      "pull_request": {}
+    },
+    "repository": {
+      "owner": {
+        "login": "servo"
+      },
+      "name": "servo"
+    }
+  }
+}

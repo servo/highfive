@@ -1,25 +1,25 @@
 {
   "expected": {
     "assignee": null
-  }, 
-  "initial": {}, 
+  },
+  "initial": {},
   "payload": {
-    "number": 7087, 
+    "number": 7087,
     "pull_request": {
-      "assignee": null, 
-      "body": "not sure who I should assign this to", 
+      "assignee": null,
+      "body": "not sure who I should assign this to",
       "base": {
         "repo": {
           "owner": {
             "login": "servo"
-          }, 
-          "name": "highfive"
+          },
+          "name": "test-repo"
         }
-      }, 
+      },
       "user": {
-        "login": "jdm"
+        "login": "highfive"
       }
-    }, 
+    },
     "action": "opened"
   }
 }

@@ -8,7 +8,7 @@
     "labels": []
   },
   "payload": {
-    "target_url": "https://travis-ci.org/servo/servo/builds/120670455",
+    "target_url": "handlers/status_update/tests/travis-ci.org/build.json",
     "context": "continuous-integration/travis-ci/pr",
     "repository": {
       "owner": {

@@ -46,8 +46,8 @@ class EventHandler:
         _warnings += [msg]
 
     def is_open_pr(self, payload):
-        return (payload['issue']['state'] == 'open' and
-                'pull_request' in payload['issue'])
+        return ('pull_request' in payload['issue'] and
+                payload['issue']['state'] == 'open')
 
 
 def reset_test_state():

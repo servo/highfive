@@ -25,6 +25,9 @@ class NodeMarker(object):
     # The following methods blindly assume that the method is supported by the
     # particular type (i.e., exceptions should be handled explicitly)
 
+    def lower(self):
+        return str(self).lower()
+
     # if you access the element in the usual way, then "bam!"
     def __getitem__(self, key):
         self._node[key].mark()      # it will be marked as used!

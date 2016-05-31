@@ -1,0 +1,21 @@
+{
+    "initial": {},
+    "expected": {
+        "comments": 0
+    },
+    "payload": {
+        "repository": {
+            "owner": {
+                "login": "servo"
+            },
+            "name": "highfive"
+        },
+        "label": {
+            "name": "unrelated-label"
+        },
+        "action": "labeled",
+        "issue": {
+            "number": 130
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "initial": {},
+    "expected": {
+        "comments": 1
+    },
+    "payload": {
+        "repository": {
+            "owner": {
+                "login": "servo"
+            },
+            "name": "highfive"
+        },
+        "label": {
+            "name": "E-Easy"
+        },
+        "action": "labeled",
+        "issue": {
+            "number": 130
+        }
+    }
+}

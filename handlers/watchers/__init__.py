@@ -19,6 +19,7 @@ def build_message(mentions):
 
 class WatchersHandler(EventHandler):
     def on_pr_opened(self, api, payload):
+        user = payload['pull_request']['user']['login']
         diff = api.get_diff()
         changed_files = []
         for line in diff.split('\n'):
@@ -49,7 +50,8 @@ class WatchersHandler(EventHandler):
                         break
                 else:
                     for watched_file in watched_files:
-                        if changed_file.startswith(watched_file):
+                        if (changed_file.startswith(watched_file) and
+                                user != watcher):
                             mentions[watcher].append(changed_file)
 
         if not mentions:

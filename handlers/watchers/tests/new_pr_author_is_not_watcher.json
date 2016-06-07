@@ -2,61 +2,64 @@
   "expected": [
     {
       "comments": 1
-    }, 
+    },
     {
       "comments": 1
-    }, 
+    },
     {
       "comments": 0
-    }, 
+    },
     {
       "comments": 1
-    }, 
+    },
     {
       "comments": 0
-    }, 
+    },
     {
       "comments": 1
-    }, 
+    },
     {
       "comments": 1
     }
-  ], 
+  ],
   "initial": [
     {
       "diff": "diff --git a/watched/dir/file.rs b/watched/dir/file.rs"
-    }, 
+    },
     {
       "diff": "diff --git a/watched/dir/file.rs /dev/null"
-    }, 
+    },
     {
       "diff": "diff --git a/not-watched/dir/not-watched-file.rs b/not-watched/dir/not-watched-file.rs"
-    }, 
+    },
     {
       "diff": "diff --git a/not-watched/dir/not-watched-file.rs b/not-watched/dir/watched-file.rs"
-    }, 
+    },
     {
       "diff": "diff --git a/blacklisted/dir/watched-file.rs b/blacklisted/dir/watched-file.rs"
-    }, 
+    },
     {
       "diff": "diff --git a/watched/dir/blacklisted-file.rs b/watched/dir/file.rs"
-    }, 
+    },
     {
       "diff": "diff --git a/watched/dir/file.rs b/watched/dir/blacklisted-file.rs"
     }
-  ], 
+  ],
   "payload": {
-    "number": 7076, 
+    "number": 7076,
     "pull_request": {
       "base": {
         "repo": {
           "owner": {
             "login": "servo"
-          }, 
+          },
           "name": "highfive-test"
         }
+      },
+      "user": {
+        "login": "not_a_watcher"
       }
-    }, 
+    },
     "action": "opened"
   }
 }

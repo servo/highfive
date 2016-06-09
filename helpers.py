@@ -34,8 +34,13 @@ def is_addition(diff_line):
 
 
 def normalize_file_path(filepath):
+    """
+    Strip any leading/training whitespace.
+    Remove any test directories from the start of the path
+    """
     if filepath is None or filepath.strip() == '':
         return None
+    filepath = filepath.strip()
     for prefix in _test_path_roots:
         if filepath.startswith(prefix):
             return filepath[len(prefix):]

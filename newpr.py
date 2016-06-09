@@ -16,8 +16,7 @@ from StringIO import StringIO
 import urllib2
 
 import eventhandler
-
-_test_path_roots = ['a/', 'b/']
+from helpers import is_addition, normalize_file_path
 
 DIFF_HEADER_LINE_START = 'diff --git '
 
@@ -71,31 +70,15 @@ class APIProvider(object):
                 changed_files.extend(line.split(DIFF_HEADER_LINE_START)[-1].split(' '))
 
             # And get unique values using `set()`
-            self.changed_files = set(f for f in map(APIProvider.normalize_file_path, changed_files) if f is not None)
+            self.changed_files = set(f for f in map(normalize_file_path, changed_files) if f is not None)
         return self.changed_files
 
     def get_added_lines(self):
         diff = self.get_diff()
         for line in diff.splitlines():
-            if self.is_addition(line):
+            if is_addition(line):
                 # prefix of one or two pluses (+)
                 yield line
-
-    @staticmethod
-    def is_addition(diff_line):
-        """
-        Checks if a line from a unified diff is an addition.
-        """
-        return diff_line.startswith('+') and not diff_line.startswith('+++')
-
-    @staticmethod
-    def normalize_file_path(filepath):
-        if filepath is None or filepath.strip() == '':
-            return None
-        for prefix in _test_path_roots:
-            if filepath.startswith(prefix):
-                return filepath[len(prefix):]
-        return filepath
 
 
 class GithubAPIProvider(APIProvider):

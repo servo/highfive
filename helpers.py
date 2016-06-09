@@ -23,13 +23,6 @@ def get_collaborators(api):
     return [username for (username, _) in config_items]
 
 
-def is_addition(diff_line):
-    """
-    Checks if a line from a unified diff is an addition.
-    """
-    return diff_line.startswith('+') and not diff_line.startswith('+++')
-
-
 def linear_search(sequence, element, callback=lambda thing: thing):
     '''
     The 'in' operator also does a linear search over a sequence, but it checks

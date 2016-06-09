@@ -77,9 +77,16 @@ class APIProvider(object):
     def get_added_lines(self):
         diff = self.get_diff()
         for line in diff.splitlines():
-            if line.startswith('+') and not line.startswith('+++'):
+            if self.is_addition(line):
                 # prefix of one or two pluses (+)
                 yield line
+
+    @staticmethod
+    def is_addition(diff_line):
+        """
+        Checks if a line from a unified diff is an addition.
+        """
+        return diff_line.startswith('+') and not diff_line.startswith('+++')
 
     @staticmethod
     def normalize_file_path(filepath):

@@ -14,13 +14,13 @@ class MissingTestHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         components_changed = set()
 
-        for line in api.get_changed_files():
+        for filepath in api.get_changed_files():
             for component in self.COMPONENT_DIRS_TO_CHECK:
-                if 'components/{0}/'.format(component) in line:
+                if 'components/{0}/'.format(component) in filepath:
                     components_changed.add(component)
 
             for directory in self.TEST_DIRS_TO_CHECK:
-                if 'tests/{0}'.format(directory) in line:
+                if 'tests/{0}'.format(directory) in filepath:
                     return
 
         if components_changed:

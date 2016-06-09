@@ -27,8 +27,8 @@ class NonINIWPTMetaFileHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         test_dirs_with_offending_files = set()
 
-        for line in api.get_changed_files():
-            test_dirs_with_offending_files |= self._wpt_ini_dirs(line)
+        for filepath in api.get_changed_files():
+            test_dirs_with_offending_files |= self._wpt_ini_dirs(filepath)
 
         if test_dirs_with_offending_files:
             if len(test_dirs_with_offending_files) == 1:

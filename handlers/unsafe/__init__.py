@@ -1,12 +1,10 @@
 from __future__ import absolute_import
 
 from eventhandler import EventHandler
-from helpers import is_addition
 
 
 unsafe_warning_msg = ('These commits modify **unsafe code**. '
                       'Please review it carefully!')
-
 
 
 class UnsafeHandler(EventHandler):

@@ -18,9 +18,11 @@ class NonINIWPTMetaFileHandler(EventHandler):
         'mozilla-sync',
     )
 
-    def _wpt_ini_dirs(self, diff_line):
-        if '.' in diff_line and not any(fp in diff_line for fp in self.FALSE_POSITIVE_SUBSTRINGS):
-            return set(directory for directory in self.DIRS_TO_CHECK if directory in diff_line)
+    def _wpt_ini_dirs(self, line):
+        if '.' in line and not any(fp in line
+                                   for fp in self.FALSE_POSITIVE_SUBSTRINGS):
+            return set(directory for directory in self.DIRS_TO_CHECK
+                       if directory in line)
         else:
             return set()
 

@@ -6,7 +6,6 @@ TEST_REQUIRED_MSG = ('These commits modify {} code, but no tests are modified.'
                      ' Please consider adding a test!')
 
 
-
 class MissingTestHandler(EventHandler):
     COMPONENT_DIRS_TO_CHECK = ('layout', 'script', 'gfx', 'style', 'net')
     TEST_DIRS_TO_CHECK = ('ref', 'wpt', 'unit')

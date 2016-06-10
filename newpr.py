@@ -18,7 +18,7 @@ import urllib2
 import eventhandler
 from helpers import is_addition, normalize_file_path
 
-DIFF_HEADER_LINE_START = 'diff --git '
+DIFF_HEADER_PREFIX = 'diff --git '
 
 
 class APIProvider(object):
@@ -60,17 +60,19 @@ class APIProvider(object):
     def get_diff_headers(self):
         diff = self.get_diff()
         for line in diff.splitlines():
-            if line.startswith(DIFF_HEADER_LINE_START):
+            if line.startswith(DIFF_HEADER_PREFIX):
                 yield line
 
     def get_changed_files(self):
         if self.changed_files is None:
             changed_files = []
             for line in self.get_diff_headers():
-                changed_files.extend(line.split(DIFF_HEADER_LINE_START)[-1].split(' '))
+                files = line.split(DIFF_HEADER_PREFIX)[-1].split(' ')
+                changed_files.extend(files)
 
             # And get unique values using `set()`
-            self.changed_files = set(f for f in map(normalize_file_path, changed_files) if f is not None)
+            normalized = map(normalize_file_path, changed_files)
+            self.changed_files = set(f for f in normalized if f is not None)
         return self.changed_files
 
     def get_added_lines(self):

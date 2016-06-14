@@ -1,20 +1,20 @@
 {
   "expected": {
-    "comments": 1
-  }, 
-  "initial": {}, 
+    "comments": 0
+  },
+  "initial": {},
   "payload": {
-    "number": 7062, 
+    "number": 7062,
     "pull_request": {
       "base": {
         "repo": {
           "owner": {
             "login": "servo"
-          }, 
+          },
           "name": "servo"
         }
       }
-    }, 
+    },
     "action": "synchronize"
   }
 }

@@ -4,8 +4,6 @@ import time
 
 from eventhandler import EventHandler
 
-PR_UPDATE_MSG = "New code was committed to pull request."
-
 
 def manage_pr_state(api, payload):
     labels = api.get_labels()
@@ -29,9 +27,6 @@ def manage_pr_state(api, payload):
 
         if mergeable:
             api.remove_label("S-needs-rebase")
-
-    if payload["action"] == "synchronize":
-        api.post_comment(PR_UPDATE_MSG)
 
 
 class StatusUpdateHandler(EventHandler):

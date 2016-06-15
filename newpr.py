@@ -8,6 +8,7 @@ import cgitb
 import ConfigParser
 import contextlib
 import gzip
+import re
 try:
     import simplejson as json
 except:
@@ -20,11 +21,26 @@ import eventhandler
 
 class APIProvider(object):
     def __init__(self, payload, user):
-        (owner, repo, issue) = extract_globals_from_payload(payload)
+        (owner, repo, issue) = self._extract_globals(payload)
         self.owner = owner
         self.repo = repo
         self.issue = issue
         self.user = user
+
+    def _extract_globals(self, payload):
+        if 'context' in payload:
+            owner = payload['repository']['owner']['login']
+            repo = payload['repository']['name']
+            issue = self.get_pull_number_from_travis(payload['target_url'])
+        elif payload['action'] == 'created' or payload['action'] == 'labeled':
+            owner = payload['repository']['owner']['login']
+            repo = payload['repository']['name']
+            issue = str(payload['issue']['number'])
+        else:
+            owner = payload['pull_request']['base']['repo']['owner']['login']
+            repo = payload['pull_request']['base']['repo']['name']
+            issue = str(payload["number"])
+        return (owner, repo, issue)
 
     def is_new_contributor(self, username):
         raise NotImplementedError
@@ -52,6 +68,13 @@ class APIProvider(object):
 
     def get_page_content(self, url):
         raise NotImplementedError
+
+    def get_pull_number_from_travis(self, target_url):
+        regex = r'(.*)(travis-ci.org/).*(build.*)'
+        build_url = re.sub(regex, r'\1api.\2\3', str(target_url))
+        build_data = self.get_page_content(build_url)
+        build_json = json.loads(build_data)
+        return int(build_json['compare_url'].split('/')[-1])
 
 
 class GithubAPIProvider(APIProvider):
@@ -212,18 +235,6 @@ img = ('<img src="http://www.joshmatthews.net/warning.svg" '
        'alt="warning" height=20>')
 warning_header = '{} **Warning** {}'.format(img, img)
 warning_summary = warning_header + '\n\n%s'
-
-
-def extract_globals_from_payload(payload):
-    if payload["action"] == "created" or payload["action"] == "labeled":
-        owner = payload['repository']['owner']['login']
-        repo = payload['repository']['name']
-        issue = str(payload['issue']['number'])
-    else:
-        owner = payload['pull_request']['base']['repo']['owner']['login']
-        repo = payload['pull_request']['base']['repo']['name']
-        issue = str(payload["number"])
-    return (owner, repo, issue)
 
 
 def handle_payload(api, payload, handlers=None):

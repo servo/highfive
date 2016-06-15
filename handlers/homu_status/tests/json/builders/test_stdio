@@ -1,10 +1,10 @@
 // fooooooooooooo barrrrrrrrrrrrrrrrrrr
 
 Tests with unexpected results:
-  ▶ OK [expected CRASH] /something/foo/something.html
+  ▶ FAIL [expected PASS] /_mozilla/mozilla/sslfail.html
 
   ▶ Unexpected subtest result in /something/blah/something.html
-  │ FAIL [expected PASS] totally-something-else
+  │ OK [expected CRASH] totally-something-else
   │
   │ reporting...
   └ I won't report anymore...

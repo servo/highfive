@@ -22,6 +22,8 @@ class TestAPIProvider(APIProvider):
         self.diff = diff
         self.pull_request = pull_request
         self.repo = str(self.repo)      # workaround for testing
+        self.search_results = payload['search'] if 'search' in payload \
+            else {'items': []}
 
     def is_new_contributor(self, username):
         return self.new_contributor
@@ -51,6 +53,9 @@ class TestAPIProvider(APIProvider):
         with open(path) as fd:
             return fd.read()
 
+    def get_intermittents(self, labels):
+        return self.search_results['items']
+
 
 def create_test(filename, initial, expected,
                 payload_wrapper, to_clean, clean_dict):
@@ -73,7 +78,7 @@ def create_test(filename, initial, expected,
 
 
 def run_tests(tests, warn=True, overwrite=False):
-    failed = 0
+    failed, dirty = 0, 0
     for handler, test in tests:
         eventhandler.reset_test_state()
 
@@ -108,15 +113,16 @@ def run_tests(tests, warn=True, overwrite=False):
                 if wrapper.unused and not overwrite:
                     error = '\033[91m%s\033[0m: The file has %s unused nodes'
                     print(error % (test['filename'], wrapper.unused))
-                    failed += 1
+                    dirty += 1
 
                 if overwrite:   # useful for cleaning up the tests locally
                     clean_dict = test['dict']
                     clean_dict['payload'] = cleaned['payload']
-                    with open(test['filename'], 'w') as fd:
-                        json.dump(clean_dict, fd, indent=2)
-                    error = '\033[91m%s\033[0m: Rewrote the JSON file'
-                    print(error % test['filename'])
+                    if wrapper.unused:
+                        with open(test['filename'], 'w') as fd:
+                            json.dump(clean_dict, fd, indent=2)
+                        message = '\033[91m%s\033[0m: Rewrote the JSON file'
+                        print(message % test['filename'])
 
         except AssertionError as error:
             _, _, tb = sys.exc_info()
@@ -129,10 +135,7 @@ def run_tests(tests, warn=True, overwrite=False):
             print(error)
             failed += 1
 
-    print('Ran %d tests, %d failed' % (len(tests), failed))
-
-    if failed:
-        sys.exit(1)
+    return failed, dirty
 
 
 def register_tests(path):
@@ -183,4 +186,12 @@ if __name__ == "__main__":
     overwrite = True if 'write' in args else False
 
     tests = setup_tests()
-    run_tests(tests, not overwrite, overwrite)
+    failed, dirty = run_tests(tests, not overwrite, overwrite)
+
+    print('Ran %d tests, %d failed, %d file(s) dirty' %
+          (len(tests), failed, dirty))
+
+    if failed or dirty:
+        if dirty:
+            print('Run `python %s write` to cleanup the dirty files' % args)
+        sys.exit(1)

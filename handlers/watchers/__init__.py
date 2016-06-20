@@ -20,16 +20,6 @@ def build_message(mentions):
 class WatchersHandler(EventHandler):
     def on_pr_opened(self, api, payload):
         user = payload['pull_request']['user']['login']
-        diff = api.get_diff()
-        changed_files = []
-        for line in diff.split('\n'):
-            if line.startswith('diff --git'):
-                changed_files.extend(line.split('diff --git ')[-1].split(' '))
-
-        # Remove the `a/` and `b/` parts of paths,
-        # And get unique values using `set()`
-        changed_files = set(map(lambda f: f if f.startswith('/') else f[2:],
-                                changed_files))
 
         watchers = get_people_from_config(api, WATCHERS_CONFIG_FILE)
         if not watchers:
@@ -44,15 +34,15 @@ class WatchersHandler(EventHandler):
                     blacklisted_files.append(watched_file[1:])
             for blacklisted_file in blacklisted_files:
                 watched_files.remove('-' + blacklisted_file)
-            for changed_file in changed_files:
+            for filepath in api.get_changed_files():
                 for blacklisted_file in blacklisted_files:
-                    if changed_file.startswith(blacklisted_file):
+                    if filepath.startswith(blacklisted_file):
                         break
                 else:
                     for watched_file in watched_files:
-                        if (changed_file.startswith(watched_file) and
+                        if (filepath.startswith(watched_file) and
                                 user != watcher):
-                            mentions[watcher].append(changed_file)
+                            mentions[watcher].append(filepath)
 
         if not mentions:
             return

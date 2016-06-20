@@ -19,19 +19,18 @@ class NonINIWPTMetaFileHandler(EventHandler):
     )
 
     def _wpt_ini_dirs(self, line):
-        if line.startswith('diff --git') and '.' in line \
-           and not any(fp in line for fp in self.FALSE_POSITIVE_SUBSTRINGS):
+        if '.' in line and not any(fp in line
+                                   for fp in self.FALSE_POSITIVE_SUBSTRINGS):
             return set(directory for directory in self.DIRS_TO_CHECK
                        if directory in line)
         else:
             return set()
 
     def on_pr_opened(self, api, payload):
-        diff = api.get_diff()
         test_dirs_with_offending_files = set()
 
-        for line in diff.split('\n'):
-            test_dirs_with_offending_files |= self._wpt_ini_dirs(line)
+        for filepath in api.get_changed_files():
+            test_dirs_with_offending_files |= self._wpt_ini_dirs(filepath)
 
         if test_dirs_with_offending_files:
             if len(test_dirs_with_offending_files) == 1:

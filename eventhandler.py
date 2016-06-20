@@ -58,8 +58,8 @@ def get_warnings():
 def get_handlers():
     modules = []
     handlers = []
-    possiblehandlers = os.listdir('handlers')
-    for i in possiblehandlers:
+    possible_handlers = os.listdir('handlers')
+    for i in possible_handlers:
         location = os.path.join('handlers', i)
         try:
             module = imp.load_module('handlers.' + i, None, location,

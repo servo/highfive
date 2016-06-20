@@ -11,18 +11,16 @@ class MissingTestHandler(EventHandler):
     TEST_DIRS_TO_CHECK = ('ref', 'wpt', 'unit')
 
     def on_pr_opened(self, api, payload):
-        diff = api.get_diff()
         components_changed = set()
 
-        for line in diff.split('\n'):
-            if line.startswith('diff --git'):
-                for component in self.COMPONENT_DIRS_TO_CHECK:
-                    if 'components/{0}/'.format(component) in line:
-                        components_changed.add(component)
+        for filepath in api.get_changed_files():
+            for component in self.COMPONENT_DIRS_TO_CHECK:
+                if 'components/{0}/'.format(component) in filepath:
+                    components_changed.add(component)
 
-                for directory in self.TEST_DIRS_TO_CHECK:
-                    if 'tests/{0}'.format(directory) in line:
-                        return
+            for directory in self.TEST_DIRS_TO_CHECK:
+                if 'tests/{0}'.format(directory) in filepath:
+                    return
 
         if components_changed:
             # Build a readable list of changed components

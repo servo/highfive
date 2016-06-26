@@ -1,29 +1,29 @@
 {
   "expected": {
-    "assignee": "manishearth", 
+    "assignee": "nox",
     "comments": 1
-  }, 
+  },
   "initial": {
     "new_contributor": true
-  }, 
+  },
   "payload": {
-    "number": 7076, 
+    "number": 7076,
     "pull_request": {
-      "number": 7076, 
-      "assignee": null, 
-      "body": "", 
+      "number": 7076,
+      "assignee": null,
+      "body": "",
       "base": {
         "repo": {
           "owner": {
             "login": "servo"
-          }, 
+          },
           "name": "servo"
         }
-      }, 
+      },
       "user": {
         "login": "frewsxcv"
       }
-    }, 
+    },
     "action": "opened"
   }
 }

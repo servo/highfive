@@ -1,6 +1,6 @@
 {
   "expected": {
-    "assignee": "nox",
+    "assignee": "highfive",
     "comments": 1
   },
   "initial": {
@@ -17,7 +17,7 @@
           "owner": {
             "login": "servo"
           },
-          "name": "servo"
+          "name": "test-repo2"
         }
       },
       "user": {

@@ -19,29 +19,31 @@ warning (which are aggregated at the end and posted as a single comment).
 Per-handler tests can be run using `python test.py`. These consist of
 a set of JSON documents collected from the `tests/` subdirectory of
 each handler, using the following format:
+
 ```json
 {
   "initial": {
-    // Initial state of the PR before any handlers process the payload.
-    // Defaults:
+    "__comment": "Initial state of the PR before any handlers process the payload.",
+
     "labels": [],
     "diff": "",
     "new_contributor": false,
-    "assignee": null,
+    "assignee": null
   },
   "expected": {
-    // Expected state of the PR after all the handlers process
-    // the following payload.
-    // Only fields present in this object will be checked.
-    // comments: 5,
-    // labels: ["S-awaiting-review"],
-    // assignee: "jdm"
+    "__comment-1": "Expected state of the PR after all the handlers process the following payload",
+    "__comment-2": "Only fields in this object will be checked. Example fields are shown below.",
+
+    "comments": 5,
+    "labels": ["S-awaiting-review"],
+    "assignee": "jdm"
   },
   "payload": {
-    // Github API event payload in JSON format
+    "__comment": "Github API event payload in JSON format"
   }
 }
 ```
+
 Each test runs with a mock Github API provider, so no account information
 or network connection is required to run the test suite.
 

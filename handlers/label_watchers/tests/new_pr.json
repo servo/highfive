@@ -18,7 +18,10 @@
     }, 
     "action": "labeled", 
     "issue": {
-      "number": 84
+      "number": 84,
+      "user": {
+        "login": "highfive"
+      }
     }
   }
 }

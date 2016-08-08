@@ -32,8 +32,14 @@ class LabelWatchersHandler(EventHandler):
             return  # No watchers
 
         mentions = []
+        creator = None
+        if 'issue' in payload:
+            creator = payload['issue']['user']['login']
+        elif 'pull_request' in payload:
+            creator = payload['pull_request']['user']['login']
+
         for (watcher, watched_labels) in watchers:
-            if watcher == payload['sender']['login']:
+            if watcher == payload['sender']['login'] or watcher == creator:
                 continue
 
             watched_labels = watched_labels.split(' ')

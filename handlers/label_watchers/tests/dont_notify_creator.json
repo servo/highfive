@@ -4,6 +4,12 @@
   }, 
   "initial": {}, 
   "payload": {
+    "issue": {
+      "number": 123,
+      "user": {
+        "login": "wafflespeanut"
+      }
+    },
     "sender": {
       "login": "jdm"
     }, 
@@ -11,17 +17,11 @@
       "owner": {
         "login": "servo"
       }, 
-      "name": "highfive"
+      "name": "servo"
     }, 
     "label": {
-      "name": "not-watched-label"
+      "name": "L-python"
     }, 
-    "action": "labeled", 
-    "issue": {
-      "number": 84,
-      "user": {
-        "login": "Wafflespeanut"
-      }
-    }
+    "action": "labeled"
   }
 }

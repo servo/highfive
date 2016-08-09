@@ -1,0 +1,26 @@
+{
+  "expected": {
+    "assignee": "jdm"
+  }, 
+  "initial": {}, 
+  "payload": {
+    "number": 149, 
+    "pull_request": {
+      "number": 149, 
+      "assignee": null, 
+      "body": "blah blah blah", 
+      "base": {
+        "repo": {
+          "owner": {
+            "login": "servo"
+          }, 
+          "name": "highfive"
+        }
+      }, 
+      "user": {
+        "login": "Wafflespeanut"
+      }
+    }, 
+    "action": "opened"
+  }
+}

@@ -26,7 +26,7 @@ def choose_reviewer(pr, collaborators):
     Choose a (pseudo-)random reviewer from the collaborators, who is not the
     author. If there are no collaborators other than the author, return None.
     """
-    author = pr['user']['login']
+    author = pr['user']['login'].lower()
     # Avoid using sets to maintain the order of reviewers and
     # thus ensure an even rotation of reviewers
     potential_reviewers = [collaborator for collaborator in collaborators

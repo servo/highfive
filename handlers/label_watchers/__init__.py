@@ -1,15 +1,10 @@
 from eventhandler import EventHandler
-import ConfigParser
+from helpers import get_people_from_config
+
 import os
 
 LABEL_WATCHERS_CONFIG_FILE = os.path.join(os.path.dirname(__file__),
                                           'watchers.ini')
-
-
-def get_label_config():
-    config = ConfigParser.ConfigParser()
-    config.read(LABEL_WATCHERS_CONFIG_FILE)
-    return config
 
 
 def build_label_message(mentions):
@@ -23,13 +18,9 @@ def build_label_message(mentions):
 class LabelWatchersHandler(EventHandler):
     def on_issue_labeled(self, api, payload):
         new_label = payload['label']['name']
-        config = get_label_config()
-
-        repo = api.owner + '/' + api.repo
-        try:
-            watchers = config.items(repo)
-        except ConfigParser.NoSectionError:
-            return  # No watchers
+        watchers = get_people_from_config(api, LABEL_WATCHERS_CONFIG_FILE)
+        if not watchers:
+            return
 
         mentions = []
         creator = None

@@ -11,6 +11,11 @@ _test_path_roots = ['a/', 'b/']
 
 
 def get_people_from_config(api, config_abs_path):
+    '''
+    Gets the people listed under a particular repo from a config file.
+    Note that the names (despite how they're in the file) will always
+    be parsed to 'lowercase'.
+    '''
     config = ConfigParser.ConfigParser()
     config.read(config_abs_path)
     repo = api.owner + '/' + api.repo

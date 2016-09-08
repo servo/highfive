@@ -9,6 +9,17 @@ TEST_REQUIRED_MSG = ('These commits modify {} code, but no tests are modified.'
 class MissingTestHandler(EventHandler):
     COMPONENT_DIRS_TO_CHECK = ('layout', 'script', 'gfx', 'style', 'net')
     TEST_DIRS_TO_CHECK = ('ref', 'wpt', 'unit')
+    TEST_FILES_TO_CHECK = [
+        '{0}/{1}'.format('components/script/dom', test_file)
+        for test_file in ['testbinding.rs',
+                          'webidls/TestBinding.webidl',
+                          'testbindingproxy.rs',
+                          'webidls/TestBindingProxy.webidl',
+                          'testbindingiterable.rs',
+                          'webidls/TestBindingIterable.webidl',
+                          'testbindingpairiterable.rs',
+                          'webidls/TestBindingPairIterable.webidl']
+        ]
 
     def on_pr_opened(self, api, payload):
         components_changed = set()
@@ -20,6 +31,10 @@ class MissingTestHandler(EventHandler):
 
             for directory in self.TEST_DIRS_TO_CHECK:
                 if 'tests/{0}'.format(directory) in filepath:
+                    return
+
+            for test_file in self.TEST_FILES_TO_CHECK:
+                if test_file in filepath:
                     return
 
         if components_changed:

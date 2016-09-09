@@ -1,0 +1,68 @@
+{
+  "initial": [
+    {
+      "diff": "diff --git components/script/dom/testbinding.rs"
+    },
+    {
+      "diff": "diff --git components/script/dom/webidls/TestBinding.webidl"
+    },
+    {
+      "diff": "diff --git components/script/dom/testbindingproxy.rs"
+    },
+    {
+      "diff": "diff --git components/script/dom/webidls/TestBindingProxy.webidl"
+    },
+    {
+      "diff": "diff --git components/script/dom/testbindingiterable.rs"
+    },
+    {
+      "diff": "diff --git components/script/dom/webidls/TestBindingIterable.webidl"
+    },
+    {
+      "diff": "diff --git components/script/dom/testbindingpairiterable.rs"
+    },
+    {
+      "diff": "diff --git components/script/dom/webidls/TestBindingPairIterable.webidl"
+    }
+  ],
+  "expected": [
+    {
+      "comments": 0
+    },
+    {
+      "comments": 0
+    },
+    {
+      "comments": 0
+    },
+    {
+      "comments": 0
+    },
+    {
+      "comments": 0
+    },
+    {
+      "comments": 0
+    },
+    {
+      "comments": 0
+    },
+    {
+      "comments": 0
+    }
+  ],
+  "payload": {
+    "number": 10355,
+    "pull_request": {
+      "base": {
+        "repo": {
+          "owner": {
+            "login": "servo"
+          },
+          "name": "servo"
+        }
+      }
+    },
+    "action": "opened"
+  }
+}

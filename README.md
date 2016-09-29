@@ -20,26 +20,24 @@ Per-handler tests can be run using `python test.py`. These consist of
 a set of JSON documents collected from the `tests/` subdirectory of
 each handler, using the following format:
 
-```json
+```js
 {
   "initial": {
-    "__comment": "Initial state of the PR before any handlers process the payload.",
-
+    // Initial state of the PR before any handlers process the payload.
     "labels": [],
     "diff": "",
     "new_contributor": false,
     "assignee": null
   },
   "expected": {
-    "__comment-1": "Expected state of the PR after all the handlers process the following payload",
-    "__comment-2": "Only fields in this object will be checked. Example fields are shown below.",
-
+    // Expected state of the PR after all the handlers process the following payload.
+    // Only fields in this object will be checked. Example fields are shown below.
     "comments": 5,
     "labels": ["S-awaiting-review"],
     "assignee": "jdm"
   },
   "payload": {
-    "__comment": "Github API event payload in JSON format"
+    // Github API event payload in JSON format.
   }
 }
 ```

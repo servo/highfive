@@ -58,6 +58,16 @@ Leave the 'secret' field blank.
 Let me select individual events: Issue Comment, Pull Request, Status
 Check the box by 'Active'
 
+Add the bot's github account as a Collaborator to the repo with Write access.
+If automatically assigning a reviewer is desired for the repo, add a new section
+to the highfive instance's `collaborators.ini` with the list of desired reviewers:
+
+```
+[user/repo]
+reviewer_name =
+another_reviewer_name =
+```
+
 ## Configuring a Highfive
 
 Copy `config.sample` to `config`. Add the username of the account that will be

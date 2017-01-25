@@ -29,6 +29,9 @@
     }, 
     {
       "comments": 0
+    },
+    {
+      "comments": 0
     }
   ], 
   "initial": [
@@ -61,6 +64,9 @@
     }, 
     {
       "diff": "diff --git components/script/\ndiff --git tests/unit"
+    }, 
+    {
+      "diff": "diff --git components/script/\ndiff --git tests/compiletest/plugin/compile-fail"
     }
   ], 
   "payload": {

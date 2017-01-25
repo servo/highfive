@@ -8,7 +8,8 @@ TEST_REQUIRED_MSG = ('These commits modify {} code, but no tests are modified.'
 
 class MissingTestHandler(EventHandler):
     COMPONENT_DIRS_TO_CHECK = ('layout', 'script', 'gfx', 'style', 'net')
-    TEST_DIRS_TO_CHECK = ('ref', 'wpt', 'unit', 'compiletest/plugin/compile-fail')
+    TEST_DIRS_TO_CHECK = ('ref', 'wpt', 'unit',
+                          'compiletest/plugin/compile-fail')
     TEST_FILES_TO_CHECK = [
         '{0}/{1}'.format('components/script/dom', test_file)
         for test_file in ['testbinding.rs',

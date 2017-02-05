@@ -46,4 +46,5 @@ class LabelWatchersHandler(EventHandler):
         message = build_label_message(mentions)
         api.post_comment(message)
 
+
 handler_interface = LabelWatchersHandler

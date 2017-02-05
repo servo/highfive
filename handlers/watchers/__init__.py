@@ -50,4 +50,5 @@ class WatchersHandler(EventHandler):
         message = build_message(mentions)
         api.post_comment(message)
 
+
 handler_interface = WatchersHandler

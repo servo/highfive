@@ -1,0 +1,29 @@
+{
+  "expected": {
+    "comments": 1,
+    "labels": [
+      "C-assigned"
+    ]
+  },
+  "initial": {},
+  "payload": {
+    "comment": {
+      "body": "@highfive: assign me",
+      "user": {
+        "login": "someone"
+      }
+    },
+    "repository": {
+      "owner": {
+        "login": "servo"
+      },
+      "name": "servo"
+    },
+    "action": "created",
+    "issue": {
+      "number": 7075,
+      "state": "open",
+      "labels": []
+    }
+  }
+}

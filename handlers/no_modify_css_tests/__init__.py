@@ -16,4 +16,5 @@ class NoModifyCSSTestsHandler(EventHandler):
                 self.warn(NO_MODIFY_CSS_TESTS_MSG)
                 break
 
+
 handler_interface = NoModifyCSSTestsHandler

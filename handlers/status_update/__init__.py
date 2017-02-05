@@ -40,4 +40,5 @@ class StatusUpdateHandler(EventHandler):
         if payload['pull_request']['merged']:
             api.remove_label("S-awaiting-merge")
 
+
 handler_interface = StatusUpdateHandler

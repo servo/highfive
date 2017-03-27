@@ -6,7 +6,7 @@ GitHub hooks to provide an encouraging atmosphere for new contributors.
 Docs for the highfive instance for servo/servo repository live [on the Servo
 wiki](https://github.com/servo/servo/wiki/Highfive).
 
-## Design
+## Designfffffffffffffff
 
 Highfive is built as a modular, loosely-coupled set of handlers for Github
 API events. Each time an API event is processed, each handler is given the

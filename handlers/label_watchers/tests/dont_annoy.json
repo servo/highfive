@@ -4,13 +4,19 @@
   },
   "initial": {},
   "payload": {
+    "action": "labeled",
     "issue": {
-      "number": 123,
-      "labels": [{
-        "name": "L-python"
-      }],
+      "labels": [
+        {
+          "name": "A-mach"
+        },
+        {
+          "name": "L-python"
+        }
+      ],
+      "number": 16179,
       "user": {
-        "login": "Wafflespeanut"
+        "login": "jdm"
       }
     },
     "sender": {
@@ -23,8 +29,7 @@
       "name": "servo"
     },
     "label": {
-      "name": "L-python"
-    },
-    "action": "labeled"
+      "name": "A-mach"
+    }
   }
 }

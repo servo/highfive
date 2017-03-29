@@ -1,3 +1,4 @@
+from copy import deepcopy
 from eventhandler import EventHandler
 from helpers import get_people_from_config
 
@@ -17,12 +18,17 @@ def build_label_message(mentions):
 
 class LabelWatchersHandler(EventHandler):
     def on_issue_labeled(self, api, payload):
-        new_label = payload['label']['name']
-        watchers = get_people_from_config(api, LABEL_WATCHERS_CONFIG_FILE)
-        if not watchers:
+        label_list = get_people_from_config(api, LABEL_WATCHERS_CONFIG_FILE)
+        if not label_list:
             return
 
-        mentions = []
+        new_label = payload['label']['name']
+        existing_labels = []
+        if 'issue' in payload:
+            for label in payload['issue']['labels']:
+                if new_label != label['name']:
+                    existing_labels.append(label['name'])
+
         creator = None
         sender = payload['sender']['login'].lower()
 
@@ -31,14 +37,20 @@ class LabelWatchersHandler(EventHandler):
         elif 'pull_request' in payload:
             creator = payload['pull_request']['user']['login'].lower()
 
-        for (watcher, watched_labels) in watchers:
+        label_map = dict()
+        for watcher, watched_labels in label_list:      # reverse map
             if watcher == sender or watcher == creator:
                 continue
 
-            watched_labels = watched_labels.split(' ')
+            for label in watched_labels.split(' '):
+                label_map.setdefault(label, set())
+                label_map[label].add(watcher)
 
-            if new_label in watched_labels:
-                mentions.append(watcher)
+        mentions = deepcopy(label_map.get(new_label, set()))
+        for label in existing_labels:
+            for watcher in label_map.get(label, set()):
+                if watcher in mentions:     # avoid cc'ing again
+                    mentions.remove(watcher)
 
         if not mentions:
             return

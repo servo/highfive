@@ -1,24 +1,27 @@
 {
   "expected": {
     "comments": 0
-  }, 
-  "initial": {}, 
+  },
+  "initial": {},
   "payload": {
     "sender": {
       "login": "jdm"
-    }, 
+    },
     "repository": {
       "owner": {
         "login": "servo"
-      }, 
+      },
       "name": "highfive"
-    }, 
+    },
     "label": {
       "name": "not-watched-label"
-    }, 
-    "action": "labeled", 
+    },
+    "action": "labeled",
     "issue": {
       "number": 84,
+      "labels": [{
+        "name": "not-watched-label"
+      }],
       "user": {
         "login": "Wafflespeanut"
       }

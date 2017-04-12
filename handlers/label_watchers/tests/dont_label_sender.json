@@ -1,23 +1,26 @@
 {
   "expected": {
     "comments": 0
-  }, 
-  "initial": {}, 
+  },
+  "initial": {},
   "payload": {
     "sender": {
       "login": "jdm"
-    }, 
+    },
     "repository": {
       "owner": {
         "login": "servo"
-      }, 
+      },
       "name": "highfive"
-    }, 
+    },
     "label": {
       "name": "enhancement"
-    }, 
-    "action": "labeled", 
+    },
+    "action": "labeled",
     "issue": {
+      "labels": [{
+        "name": "enhancement"
+      }],
       "number": 84,
       "user": {
         "login": "nox"

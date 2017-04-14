@@ -12,7 +12,10 @@ WATCHERS_CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'watchers.ini')
 def build_message(mentions):
     message = ['Heads up! This PR modifies the following files:']
     for (watcher, file_names) in mentions.items():
-        message.append(" * @{}: {}".format(watcher, ', '.join(file_names)))
+        message.append(" * @{}: {}".format(watcher, ', '.join(file_names[:5])))
+        remaining = len(file_names[5:])
+        if remaining:
+            message[-1] += " and {} more".format(remaining)
 
     return '\n'.join(message)
 

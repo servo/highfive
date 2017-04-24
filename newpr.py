@@ -107,7 +107,7 @@ class GithubAPIProvider(APIProvider):
         headers = {} if not data else {'Content-Type': 'application/json'}
         req = urllib2.Request(url, data, headers)
         req.get_method = lambda: method
-        if token:
+        if self.token:
             authorization = '%s:%s' % (self.user, self.token)
             base64string = standard_b64encode(authorization).replace('\n', '')
             req.add_header("Authorization", "Basic %s" % base64string)

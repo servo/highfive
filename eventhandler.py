@@ -60,13 +60,14 @@ def get_handlers():
     handlers = []
     possible_handlers = os.listdir('handlers')
     for i in possible_handlers:
-        if not i.startswith('.'):
-            location = os.path.join('handlers', i)
-            try:
-                module = imp.load_module('handlers.' + i, None, location,
-                ('', '', imp.PKG_DIRECTORY))
-                handlers.append(module.handler_interface())
-                modules.append((module, location))
-            except ImportError:
-                pass
+        if i.startswith('.'):
+            continue
+        location = os.path.join('handlers', i)
+        try:
+            module = imp.load_module('handlers.' + i, None, location,
+                                     ('', '', imp.PKG_DIRECTORY))
+            handlers.append(module.handler_interface())
+            modules.append((module, location))
+        except ImportError:
+            pass
     return (modules, handlers)

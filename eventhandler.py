@@ -64,7 +64,7 @@ def get_handlers():
             location = os.path.join('handlers', i)
             try:
                 module = imp.load_module('handlers.' + i, None, location,
-                    ('', '', imp.PKG_DIRECTORY))
+                ('', '', imp.PKG_DIRECTORY))
                 handlers.append(module.handler_interface())
                 modules.append((module, location))
             except ImportError:

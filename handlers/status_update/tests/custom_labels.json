@@ -1,0 +1,27 @@
+{
+  "expected": {
+    "labels": [
+      "S-needs-deploy"
+    ]
+  },
+  "initial": {
+    "labels": [
+      "S-awaiting-merge"
+    ]
+  },
+  "payload": {
+    "number": 659,
+    "pull_request": {
+      "base": {
+        "repo": {
+          "owner": {
+            "login": "servo"
+          },
+          "name": "saltfs"
+        }
+      },
+      "merged": true
+    },
+    "action": "closed"
+  }
+}

@@ -8,10 +8,10 @@
     "issue": {
       "labels": [
         {
-          "name": "A-mach"
+          "name": "foo"
         },
         {
-          "name": "L-python"
+          "name": "bar"
         }
       ],
       "number": 16179,
@@ -26,10 +26,10 @@
       "owner": {
         "login": "servo"
       },
-      "name": "servo"
+      "name": "highfive-test"
     },
     "label": {
-      "name": "A-mach"
+      "name": "foo"
     }
   }
 }

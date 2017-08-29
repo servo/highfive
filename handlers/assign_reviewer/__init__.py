@@ -15,7 +15,7 @@ def find_reviewer(comment):
     If the user specified a reviewer, return the username,
     otherwise returns None.
     """
-    reviewer = re.search(r'.*r\?[:\- ]*@([a-zA-Z0-9\-]*)', str(comment))
+    reviewer = re.search(r'.*r\?[:\- ]*@?([a-zA-Z0-9\-]+)', str(comment))
     if reviewer:
         return reviewer.group(1)
     return None

@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from collections import defaultdict
 import os
+import fnmatch
 
 from eventhandler import EventHandler
 from helpers import get_people_from_config
@@ -29,23 +30,44 @@ class WatchersHandler(EventHandler):
             return
 
         mentions = defaultdict(list)
+
         for (watcher, watched_files) in watchers:
             watched_files = watched_files.split(' ')
             blacklisted_files = []
+
             for watched_file in watched_files:
                 if watched_file.startswith('-'):
                     blacklisted_files.append(watched_file[1:])
             for blacklisted_file in blacklisted_files:
                 watched_files.remove('-' + blacklisted_file)
+            
+
+            # Note: this is opt-in, i.e. a blacklist will override a watch rule
+            # We need to check the specificiy of each rule and take the most specific
+
             for filepath in api.get_changed_files():
-                for blacklisted_file in blacklisted_files:
-                    if filepath.startswith(blacklisted_file):
-                        break
-                else:
-                    for watched_file in watched_files:
-                        if (filepath.startswith(watched_file) and
-                                user != watcher):
-                            mentions[watcher].append(filepath)
+                for watched_file in watched_files:  
+                    comment = True
+
+                    # If file matches a watched_file
+                    if (fnmatch.fnmatch(filepath, watched_file) and (user != watcher)):
+
+                        # If there are blacklisted_files
+                        if blacklisted_files is not []:
+
+                            # Check against each blacklisted_file
+                            for blacklisted_file in blacklisted_files:
+
+                                # If file matches current blacklist_file or any previous
+                                if (fnmatch.fnmatch(filepath, blacklisted_file) or (not comment)):
+                                    comment = False
+                    
+                    # If file does not match a watched file
+                    else:
+                        comment = False
+
+                    if (comment):
+                        mentions[watcher].append(filepath)
 
         if not mentions:
             return

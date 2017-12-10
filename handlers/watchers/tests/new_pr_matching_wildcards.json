@@ -1,0 +1,41 @@
+{
+    "expected": [
+      {
+        "comments": 1
+      },
+      {
+        "comments": 0
+      },
+      {
+        "comments": 0
+      }
+    ],
+    "initial": [
+      {
+        "diff": "diff --git a/not-watched/dir/file.rs b/not-watched/dir/file.txt"
+      },
+      {
+        "diff": "diff --git a/not-watched/dir/file.py b/not-watched/dir/file.py"
+      },
+      {
+        "diff": "diff --git a/not-watched/dir/exclude.rs b/not-watched/dir/exclude.txt"
+      }
+    ],
+    "payload": {
+      "number": 7076,
+      "pull_request": {
+        "base": {
+          "repo": {
+            "owner": {
+              "login": "servo"
+            },
+            "name": "highfive-test"
+          }
+        },
+        "user": {
+          "login": "not_test_user"
+        }
+      },
+      "action": "opened"
+    }
+  }

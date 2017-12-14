@@ -40,7 +40,7 @@ class WatchersHandler(EventHandler):
                     blacklisted_files.append(watched_file[1:])
             for blacklisted_file in blacklisted_files:
                 watched_files.remove('-' + blacklisted_file)
-    
+
             for filepath in api.get_changed_files():
                 comment = False
                 for watched_file in watched_files:

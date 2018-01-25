@@ -30,6 +30,9 @@ class MissingTestHandler(EventHandler):
                 if 'components/{0}/'.format(component) in filepath:
                     components_changed.add(component)
 
+            if '/tests/' in filepath:
+                return
+
             for directory in self.TEST_DIRS_TO_CHECK:
                 if 'tests/{0}'.format(directory) in filepath:
                     return

@@ -9,14 +9,14 @@ from HTMLParser import HTMLParser
 
 def check_failure_log(api, bors_comment):
     # bors_comment would be something like,
-    # ":broken_heart: Test failed - [linux2](http://build.servo.org/builders/linux2/builds/2627)"  # noqa
+    # ":broken_heart: Test failed - [linux2](https://build.servo.org/builders/linux2/builds/2627)"  # noqa
     # ... from which we get the relevant build result url
     url = iter(re.findall(r'.*\((.*)\)', str(bors_comment))).next()
     if not url:
         return
 
     # Substitute and get the new url
-    # (e.g. http://build.servo.org/json/builders/linux2/builds/2627)
+    # (e.g. https://build.servo.org/json/builders/linux2/builds/2627)
     json_url = re.sub(r'(.*)(builders/.*)', r'\1json/\2', url)
     json_stuff = api.get_page_content(json_url)
     if not json_stuff:

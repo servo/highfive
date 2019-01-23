@@ -4,7 +4,6 @@ import json
 import re
 
 from eventhandler import EventHandler
-from HTMLParser import HTMLParser
 
 
 def check_failure_log(api, bors_comment):
@@ -30,22 +29,28 @@ def check_failure_log(api, bors_comment):
             build_log = step['logs']
             break
 
-    failed_url = None
+    failed_tests_url = None
+    failed_summary_url = None
     for (name, log_url) in build_log:
         if name == 'stdio':
-            failed_url = log_url
-            break
+            failed_tests_url = log_url + '/text'
+        elif 'errorsummary.log' in name:
+            failed_summary_url = log_url + '/text'
 
-    if not failed_url:
+    if not failed_summary_url and not failed_tests_url:
         return
 
-    stdio = api.get_page_content(failed_url)
-    failure_regex = r'.*Tests with unexpected results:\n(.*)\n</span><span'
-    failures = iter(re.findall(failure_regex, stdio, re.DOTALL)).next()
-    failures = HTMLParser().unescape(failures)
+    if failed_tests_url:
+        stdio = api.get_page_content(failed_tests_url)
+        failure_regex = r'.*Tests with unexpected results:\n(.*)$'
+        failures = iter(re.findall(failure_regex, stdio, re.DOTALL)).next()
+    else:
+        failures = api.get_page_content(failed_summary_url)
 
     if failures:
-        comments = [' ' * 4 + line for line in failures.split('\n')]
+        comments = ["Test failures:", "<details>"]
+        comments += [' ' * 4 + line for line in failures.split('\n')]
+        comments += ["</details>"]
         api.post_comment('\n'.join(comments))
 
 

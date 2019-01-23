@@ -4,7 +4,6 @@ import json
 import re
 
 from eventhandler import EventHandler
-from HTMLParser import HTMLParser
 
 
 def check_failure_log(api, bors_comment):
@@ -49,8 +48,10 @@ def check_failure_log(api, bors_comment):
         failures = api.get_page_content(failed_summary_url)
 
     if failures:
-        comments = [' ' * 4 + line for line in failures.split('\n')]
-        api.post_comment('\n'.join(["Test failures:", "<details>"] + comments + ["</details>"]))
+        comments = ["Test failures:", "<details>"]
+        comments += [' ' * 4 + line for line in failures.split('\n')]
+        comments += ["</details>"]
+        api.post_comment('\n'.join(comments))
 
 
 class HomuStatusHandler(EventHandler):

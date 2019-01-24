@@ -40,11 +40,13 @@ def check_failure_log(api, bors_comment):
     if not failed_summary_url and not failed_tests_url:
         return
 
+    failures = None
     if failed_tests_url:
         stdio = api.get_page_content(failed_tests_url)
         failure_regex = r'.*Tests with unexpected results:\n(.*)$'
         failures = iter(re.findall(failure_regex, stdio, re.DOTALL)).next()
-    else:
+
+    if not failures and failured_summary_url:
         failures = api.get_page_content(failed_summary_url)
 
     if failures:

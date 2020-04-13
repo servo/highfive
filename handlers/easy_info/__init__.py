@@ -6,7 +6,7 @@ ASSIGN_MSG = 'assign me'
 
 MSG = ('Hi! If you have any questions regarding this issue, feel free to make'
        ' a comment here, or ask it in the `#servo` channel in '
-       '[IRC](https://wiki.mozilla.org/IRC).\n\n'
+       '[Matrix](https://wiki.mozilla.org/Matrix).\n\n'
        'If you intend to work on this issue, then add `@%s: %s`'
        ' to your comment, and I\'ll assign this to you. :smile:')
 

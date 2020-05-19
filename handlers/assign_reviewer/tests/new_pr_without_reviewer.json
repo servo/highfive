@@ -8,6 +8,7 @@
     "pull_request": {
       "number": 7087,
       "assignee": null,
+      "requested_reviewers": [],
       "body": "not sure who I should assign this to",
       "base": {
         "repo": {

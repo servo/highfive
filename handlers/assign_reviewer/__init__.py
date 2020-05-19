@@ -58,7 +58,10 @@ class AssignReviewerHandler(EventHandler):
         if pr["assignee"] != None:      # NOQA (silence flake8 here)
             return
 
-        reviewer = find_reviewer(pr["body"])
+        if "requested_reviewers" in pr and pr["requested_reviewers"] != []:
+            reviewer = pr["requested_reviewers"][0]["login"]
+        else:
+            reviewer = find_reviewer(pr["body"])
 
         # Find a reviewer from PR comment (like "r? username"),
         # or assign one ourselves.

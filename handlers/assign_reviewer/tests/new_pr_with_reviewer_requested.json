@@ -1,14 +1,13 @@
 {
   "expected": {
     "assignee": "SimonSapin"
-  }, 
-  "initial": {
-    "assignee": "SimonSapin"
-  }, 
+  },
+  "initial": {},
   "payload": {
     "number": 7087, 
     "pull_request": {
-      "assignee": {}, 
+      "assignee": null,
+      "requested_reviewers": [{ "login": "SimonSapin" }],
       "base": {
         "repo": {
           "owner": {
@@ -16,6 +15,9 @@
           }, 
           "name": "highfive"
         }
+      },
+      "user": {
+        "login": "highfive"
       }
     }, 
     "action": "opened"

@@ -8,6 +8,7 @@
     "pull_request": {
       "number": 149, 
       "assignee": null, 
+      "requested_reviewers": [],
       "body": "blah blah blah", 
       "base": {
         "repo": {

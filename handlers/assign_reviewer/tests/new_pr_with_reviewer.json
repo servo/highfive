@@ -7,6 +7,7 @@
     "number": 7076, 
     "pull_request": {
       "assignee": null, 
+      "requested_reviewers": [],
       "body": "r? @jdm", 
       "base": {
         "repo": {

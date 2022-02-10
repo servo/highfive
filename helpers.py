@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import ConfigParser
+from configparser import ConfigParser
 import os
 
 COLLABORATORS_CONFIG_FILE = os.path.join(os.path.dirname(__file__),
@@ -16,7 +16,7 @@ def get_people_from_config(api, config_abs_path):
     Note that the names (despite how they're in the file) will always
     be parsed to 'lowercase'.
     '''
-    config = ConfigParser.ConfigParser()
+    config = ConfigParser()
     config.read(config_abs_path)
     repo = api.owner + '/' + api.repo
 

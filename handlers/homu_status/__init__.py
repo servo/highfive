@@ -10,7 +10,7 @@ def check_failure_log(api, bors_comment):
     # bors_comment would be something like,
     # ":broken_heart: Test failed - [linux2](https://build.servo.org/builders/linux2/builds/2627)"  # noqa
     # ... from which we get the relevant build result url
-    url = iter(re.findall(r'.*\((.*)\)', str(bors_comment))).next()
+    url = next(iter(re.findall(r'.*\((.*)\)', str(bors_comment))))
     if not url:
         return
 
@@ -44,7 +44,7 @@ def check_failure_log(api, bors_comment):
     if failed_tests_url:
         stdio = api.get_page_content(failed_tests_url)
         failure_regex = r'.*Tests with unexpected results:\n(.*)$'
-        failures = iter(re.findall(failure_regex, stdio, re.DOTALL)).next()
+        failures = next(iter(re.findall(failure_regex, stdio, re.DOTALL)))
 
     if not failures and failed_summary_url:
         failures = api.get_page_content(failed_summary_url)

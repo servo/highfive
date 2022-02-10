@@ -1,19 +1,19 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 from __future__ import absolute_import, print_function
 
 from base64 import standard_b64encode
 import cgi
 import cgitb
-import ConfigParser
+from configparser import ConfigParser, RawConfigParser
 import contextlib
 import gzip
 try:
     import simplejson as json
 except:
     import json
-from StringIO import StringIO
-import urllib2
+from io import StringIO
+import urllib
 
 import eventhandler
 from helpers import is_addition, normalize_file_path
@@ -105,7 +105,7 @@ class GithubAPIProvider(APIProvider):
     def api_req(self, method, url, data=None, media_type=None):
         data = None if not data else json.dumps(data)
         headers = {} if not data else {'Content-Type': 'application/json'}
-        req = urllib2.Request(url, data, headers)
+        req = urllib.Request(url, data, headers)
         req.get_method = lambda: method
         if self.token:
             authorization = '%s:%s' % (self.user, self.token)
@@ -114,7 +114,7 @@ class GithubAPIProvider(APIProvider):
 
         if media_type:
             req.add_header("Accept", media_type)
-        f = urllib2.urlopen(req)
+        f = urllib.urlopen(req)
         header = f.info()
         if header.get('Content-Encoding') == 'gzip':
             buf = StringIO(f.read())
@@ -168,7 +168,7 @@ class GithubAPIProvider(APIProvider):
         url = self.post_comment_url % (self.owner, self.repo, self.issue)
         try:
             self.api_req("POST", url, {"body": body})
-        except urllib2.HTTPError as e:
+        except urllib.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -180,7 +180,7 @@ class GithubAPIProvider(APIProvider):
             self._labels += [label]
         try:
             self.api_req("POST", url, [label])
-        except urllib2.HTTPError as e:
+        except urllib.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -193,7 +193,7 @@ class GithubAPIProvider(APIProvider):
             self._labels.remove(label)
         try:
             self.api_req("DELETE", url, {})
-        except urllib2.HTTPError:
+        except urllib.HTTPError:
             pass
 
     def get_labels(self):
@@ -202,7 +202,7 @@ class GithubAPIProvider(APIProvider):
             return self._labels
         try:
             result = self.api_req("GET", url)
-        except urllib2.HTTPError as e:
+        except urllib.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -220,7 +220,7 @@ class GithubAPIProvider(APIProvider):
         url = self.issue_url % (self.owner, self.repo, self.issue)
         try:
             self.api_req("PATCH", url, {"assignee": assignee})['body']
-        except urllib2.HTTPError as e:
+        except urllib.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -231,9 +231,9 @@ class GithubAPIProvider(APIProvider):
 
     def get_page_content(self, url):
         try:
-            with contextlib.closing(urllib2.urlopen(url)) as fd:
+            with contextlib.closing(urllib.urlopen(url)) as fd:
                 return fd.read()
-        except urllib2.URLError:
+        except urllib.URLError:
             return None
 
 
@@ -272,7 +272,7 @@ if __name__ == "__main__":
 
     cgitb.enable()
 
-    config = ConfigParser.RawConfigParser()
+    config = RawConfigParser()
     config.read('./config')
     user = config.get('github', 'user')
     token = config.get('github', 'token')

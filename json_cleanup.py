@@ -4,8 +4,8 @@ NODE_SEP = ' -> '
 def visit_nodes(node):          # simple recursive tree traversal
     if hasattr(node, 'mark'):   # it's already a NodeMarker
         return node
-    if hasattr(node, '__iter__'):
-        iterator = xrange(len(node)) if isinstance(node, list) else node
+    if hasattr(node, '__iter__') and not isinstance(node, str):
+        iterator = range(len(node)) if isinstance(node, list) else node
         for thing in iterator:
             node[thing] = visit_nodes(node[thing])
     return NodeMarker(node)
@@ -18,8 +18,8 @@ def visit_nodes(node):          # simple recursive tree traversal
 # So, we do another traversal to store the references of the root nodes
 def assign_roots(marker_node, root=None):
     node = marker_node._node
-    if hasattr(node, '__iter__'):
-        iterator = xrange(len(node)) if isinstance(node, list) else node
+    if hasattr(node, '__iter__') and not isinstance(node, str):
+        iterator = range(len(node)) if isinstance(node, list) else node
         for thing in iterator:
             assign_roots(node[thing], marker_node)
     marker_node._root = root
@@ -82,7 +82,7 @@ class NodeMarker(object):
         other = self.get_object(other)
         # since string is also a sequence in python, we shouldn't iterate
         # over it and check the individual characters
-        if isinstance(self._node, str) or isinstance(self._node, unicode):
+        if isinstance(self._node, str) or isinstance(self._node, bytes):
             return other in self._node
 
         for idx, thing in enumerate(self._node):
@@ -113,10 +113,10 @@ class JsonCleaner(object):
     def _filter_nodes(self, marker_node, warn, path=''):
         if marker_node._is_used:
             node = marker_node._node
-            if hasattr(node, '__iter__'):
+            if hasattr(node, '__iter__') and not isinstance(node, str):
                 # it's either 'list' or 'dict' when it comes to JSONs
                 removed = 0
-                iterator = xrange(len(node)) if isinstance(node, list) \
+                iterator = range(len(node)) if isinstance(node, list) \
                     else node.keys()
                 for thing in iterator:
                     new_path = path + str(thing) + NODE_SEP
@@ -130,7 +130,7 @@ class JsonCleaner(object):
                         self.unused += 1
                         if warn:
                             new_path = new_path.strip(NODE_SEP)
-                            print 'unused node at "%s"' % new_path
+                            print('unused node at "%s"' % new_path)
                         node.pop(thing)
                         removed += 1
             return node

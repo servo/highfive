@@ -244,7 +244,7 @@ warning_summary = warning_header + '\n\n%s'
 
 
 def extract_globals_from_payload(payload):
-    if payload["action"] == "created" or payload["action"] == "labeled":
+    if payload["action"] == "created" or payload["action"] == "labeled" or 'issue' in payload:
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])

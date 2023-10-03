@@ -13,7 +13,7 @@ try:
 except:
     import json
 from io import StringIO
-import urllib
+from urllib import request, error
 
 import eventhandler
 from helpers import is_addition, normalize_file_path
@@ -103,18 +103,18 @@ class GithubAPIProvider(APIProvider):
             self.pull_url = payload["pull_request"]["url"]
 
     def api_req(self, method, url, data=None, media_type=None):
-        data = None if not data else json.dumps(data)
+        data = None if not data else json.dumps(data).encode('utf-8')
         headers = {} if not data else {'Content-Type': 'application/json'}
-        req = urllib.Request(url, data, headers)
+        req = request.Request(url, data, headers)
         req.get_method = lambda: method
         if self.token:
             authorization = '%s:%s' % (self.user, self.token)
-            base64string = standard_b64encode(authorization).replace('\n', '')
+            base64string = standard_b64encode(authorization.encode('utf-8')).decode('utf-8').replace('\n', '')
             req.add_header("Authorization", "Basic %s" % base64string)
 
         if media_type:
             req.add_header("Accept", media_type)
-        f = urllib.urlopen(req)
+        f = request.urlopen(req)
         header = f.info()
         if header.get('Content-Encoding') == 'gzip':
             buf = StringIO(f.read())
@@ -168,7 +168,7 @@ class GithubAPIProvider(APIProvider):
         url = self.post_comment_url % (self.owner, self.repo, self.issue)
         try:
             self.api_req("POST", url, {"body": body})
-        except urllib.HTTPError as e:
+        except error.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -180,7 +180,7 @@ class GithubAPIProvider(APIProvider):
             self._labels += [label]
         try:
             self.api_req("POST", url, [label])
-        except urllib.HTTPError as e:
+        except error.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -193,7 +193,7 @@ class GithubAPIProvider(APIProvider):
             self._labels.remove(label)
         try:
             self.api_req("DELETE", url, {})
-        except urllib.HTTPError:
+        except error.HTTPError:
             pass
 
     def get_labels(self):
@@ -202,7 +202,7 @@ class GithubAPIProvider(APIProvider):
             return self._labels
         try:
             result = self.api_req("GET", url)
-        except urllib.HTTPError as e:
+        except error.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -220,7 +220,7 @@ class GithubAPIProvider(APIProvider):
         url = self.issue_url % (self.owner, self.repo, self.issue)
         try:
             self.api_req("PATCH", url, {"assignee": assignee})['body']
-        except urllib.HTTPError as e:
+        except error.HTTPError as e:
             if e.code == 201:
                 pass
             else:
@@ -231,9 +231,9 @@ class GithubAPIProvider(APIProvider):
 
     def get_page_content(self, url):
         try:
-            with contextlib.closing(urllib.urlopen(url)) as fd:
+            with contextlib.closing(request.urlopen(url)) as fd:
                 return fd.read()
-        except urllib.URLError:
+        except error.URLError:
             return None
 
 

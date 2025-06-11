@@ -39,6 +39,7 @@ class EasyInfoHandler(EventHandler):
                 return
 
             api.add_label('C-assigned')
+            api.set_assignee(user)
             api.post_comment(RESPONSE_OK % user)
 
 

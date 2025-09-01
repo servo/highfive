@@ -60,6 +60,8 @@ def get_handlers():
     handlers = []
     possible_handlers = os.listdir('handlers')
     for i in possible_handlers:
+        if i.startswith('.'):
+            continue
         location = os.path.join('handlers', i)
         try:
             module = imp.load_module('handlers.' + i, None, location,

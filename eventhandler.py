@@ -64,6 +64,8 @@ def get_handlers():
         abs_location = os.path.join(os.path.dirname(__file__), location)
         try:
             spec = importlib.util.spec_from_file_location(i, abs_location)
+            if spec is None:
+                raise ImportError(f"Could not load spec for module '{i}' at: {abs_location}")
             module = importlib.util.module_from_spec(spec)
             sys.modules[i] = module
             spec.loader.exec_module(module)

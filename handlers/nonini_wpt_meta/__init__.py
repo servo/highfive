@@ -8,7 +8,7 @@ file extension to {1}. Please consider removing {2}!'
 
 class NonINIWPTMetaFileHandler(EventHandler):
     DIRS_TO_CHECK = (
-        'tests/wpt/metadata',
+        'tests/wpt/meta',
         'tests/wpt/mozilla/meta',
     )
 

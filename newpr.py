@@ -5,12 +5,12 @@ from __future__ import absolute_import, print_function
 from base64 import standard_b64encode
 import cgi
 import cgitb
-from configparser import ConfigParser, RawConfigParser
+from configparser import RawConfigParser
 import contextlib
 import gzip
 try:
     import simplejson as json
-except:
+except ImportError:
     import json
 from io import StringIO
 from urllib import request, error

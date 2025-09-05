@@ -34,7 +34,7 @@ class EasyInfoHandler(EventHandler):
 
         if re.search(r'@%s[: ]*%s' % (api.user, ASSIGN_MSG), str(msg)):
             labels = payload['issue']['labels']
-            if any(l['name'] == 'C-assigned' for l in labels):
+            if any(label['name'] == 'C-assigned' for label in labels):
                 api.post_comment(RESPONSE_FAIL)
                 return
 

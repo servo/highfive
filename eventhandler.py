@@ -51,7 +51,6 @@ def reset_test_state():
 
 
 def get_warnings():
-    global _warnings
     return _warnings
 
 

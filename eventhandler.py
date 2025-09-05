@@ -61,8 +61,9 @@ def get_handlers():
     possible_handlers = os.listdir('handlers')
     for i in possible_handlers:
         location = os.path.join('handlers', i)
+        abs_location = os.path.join(os.path.dirname(__file__), location)
         try:
-            spec = importlib.util.spec_from_file_location(i, location)
+            spec = importlib.util.spec_from_file_location(i, abs_location)
             module = importlib.util.module_from_spec(spec)
             sys.modules[i] = module
             spec.loader.exec_module(module)

@@ -1,0 +1,23 @@
+name: Main
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: ['opened', 'synchronize']
+    branches: ["**"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup Python
+        uses: actions/setup-python@v6
+      - name: Install requirements
+        run: pip install flake8 legacy-cgi
+      - name: flake8
+        run: flake8 .
+      - name: tests
+        run: python test.py

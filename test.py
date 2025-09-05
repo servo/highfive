@@ -133,7 +133,7 @@ def run_tests(tests, warn=True, overwrite=False):
 
 
 def register_tests(path):
-    tests_location = os.path.join(path, 'tests')
+    tests_location = os.path.join(os.path.dirname(path), 'tests')
     if not os.path.isdir(tests_location):
         return
 

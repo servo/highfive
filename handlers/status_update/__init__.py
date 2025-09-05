@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 
-import ConfigParser
+from configparser import ConfigParser
 import os.path
 import time
 
 from eventhandler import EventHandler
 
 
-config = ConfigParser.SafeConfigParser()
+config = ConfigParser()
 config.optionxform = str  # Be case sensitive
 config.read(os.path.join(os.path.dirname(__file__), 'labels.ini'))
 config = {
@@ -46,16 +46,16 @@ def manage_pr_state(api, payload):
 
 
 def handle_custom_labels(api, event):
-        repo_config = config.get('{}/{}'.format(api.owner, api.repo), None)
-        if not repo_config:
-            return
-        labels = api.get_labels()
-        for label in repo_config.get('remove_on_pr_{}'.format(event), []):
-            if label in labels:
-                api.remove_label(label)
-        for label in repo_config.get('add_on_pr_{}'.format(event), []):
-            if label not in labels:
-                api.add_label(label)
+    repo_config = config.get('{}/{}'.format(api.owner, api.repo), None)
+    if not repo_config:
+        return
+    labels = api.get_labels()
+    for label in repo_config.get('remove_on_pr_{}'.format(event), []):
+        if label in labels:
+            api.remove_label(label)
+    for label in repo_config.get('add_on_pr_{}'.format(event), []):
+        if label not in labels:
+            api.add_label(label)
 
 
 class StatusUpdateHandler(EventHandler):

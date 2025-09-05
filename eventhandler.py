@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 from helpers import linear_search
 
-import imp
+import importlib.util
 import os
+import sys
 
 _warnings = []
 _payload_actions = {
@@ -51,7 +52,6 @@ def reset_test_state():
 
 
 def get_warnings():
-    global _warnings
     return _warnings
 
 
@@ -60,12 +60,16 @@ def get_handlers():
     handlers = []
     possible_handlers = os.listdir('handlers')
     for i in possible_handlers:
-        location = os.path.join('handlers', i)
-        try:
-            module = imp.load_module('handlers.' + i, None, location,
-                                     ('', '', imp.PKG_DIRECTORY))
-            handlers.append(module.handler_interface())
-            modules.append((module, location))
-        except ImportError:
-            pass
+        location = os.path.join('handlers', i, "__init__.py")
+        abs_location = os.path.join(os.path.dirname(__file__), location)
+        spec = importlib.util.spec_from_file_location(i, abs_location)
+        if spec is None:
+            raise ImportError(
+                f"Could not load spec for module '{i}' at: {abs_location}"
+            )
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[i] = module
+        spec.loader.exec_module(module)
+        handlers.append(module.handler_interface())
+        modules.append((module, location))
     return (modules, handlers)

@@ -109,7 +109,8 @@ class GithubAPIProvider(APIProvider):
         req.get_method = lambda: method
         if self.token:
             authorization = '%s:%s' % (self.user, self.token)
-            base64string = standard_b64encode(authorization.encode('utf-8')).decode('utf-8').replace('\n', '')
+            encoded = authorization.encode('utf-8')
+            base64string = standard_b64encode(encoded).decode('utf-8').replace('\n', '')
             req.add_header("Authorization", "Basic %s" % base64string)
 
         if media_type:
@@ -244,7 +245,8 @@ warning_summary = warning_header + '\n\n%s'
 
 
 def extract_globals_from_payload(payload):
-    if payload["action"] == "created" or payload["action"] == "labeled" or 'issue' in payload:
+    action = payload["action"]
+    if action == "created" or action == "labeled" or 'issue' in payload:
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])

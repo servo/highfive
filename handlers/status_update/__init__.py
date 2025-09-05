@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 
-import ConfigParser
+from configparser import ConfigParser
 import os.path
 import time
 
 from eventhandler import EventHandler
 
 
-config = ConfigParser.SafeConfigParser()
+config = ConfigParser()
 config.optionxform = str  # Be case sensitive
 config.read(os.path.join(os.path.dirname(__file__), 'labels.ini'))
 config = {

@@ -110,7 +110,8 @@ class GithubAPIProvider(APIProvider):
         if self.token:
             authorization = '%s:%s' % (self.user, self.token)
             encoded = authorization.encode('utf-8')
-            base64string = standard_b64encode(encoded).decode('utf-8').replace('\n', '')
+            decoded = standard_b64encode(encoded).decode('utf-8')
+            base64string = decoded.replace('\n', '')
             req.add_header("Authorization", "Basic %s" % base64string)
 
         if media_type:

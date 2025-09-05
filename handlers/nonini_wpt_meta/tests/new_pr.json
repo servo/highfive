@@ -24,7 +24,7 @@
   ], 
   "initial": [
     {
-      "diff": "diff --git tests/wpt/metadata/foo.ini"
+      "diff": "diff --git tests/wpt/meta/foo.ini"
     }, 
     {
       "diff": "diff --git tests/wpt/mozilla/meta/bar.tgz"
@@ -33,16 +33,16 @@
       "diff": "diff --git tests/wpt/mozilla/meta/bar.tgz tests/wpt/metadata/spam.xz"
     }, 
     {
-      "diff": "diff --git tests/wpt/metadata"
+      "diff": "diff --git tests/wpt/meta"
     }, 
     {
-      "diff": "not diff tests/wpt/metadata/eggs.delicious"
+      "diff": "not diff tests/wpt/meta/eggs.delicious"
     }, 
     {
-      "diff": "diff --git tests/wpt/metadata/MANIFEST.json"
+      "diff": "diff --git tests/wpt/meta/MANIFEST.json"
     }, 
     {
-      "diff": "diff --git tests/wpt/metadata/mozilla-sync"
+      "diff": "diff --git tests/wpt/meta/mozilla-sync"
     }
   ], 
   "payload": {

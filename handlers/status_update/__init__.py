@@ -69,7 +69,7 @@ class StatusUpdateHandler(EventHandler):
 
     def on_pr_closed(self, api, payload):
         handle_custom_labels(api, 'closed')
-        if payload['pull_request']['merged']:
+        if "pull_request" in payload and payload['pull_request']['merged']:
             api.remove_label("S-awaiting-merge")
             handle_custom_labels(api, 'merged')
 

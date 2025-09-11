@@ -98,6 +98,9 @@ class GithubAPIProvider(APIProvider):
         self.token = token
         self._labels = None
         self._diff = None
+        if "issue" in payload and "pull_request" in payload["issue"]:
+            self.diff_url = payload["issue"]["pull_request"]["diff_url"]
+            self.pull_url = payload["issue"]["pull_request"]["url"]
         if "pull_request" in payload:
             self.diff_url = payload["pull_request"]["diff_url"]
             self.pull_url = payload["pull_request"]["url"]
@@ -247,7 +250,7 @@ warning_summary = warning_header + '\n\n%s'
 
 def extract_globals_from_payload(payload):
     action = payload["action"]
-    if action == "created" or action == "labeled" or 'issue' in payload:
+    if "issue" in payload:
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])

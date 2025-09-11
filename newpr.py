@@ -215,7 +215,7 @@ class GithubAPIProvider(APIProvider):
     def get_diff(self):
         if self._diff:
             return self._diff
-        self._diff = self.api_req("GET", self.diff_url)['body']
+        self._diff = self.api_req("GET", self.diff_url)['body'].decode('utf-8')
         return self._diff
 
     def set_assignee(self, assignee):

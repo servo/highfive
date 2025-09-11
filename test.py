@@ -13,7 +13,7 @@ from newpr import APIProvider, handle_payload
 
 class TestAPIProvider(APIProvider):
     def __init__(self, payload, user, new_contributor, labels, assignee,
-                 diff="", pull_request=""):
+                 diff=b"", pull_request=""):
         super(TestAPIProvider, self).__init__(payload, user)
         self.new_contributor = new_contributor
         self.comments_posted = []
@@ -39,7 +39,7 @@ class TestAPIProvider(APIProvider):
         return self.labels
 
     def get_diff(self):
-        return self.diff
+        return self.diff.decode('utf-8')
 
     def get_pull(self):
         return self.pull_request
@@ -57,7 +57,7 @@ def create_test(filename, initial, expected,
     initial_values = {
         'new_contributor': initial.get('new_contributor', False),
         'labels': initial.get('labels', []),
-        'diff': initial.get('diff', ''),
+        'diff': initial.get('diff', '').encode('utf-8'),
         'pull_request': initial.get('pull_request', ''),
         'assignee': initial.get('assignee', None),
     }

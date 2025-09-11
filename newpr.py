@@ -4,7 +4,6 @@ from __future__ import absolute_import, print_function
 
 from base64 import standard_b64encode
 import cgi
-import cgitb
 from configparser import RawConfigParser
 import contextlib
 import gzip
@@ -98,6 +97,9 @@ class GithubAPIProvider(APIProvider):
         self.token = token
         self._labels = None
         self._diff = None
+        if "issue" in payload and "pull_request" in payload["issue"]:
+            self.diff_url = payload["issue"]["pull_request"]["diff_url"]
+            self.pull_url = payload["issue"]["pull_request"]["url"]
         if "pull_request" in payload:
             self.diff_url = payload["pull_request"]["diff_url"]
             self.pull_url = payload["pull_request"]["url"]
@@ -209,13 +211,16 @@ class GithubAPIProvider(APIProvider):
                 pass
             else:
                 raise e
-        self._labels = map(lambda x: x["name"], json.loads(result['body']))
+        self._labels = list(map(
+            lambda x: x["name"],
+            json.loads(result['body'])
+        ))
         return self._labels
 
     def get_diff(self):
         if self._diff:
             return self._diff
-        self._diff = self.api_req("GET", self.diff_url)['body']
+        self._diff = self.api_req("GET", self.diff_url)['body'].decode('utf-8')
         return self._diff
 
     def set_assignee(self, assignee):
@@ -246,8 +251,7 @@ warning_summary = warning_header + '\n\n%s'
 
 
 def extract_globals_from_payload(payload):
-    action = payload["action"]
-    if action == "created" or action == "labeled" or 'issue' in payload:
+    if "issue" in payload:
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
         issue = str(payload['issue']['number'])
@@ -272,8 +276,6 @@ def handle_payload(api, payload, handlers=None):
 if __name__ == "__main__":
     print("Content-Type: text/html;charset=utf-8")
     print()
-
-    cgitb.enable()
 
     config = RawConfigParser()
     config.read('./config')

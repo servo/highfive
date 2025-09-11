@@ -4,7 +4,6 @@ from __future__ import absolute_import, print_function
 
 from base64 import standard_b64encode
 import cgi
-import cgitb
 from configparser import RawConfigParser
 import contextlib
 import gzip
@@ -212,7 +211,10 @@ class GithubAPIProvider(APIProvider):
                 pass
             else:
                 raise e
-        self._labels = list(map(lambda x: x["name"], json.loads(result['body'])))
+        self._labels = list(map(
+            lambda x: x["name"],
+            json.loads(result['body'])
+        ))
         return self._labels
 
     def get_diff(self):
@@ -249,7 +251,6 @@ warning_summary = warning_header + '\n\n%s'
 
 
 def extract_globals_from_payload(payload):
-    action = payload["action"]
     if "issue" in payload:
         owner = payload['repository']['owner']['login']
         repo = payload['repository']['name']
@@ -275,8 +276,6 @@ def handle_payload(api, payload, handlers=None):
 if __name__ == "__main__":
     print("Content-Type: text/html;charset=utf-8")
     print()
-
-    #cgitb.enable()
 
     config = RawConfigParser()
     config.read('./config')

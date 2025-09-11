@@ -212,7 +212,7 @@ class GithubAPIProvider(APIProvider):
                 pass
             else:
                 raise e
-        self._labels = map(lambda x: x["name"], json.loads(result['body']))
+        self._labels = list(map(lambda x: x["name"], json.loads(result['body'])))
         return self._labels
 
     def get_diff(self):

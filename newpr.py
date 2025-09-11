@@ -276,7 +276,7 @@ if __name__ == "__main__":
     print("Content-Type: text/html;charset=utf-8")
     print()
 
-    cgitb.enable()
+    #cgitb.enable()
 
     config = RawConfigParser()
     config.read('./config')

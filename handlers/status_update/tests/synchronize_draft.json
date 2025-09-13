@@ -1,7 +1,9 @@
 {
   "expected": {
     "labels": [
-      "S-awaiting-review"
+      "S-needs-code-changes", 
+      "S-tests-failed", 
+      "S-awaiting-merge"
     ]
   }, 
   "initial": {
@@ -14,8 +16,7 @@
   "payload": {
     "number": 7062, 
     "pull_request": {
-      "draft": false,
-      "mergeable": true,
+      "draft": true,
       "base": {
         "repo": {
           "owner": {

@@ -9,6 +9,7 @@
   "payload": {
     "number": 7076, 
     "pull_request": {
+      "draft": false,
       "mergeable": false,
       "base": {
         "repo": {

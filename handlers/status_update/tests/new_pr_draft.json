@@ -1,15 +1,13 @@
 {
   "expected": {
     "labels": [
-      "S-awaiting-review"
     ]
   }, 
   "initial": {}, 
   "payload": {
     "number": 7076, 
     "pull_request": {
-      "draft": false,
-      "mergeable": true,
+      "draft": true,
       "base": {
         "repo": {
           "owner": {

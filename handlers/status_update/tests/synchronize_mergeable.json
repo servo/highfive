@@ -314,6 +314,7 @@
   "payload": {
     "number": 7062, 
     "pull_request": {
+      "draft": false,
       "mergeable": null, 
       "base": {
         "repo": {

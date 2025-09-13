@@ -44,7 +44,7 @@ class TestAPIProvider(APIProvider):
         return self.diff.decode('utf-8')
 
     def get_pull(self):
-        return self.pull_request
+        return json.loads(self.pull_request)
 
     def set_assignee(self, assignee):
         self.assignee = assignee
@@ -60,7 +60,7 @@ def create_test(filename, initial, expected,
         'new_contributor': initial.get('new_contributor', False),
         'labels': initial.get('labels', []),
         'diff': initial.get('diff', None),
-        'pull_request': initial.get('pull_request', ''),
+        'pull_request': json.dumps(initial.get('pull_request', {})),
         'assignee': initial.get('assignee', None),
     }
 

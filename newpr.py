@@ -238,7 +238,7 @@ class GithubAPIProvider(APIProvider):
                 raise e
 
     def get_pull(self):
-        return self.api_req("GET", self.pull_url)["body"]
+        return json.loads(self.api_req("GET", self.pull_url)["body"])
 
     def get_page_content(self, url):
         try:

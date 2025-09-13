@@ -120,5 +120,18 @@ class StatusUpdateHandler(EventHandler):
                 api.add_label(TESTS_FAILED)
         handle_custom_labels(api, 'dequeued')
 
+    def on_review_submitted(self, api, payload):
+        update_rebase_status(api, payload)
+        labels = api.get_labels()
+        state = payload["review"]["state"]
+        if state == "REQUEST_CHANGES":
+            if AWAITING_REVIEW in labels:
+                api.remove_label(AWAITING_REVIEW)
+            if NEED_CODE_CHANGES not in labels:
+                api.add_label(NEED_CODE_CHANGES)
+        elif state == "APPROVED":
+            if AWAITING_REVIEW in labels:
+                api.remove_label(AWAITING_REVIEW)
+
 
 handler_interface = StatusUpdateHandler

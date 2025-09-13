@@ -1,0 +1,30 @@
+{
+  "expected": {
+    "labels": [
+      "S-needs-code-changes"
+    ]
+  }, 
+  "initial": {
+    "labels": [
+      "S-awaiting-review"
+    ]
+  }, 
+  "payload": {
+    "number": 7076, 
+    "review": {
+      "state": "REQUEST_CHANGES"
+    },
+    "pull_request": {
+      "mergeable": true,
+      "base": {
+        "repo": {
+          "owner": {
+            "login": "servo"
+          }, 
+          "name": "servo"
+        }
+      }
+    }, 
+    "action": "submitted"
+  }
+}

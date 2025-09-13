@@ -15,6 +15,7 @@ _payload_actions = {
     'enqueued': 'on_pr_enqueued',
     'dequeued': 'on_pr_dequeued',
     'ready_for_review': 'on_pr_ready_for_review',
+    'submitted': 'on_review_submitted',
 }
 
 
@@ -41,6 +42,9 @@ class EventHandler:
         pass
 
     def on_issue_labeled(self, api, payload):
+        pass
+
+    def on_review_submitted(self, api, payload):
         pass
 
     def handle_payload(self, api, payload):

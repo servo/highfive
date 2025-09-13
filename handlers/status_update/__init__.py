@@ -51,6 +51,9 @@ def handle_custom_labels(api, event):
 
 
 def update_rebase_status(api, payload):
+    if "pull_request" not in payload:
+        return
+
     mergeable = payload['pull_request']['mergeable']
 
     # If mergeable is null, the data wasn't available yet.
@@ -64,8 +67,16 @@ def update_rebase_status(api, payload):
         api.add_label(NEED_REBASE)
 
 
+def is_draft_pr(payload):
+    return "pull_request" in payload and \
+        payload["pull_request"]["draft"] == True # noqa
+
+
 class StatusUpdateHandler(EventHandler):
     def on_pr_opened(self, api, payload):
+        if is_draft_pr(payload):
+            return
+
         labels = api.get_labels()
         if AWAITING_REVIEW not in labels:
             api.add_label(AWAITING_REVIEW)
@@ -73,6 +84,9 @@ class StatusUpdateHandler(EventHandler):
         handle_custom_labels(api, 'opened')
 
     def on_pr_updated(self, api, payload):
+        if is_draft_pr(payload):
+            return
+
         clear_pr_labels(api)
         api.add_label(AWAITING_REVIEW)
         update_rebase_status(api, payload)
@@ -80,7 +94,8 @@ class StatusUpdateHandler(EventHandler):
 
     def on_pr_closed(self, api, payload):
         handle_custom_labels(api, 'closed')
-        if "pull_request" in payload and payload['pull_request']['merged']:
+        if "pull_request" in payload and \
+           payload['pull_request']['merged'] == True: # noqa
             api.remove_label(AWAITING_MERGE)
             handle_custom_labels(api, 'merged')
 

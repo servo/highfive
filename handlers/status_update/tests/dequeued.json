@@ -1,12 +1,15 @@
 {
   "expected": {
+    "labels": ["S-tests-failed"]
+  }, 
+  "initial": {
     "labels": [
-      "S-awaiting-review"
+      "S-awaiting-merge"
     ]
   }, 
-  "initial": {}, 
   "payload": {
-    "number": 7076, 
+    "number": 7062,
+    "reason": "CI_FAILURE",
     "pull_request": {
       "mergeable": true,
       "base": {
@@ -18,6 +21,6 @@
         }
       }
     }, 
-    "action": "opened"
+    "action": "dequeued"
   }
 }

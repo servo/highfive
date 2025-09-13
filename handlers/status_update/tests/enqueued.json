@@ -1,14 +1,20 @@
 {
   "expected": {
     "labels": [
-      "S-awaiting-review"
+      "S-awaiting-merge"
     ]
   }, 
-  "initial": {}, 
+  "initial": {
+    "labels": [
+      "S-needs-code-changes", 
+      "S-tests-failed", 
+      "S-awaiting-merge",
+      "S-needs-rebase"
+    ]
+  }, 
   "payload": {
-    "number": 7076, 
+    "number": 7062, 
     "pull_request": {
-      "mergeable": true,
       "base": {
         "repo": {
           "owner": {
@@ -18,6 +24,6 @@
         }
       }
     }, 
-    "action": "opened"
+    "action": "enqueued"
   }
 }

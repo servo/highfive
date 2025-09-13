@@ -1,14 +1,17 @@
 {
   "expected": {
+    "labels": ["S-needs-rebase"]
+  }, 
+  "initial": {
     "labels": [
-      "S-awaiting-review"
+      "S-awaiting-merge"
     ]
   }, 
-  "initial": {}, 
   "payload": {
-    "number": 7076, 
+    "number": 7062,
+    "reason": "MERGE_CONFLICT",
     "pull_request": {
-      "mergeable": true,
+      "mergeable": false,
       "base": {
         "repo": {
           "owner": {
@@ -18,6 +21,6 @@
         }
       }
     }, 
-    "action": "opened"
+    "action": "dequeued"
   }
 }

@@ -80,6 +80,7 @@ def run_tests(tests, warn=True, overwrite=False):
         eventhandler.reset_test_state()
 
         try:
+            # print(test["filename"])
             initial, expected, = test['initial'], test['expected']
             wrapper = test['wrapper']
             payload = wrapper.json['payload']

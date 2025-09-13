@@ -124,12 +124,12 @@ class StatusUpdateHandler(EventHandler):
         update_rebase_status(api, payload)
         labels = api.get_labels()
         state = payload["review"]["state"]
-        if state == "REQUEST_CHANGES":
+        if state == "changes_requested":
             if AWAITING_REVIEW in labels:
                 api.remove_label(AWAITING_REVIEW)
             if NEED_CODE_CHANGES not in labels:
                 api.add_label(NEED_CODE_CHANGES)
-        elif state == "APPROVED":
+        elif state == "approved":
             if AWAITING_REVIEW in labels:
                 api.remove_label(AWAITING_REVIEW)
 

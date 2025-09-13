@@ -12,7 +12,7 @@
   "payload": {
     "number": 7076, 
     "review": {
-      "state": "REQUEST_CHANGES"
+      "state": "changes_requested"
     },
     "pull_request": {
       "mergeable": true,

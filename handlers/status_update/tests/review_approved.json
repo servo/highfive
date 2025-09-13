@@ -11,7 +11,7 @@
   "payload": {
     "number": 7076, 
     "review": {
-      "state": "APPROVED"
+      "state": "approved"
     },
     "pull_request": {
       "mergeable": true,

@@ -54,7 +54,7 @@ def update_rebase_status(api, payload):
     if "pull_request" not in payload:
         return
 
-    mergeable = payload['pull_request']['mergeable']
+    mergeable = payload['pull_request'].get('mergeable', None)
 
     # If mergeable is null, the data wasn't available yet.
     # Once it is, mergeable will be either true or false.

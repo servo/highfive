@@ -23,6 +23,9 @@ def build_message(mentions):
 
 class WatchersHandler(EventHandler):
     def on_pr_opened(self, api, payload):
+        if "pull_request" not in payload:
+            return
+
         user = payload['pull_request']['user']['login']
 
         watchers = get_people_from_config(api, WATCHERS_CONFIG_FILE)

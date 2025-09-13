@@ -92,6 +92,12 @@ class StatusUpdateHandler(EventHandler):
         update_rebase_status(api, payload)
         handle_custom_labels(api, 'updated')
 
+    def on_pr_ready_for_review(self, api, payload):
+        clear_pr_labels(api)
+        api.add_label(AWAITING_REVIEW)
+        update_rebase_status(api, payload)
+        handle_custom_labels(api, 'ready')
+
     def on_pr_closed(self, api, payload):
         handle_custom_labels(api, 'closed')
         if "pull_request" in payload and \

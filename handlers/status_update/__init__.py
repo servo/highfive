@@ -74,7 +74,7 @@ def is_draft_pr(payload):
 
 class StatusUpdateHandler(EventHandler):
     def on_pr_opened(self, api, payload):
-        if is_draft_pr(payload):
+        if "pull_request" not in payload or is_draft_pr(payload):
             return
 
         labels = api.get_labels()

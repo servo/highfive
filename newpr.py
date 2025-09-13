@@ -265,7 +265,7 @@ def extract_globals_from_payload(payload):
         if "number" in payload:
             issue = str(payload["number"])
         else:
-            str(payload["pull_request"]["number"])
+            issue = str(payload["pull_request"]["number"])
     return (owner, repo, issue)
 
 

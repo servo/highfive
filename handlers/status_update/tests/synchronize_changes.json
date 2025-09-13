@@ -6,6 +6,7 @@
   "payload": {
     "number": 7062,
     "pull_request": {
+      "mergeable": true,
       "base": {
         "repo": {
           "owner": {

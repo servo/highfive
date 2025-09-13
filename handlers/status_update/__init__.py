@@ -6,6 +6,11 @@ import time
 
 from eventhandler import EventHandler
 
+AWAITING_MERGE = "S-awaiting-merge"
+AWAITING_REVIEW = "S-awaiting-review"
+NEED_CODE_CHANGES = "S-needs-code-changes"
+NEED_REBASE = "S-needs-rebase"
+TESTS_FAILED = "S-tests-failed"
 
 config = ConfigParser()
 config.optionxform = str  # Be case sensitive
@@ -19,30 +24,17 @@ config = {
 # TODO(aneeshusa): Add checking of config option validity
 
 
-def manage_pr_state(api, payload):
+def clear_pr_labels(api):
     labels = api.get_labels()
 
     for label in [
-        "S-awaiting-merge",
-        "S-tests-failed",
-        "S-needs-code-changes"
+        AWAITING_MERGE,
+        TESTS_FAILED,
+        NEED_CODE_CHANGES,
+        NEED_REBASE,
     ]:
         if label in labels:
             api.remove_label(label)
-    if "S-awaiting-review" not in labels:
-        api.add_label("S-awaiting-review")
-
-    if payload["action"] == "synchronize" and "S-needs-rebase" in labels:
-        mergeable = payload['pull_request']['mergeable']
-        # If mergeable is null, the data wasn't available yet.
-        # Once it is, mergeable will be either true or false.
-        while mergeable is None:
-            time.sleep(1)  # wait for GitHub to finish determine mergeability
-            pull_request = api.get_pull()
-            mergeable = pull_request['mergeable']
-
-        if mergeable:
-            api.remove_label("S-needs-rebase")
 
 
 def handle_custom_labels(api, event):
@@ -58,20 +50,54 @@ def handle_custom_labels(api, event):
             api.add_label(label)
 
 
+def update_rebase_status(api, payload):
+    mergeable = payload['pull_request']['mergeable']
+
+    # If mergeable is null, the data wasn't available yet.
+    # Once it is, mergeable will be either true or false.
+    while mergeable is None:
+        time.sleep(1)  # wait for GitHub to finish determine mergeability
+        pull_request = api.get_pull()
+        mergeable = pull_request['mergeable']
+
+    if mergeable == False: # noqa
+        api.add_label(NEED_REBASE)
+
+
 class StatusUpdateHandler(EventHandler):
     def on_pr_opened(self, api, payload):
-        manage_pr_state(api, payload)
+        labels = api.get_labels()
+        if AWAITING_REVIEW not in labels:
+            api.add_label(AWAITING_REVIEW)
+        update_rebase_status(api, payload)
         handle_custom_labels(api, 'opened')
 
     def on_pr_updated(self, api, payload):
-        manage_pr_state(api, payload)
+        clear_pr_labels(api)
+        api.add_label(AWAITING_REVIEW)
+        update_rebase_status(api, payload)
         handle_custom_labels(api, 'updated')
 
     def on_pr_closed(self, api, payload):
         handle_custom_labels(api, 'closed')
         if "pull_request" in payload and payload['pull_request']['merged']:
-            api.remove_label("S-awaiting-merge")
+            api.remove_label(AWAITING_MERGE)
             handle_custom_labels(api, 'merged')
+
+    def on_pr_enqueued(self, api, payload):
+        clear_pr_labels(api)
+        api.add_label(AWAITING_MERGE)
+        handle_custom_labels(api, 'enqueued')
+
+    def on_pr_dequeued(self, api, payload):
+        labels = api.get_labels()
+        update_rebase_status(api, payload)
+        if payload["reason"] != "MERGE":
+            if AWAITING_MERGE in labels:
+                api.remove_label(AWAITING_MERGE)
+            if payload["reason"] == "CI_FAILURE":
+                api.add_label(TESTS_FAILED)
+        handle_custom_labels(api, 'dequeued')
 
 
 handler_interface = StatusUpdateHandler

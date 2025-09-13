@@ -97,6 +97,8 @@ class GithubAPIProvider(APIProvider):
         self.token = token
         self._labels = None
         self._diff = None
+        self.diff_url = None
+        self.pull_url = None
         if "issue" in payload and "pull_request" in payload["issue"]:
             self.diff_url = payload["issue"]["pull_request"]["diff_url"]
             self.pull_url = payload["issue"]["pull_request"]["url"]
@@ -218,6 +220,8 @@ class GithubAPIProvider(APIProvider):
         return self._labels
 
     def get_diff(self):
+        if not self.diff_url:
+            return ''
         if self._diff:
             return self._diff
         self._diff = self.api_req("GET", self.diff_url)['body'].decode('utf-8')

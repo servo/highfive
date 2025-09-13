@@ -13,7 +13,7 @@ from newpr import APIProvider, handle_payload
 
 class TestAPIProvider(APIProvider):
     def __init__(self, payload, user, new_contributor, labels, assignee,
-                 diff=b"", pull_request=""):
+                 diff=None, pull_request=""):
         super(TestAPIProvider, self).__init__(payload, user)
         self.new_contributor = new_contributor
         self.comments_posted = []
@@ -39,6 +39,8 @@ class TestAPIProvider(APIProvider):
         return self.labels
 
     def get_diff(self):
+        if not self.diff:
+            return ''
         return self.diff.decode('utf-8')
 
     def get_pull(self):
@@ -57,7 +59,7 @@ def create_test(filename, initial, expected,
     initial_values = {
         'new_contributor': initial.get('new_contributor', False),
         'labels': initial.get('labels', []),
-        'diff': initial.get('diff', '').encode('utf-8'),
+        'diff': initial.get('diff', None),
         'pull_request': initial.get('pull_request', ''),
         'assignee': initial.get('assignee', None),
     }
@@ -81,12 +83,16 @@ def run_tests(tests, warn=True, overwrite=False):
             initial, expected, = test['initial'], test['expected']
             wrapper = test['wrapper']
             payload = wrapper.json['payload']
+            if initial['diff']:
+                diff = initial['diff'].encode('utf-8')
+            else:
+                diff = None
             api = TestAPIProvider(payload,
                                   'highfive',
                                   initial['new_contributor'],
                                   initial['labels'],
                                   initial['assignee'],
-                                  initial['diff'],
+                                  diff,
                                   initial['pull_request'])
             handle_payload(api, payload, [handler])
 

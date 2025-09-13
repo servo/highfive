@@ -1,0 +1,22 @@
+{
+  "expected": [
+    {
+      "comments": 0
+    }
+  ], 
+  "initial": [
+    {}
+  ], 
+  "payload": {
+    "issue": {
+      "number": 7076
+    },
+    "repository": {
+      "owner": {
+        "login": ""
+      },
+      "name": ""
+    },
+    "action": "opened"
+  }
+}

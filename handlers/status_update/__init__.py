@@ -58,7 +58,7 @@ def update_rebase_status(api, payload):
 
     # If mergeable is null, the data wasn't available yet.
     # Once it is, mergeable will be either true or false.
-    while mergeable == None:
+    while mergeable == None: # noqa
         time.sleep(1)  # wait for GitHub to finish determine mergeability
         pull_request = api.get_pull()
         mergeable = pull_request['mergeable']

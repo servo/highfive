@@ -23,6 +23,7 @@ class MissingTestHandler(EventHandler):
         ]
 
     def on_pr_opened(self, api, payload):
+        return
         components_changed = set()
 
         for filepath in api.get_changed_files():

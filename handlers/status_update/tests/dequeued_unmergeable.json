@@ -11,6 +11,7 @@
     "number": 7062,
     "reason": "MERGE_CONFLICT",
     "pull_request": {
+      "draft": false,
       "mergeable": false,
       "base": {
         "repo": {

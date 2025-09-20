@@ -49,6 +49,8 @@ class EventHandler:
 
     def handle_payload(self, api, payload):
         def callback(action):
+            if "pull_request" in payload and payload["pull_request"]["draft"] == True: # noqa
+                return
             getattr(self, _payload_actions[action])(api, payload)
         payload_action = payload['action']
         linear_search(_payload_actions, payload_action, callback)

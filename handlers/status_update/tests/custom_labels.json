@@ -12,6 +12,7 @@
   "payload": {
     "number": 659,
     "pull_request": {
+      "draft": false,
       "base": {
         "repo": {
           "owner": {

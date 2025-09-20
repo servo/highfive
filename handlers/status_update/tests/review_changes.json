@@ -15,6 +15,7 @@
       "state": "changes_requested"
     },
     "pull_request": {
+      "draft": false,
       "mergeable": true,
       "base": {
         "repo": {

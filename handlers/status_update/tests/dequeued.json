@@ -11,6 +11,7 @@
     "number": 7062,
     "reason": "CI_FAILURE",
     "pull_request": {
+      "draft": false,
       "mergeable": true,
       "base": {
         "repo": {

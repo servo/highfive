@@ -54,6 +54,7 @@
   "payload": {
     "number": 10355,
     "pull_request": {
+      "draft": false,
       "base": {
         "repo": {
           "owner": {

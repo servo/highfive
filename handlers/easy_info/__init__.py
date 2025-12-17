@@ -19,7 +19,7 @@ RESPONSE_OK = ('Hey @%s! Thanks for your interest in working on this issue.'
 
 class EasyInfoHandler(EventHandler):
     def on_issue_labeled(self, api, payload):
-        if payload['label']['name'].lower() == 'e-less complex':
+        if payload['label']['name'].lower() == 'e-less-complex':
             api.post_comment(MSG % (api.user, ASSIGN_MSG))
 
     def on_new_comment(self, api, payload):

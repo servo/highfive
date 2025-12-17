@@ -1,6 +1,6 @@
 {
   "expected": {
-    "comments": 1
+    "comments": 0
   }, 
   "initial": {
     "diff": "+ unsafe fn foo()"

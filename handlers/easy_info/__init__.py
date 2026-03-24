@@ -8,7 +8,9 @@ MSG = ('Hi! If you have any questions regarding this issue, feel free to make'
        ' a comment here, or ask it in '
        '[Zulip](https://servo.zulipchat.com/).\n\n'
        'If you intend to work on this issue, then add `@%s: %s`'
-       ' to your comment, and I\'ll assign this to you. :smile:')
+       ' to your comment, and I\'ll assign this to you. :smile:\n\n'
+       'Please read our [policy on AI contributions](https://book.servo.org/contributing/getting-started.html#ai-contributions) '  # noqa: E501
+       'before getting started.')
 
 RESPONSE_FAIL = ('It looks like this has already been assigned to someone.'
                  ' I\'ll leave the decision to a core contributor.')

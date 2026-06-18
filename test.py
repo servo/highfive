@@ -22,6 +22,7 @@ class TestAPIProvider(APIProvider):
         self.diff = diff
         self.pull_request = pull_request
         self.repo = str(self.repo)      # workaround for testing
+        self.reactions = []
 
     def is_new_contributor(self, username):
         return self.new_contributor
@@ -31,6 +32,9 @@ class TestAPIProvider(APIProvider):
 
     def add_label(self, label):
         self.labels += [label]
+
+    def add_reaction(self, comment_id, reaction):
+        self.reactions += [reaction]
 
     def remove_label(self, label):
         self.labels.remove(label)
@@ -107,6 +111,9 @@ def run_tests(tests, warn=True, overwrite=False):
             if 'assignee' in expected:
                 assert api.assignee == expected['assignee'], \
                     "%s == %s" % (api.assignee, expected['assignee'])
+            if 'reactions' in expected:
+                assert len(api.reactions) == expected['reactions'], \
+                    "%s == %s" % (len(api.reactions), expected['reactions'])
 
             # If this is the last test in the file, then it's time for cleanup
             if test['clean']:

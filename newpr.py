@@ -86,6 +86,7 @@ class GithubAPIProvider(APIProvider):
     BASE_URL = "https://api.github.com/repos/"
     contributors_url = BASE_URL + "%s/%s/contributors?per_page=400"
     post_comment_url = BASE_URL + "%s/%s/issues/%s/comments"
+    add_reaction_url = BASE_URL + "%s/%s/issues/comments/%s/reactions"
     collaborators_url = BASE_URL + "%s/%s/collaborators"
     issue_url = BASE_URL + "%s/%s/issues/%s"
     get_label_url = BASE_URL + "%s/%s/issues/%s/labels"
@@ -169,6 +170,16 @@ class GithubAPIProvider(APIProvider):
             if not links or 'next' not in links:
                 return True
             url = links['next']
+
+    def add_reaction(self, comment_id, reaction):
+        url = self.add_reaction_url % (self.owner, self.repo, comment_id)
+        try:
+            self.api_req("POST", url, {"content": reaction})
+        except error.HTTPError as e:
+            if e.code == 201:
+                pass
+            else:
+                raise e
 
     def post_comment(self, body):
         url = self.post_comment_url % (self.owner, self.repo, self.issue)

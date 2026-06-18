@@ -1,0 +1,26 @@
+{
+    "initial": {},
+    "expected": {
+        "reactions": 1
+    },
+    "payload": {
+        "repository": {
+            "owner": {
+                "login": "servo"
+            },
+            "name": "highfive"
+        },
+        "action": "created",
+        "issue": {
+            "number": 130,
+            "state": "open"
+        },
+        "comment": {
+            "user": {
+                "login": "someone"
+            },
+            "body": "@highfive monthly update answers!",
+            "id": 12
+        }
+    }
+}

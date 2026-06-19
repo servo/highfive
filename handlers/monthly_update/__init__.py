@@ -2,7 +2,7 @@ from eventhandler import EventHandler
 
 import re
 
-REPLY = "monthly update"
+REPLY = "monthly update answer"
 
 REACTION = "eyes"
 

@@ -30,9 +30,6 @@ class MonthlyUpdateHandler(EventHandler):
             api.post_comment(MSG % (api.user, REPLY))
 
     def on_new_comment(self, api, payload):
-        if payload['issue']['state'] != 'open':
-            return
-
         user = payload['comment']['user']['login']
         if user == api.user:    # ignore comments from self
             return              # (since `MSG` already has `REPLY`)

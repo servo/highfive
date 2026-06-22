@@ -8,7 +8,7 @@ REACTION = "eyes"
 
 MSG = ('Someone thinks this change could be added to the monthly blog '
        'post! To help with this, we need someone to answer the following '
-       'qurstions: :smile:\n\n'
+       'questions: :smile:\n\n'
        '1. Who is most impacted by this change: users, '
        'Servo developers, embedders, or some other group?\n'
        '1. What observable difference does this change make?\n'

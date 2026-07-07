@@ -3,6 +3,8 @@ from eventhandler import EventHandler
 import re
 
 REPLY = "monthly update answer"
+COMMAND = "monthly update"
+LABEL = "monthly update"
 
 REACTION = "eyes"
 
@@ -26,7 +28,7 @@ MSG = ('Someone thinks this change could be added to the monthly blog '
 
 class MonthlyUpdateHandler(EventHandler):
     def on_issue_labeled(self, api, payload):
-        if payload['label']['name'].lower() == 'monthly update':
+        if payload['label']['name'].lower() == LABEL:
             api.post_comment(MSG % (api.user, REPLY))
 
     def on_new_comment(self, api, payload):
@@ -38,6 +40,8 @@ class MonthlyUpdateHandler(EventHandler):
 
         if re.search(r'@%s[: ]*%s' % (api.user, REPLY), str(msg)):
             api.add_reaction(payload['comment']['id'], REACTION)
+        elif re.search(r'@%s[: ]*%s' % (api.user, COMMAND), str(msg)):
+            api.add_label(LABEL)
 
 
 handler_interface = MonthlyUpdateHandler
